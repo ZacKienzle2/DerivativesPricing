@@ -1,0 +1,780 @@
+%packages
+\usepackage{import}
+\usepackage[utf8]{inputenc}
+\PassOptionsToPackage{formats}{listings}
+\usepackage[margin=1in, bindingoffset=0.5cm, headheight=15pt, twoside]{geometry}
+\usepackage{setspace}
+\usepackage{wrapfig}
+\usepackage{boxedminipage}
+\usepackage{pifont}
+\usepackage{euscript}
+\usepackage{dcolumn}
+\usepackage{float}
+\usepackage{fancybox}
+\usepackage{fancyhdr}
+\usepackage{rotating}
+\usepackage{multirow}
+\usepackage{latexsym}
+\usepackage{amsmath,amssymb,mathtools,mathrsfs}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{mparhack} % Fix \margref
+\usepackage{dsfont}
+\usepackage[style=authoryear, backend=biber, natbib=true, doi=true]{biblatex}
+\usepackage{hyperref}
+\usepackage[nameinlink]{cleveref} % needed for \crefname
+\usepackage{xurl}
+\usepackage{multicol}
+\usepackage[shortlabels]{enumitem}
+\usepackage{siunitx}
+\usepackage{cancel}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepgfplotslibrary{external}
+\tikzexternalize[prefix=plotting/cache/]
+\tcbset{shield externalize}
+\usetikzlibrary{matrix, calc, positioning, arrows.meta, intersections, chains, shapes.geometric, patterns, fpu}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\tcbuselibrary{listings, skins}
+\usepgfplotslibrary{fillbetween}
+
+\usepackage[font=small,labelfont=bf,margin=10pt]{caption}
+\usepackage{subcaption}
+\numberwithin{equation}{section}
+\usepackage[acronym, toc, nonumberlist]{glossaries}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[LE]{\scshape\nouppercase{\leftmark}}
+\fancyhead[RO]{\bfseries\nouppercase{\rightmark}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\renewcommand{\subsectionmark}[1]{\markright{#1}}
+
+\usepackage[all]{nowidow}
+% \g@addto@macro\bfseries{\boldmath} % avoid primitive TeX; use \boldmath locally if needed
+\usepackage{titlesec}
+\usepackage{etoolbox}
+\pretocmd{\section}{\clearpage}{}{}
+\assignpagestyle{\part}{empty}
+
+\titleformat{\part}[display]
+  {\thispagestyle{empty}\null\vfill\centering\normalfont\huge\bfseries}
+  {\partname\ \thepart}
+  {20pt}
+  {\titlerule[1pt]\vspace{20pt}\Huge}
+  [\vfill\clearpage]
+
+\titlespacing*{\part}{0pt}{0pt}{0pt}
+\assignpagestyle{\part}{empty} % Double safety
+
+\titleformat{\section}
+  {\color{darkblue}\normalfont\Large\bfseries}
+  {\thesection}
+  {1em}
+  {}
+
+\titlespacing*{\section}{0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+
+\titleformat{\subsection}
+  {\color{darkblue}\normalfont\large\bfseries}
+  {\thesubsection}
+  {1em}
+  {}
+\titlespacing*{\subsection}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\usepackage{libertine}
+\usepackage[libertine]{newtxmath}
+\usepackage[varqu,scaled=0.95]{inconsolata}
+
+\usepackage{nicefrac}
+\usepackage{varwidth}
+\usepackage{tabularx}
+\usepackage{booktabs}      % For \toprule, \midrule, \bottomrule
+% \usepackage{tabularx}    % duplicate removed
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{ragged2e}
+% \usepackage{caption}     % duplicate removed; already loaded above
+\usepackage{threeparttable}
+\usepackage{tablefootnote}
+\usepackage{epigraph}
+\usepackage{lettrine}
+\pgfplotsset{compat=1.18}
+\definecolor{ltgray}{HTML}{F2F2F2}
+\definecolor{mdgray}{HTML}{E3E3E3}
+
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.55}
+\definecolor{lightblue}{rgb}{0.93, 0.96, 1.0}
+
+\newcommand{\myurl}[1]{\textcolor{blue}{\url{#1}}}
+\newcommand{\myhref}[2]{\textcolor{blue}{\href{#1}{#2}}}
+\newcommand{\preface}[1][Preface]{\chapter*{#1}\markboth{#1}{#1}}
+\newcommand{\code}[1]{{\normalfont\ttfamily\hyphenchar\font=-1 #1}}
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\newcommand{\str}[1]{{{\tt \textquotesingle}}{\ttfamily#1}{\tt \textquotesingle}}
+% Safer inline math macro (available early for downstream macros)
+\newcommand{\mathem}[1]{\(\boldsymbol{#1}\)}
+
+\usepackage{mathtools}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+
+% Automatic sizing for brackets: use \E*{} for auto-size, \E{} for standard
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+\DeclarePairedDelimiter\bra{\langle}{\rvert}
+\DeclarePairedDelimiter\ket{\lvert}{\rangle}
+\DeclarePairedDelimiterX\braket[2]{\langle}{\rangle}{#1 \delimsize\vert #2}
+\DeclarePairedDelimiterX\inner[2]{\langle}{\rangle}{#1, #2}
+\DeclarePairedDelimiter\set{\{}{\}}
+
+%commands
+\newcommand{\bb}[1]{\mathbb{#1}}
+\newcommand{\mathdefault}[1]{#1}
+\newcommand{\X}{\textcolor{blue}{\mathbf{X}}} %model matrix
+\newcommand{\Y}{\textcolor{blue}{\mathbf{Y}}} %output matrix
+\newcommand{\indsim}{\stackrel{\mathrm{ind}}{\sim}}
+\newcommand{\simind}{\indsim}
+\newcommand{\simindt}{{\:{\sim}_{\mathrm{ind}}\:}}
+\newcommand{\tilda}{\mathem{\sim}}
+\newcommand{\blar}{\textcolor{black}{>}}     % fixed missing braces
+\newcommand{\plar}{\textcolor{black}{>>}}
+\newcommand{\blpl}{\textcolor{black}{+}}
+\newcommand{\sgn}{\mathrm{sgn}}
+\newcommand{\la}{\leftarrow}
+\newcommand{\st}{\: : \:} % such that
+\newcommand{\otoprule}{\midrule[\heavyrulewidth]} % remove spaces in command name
+\newcommand{\Span}[1]{\mathrm{Span}\left\{ #1 \right\}}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\dd}{\partial}
+\newcommand{\cZ}{\mathcal{Z}}
+\newcommand{\Shan}{\EuScript{H}}
+\newcommand{\KL}{\EuScript{D}}
+\newcommand{\El}{\EuScript{E}}
+\newcommand{\MI}{\EuScript{M}} % mutual information
+\newcommand{\Lh}{\EuScript{L}} % likelihood
+\newcommand{\Fish}{\EuScript{I}}
+\newcommand{\Sc}{\EuScript{S}} % score function
+\newcommand{\bigO}{\mathcal{O}} % avoid \c in macro name here
+\newcommand{\btau}{\vect{\tau}}
+\newcommand{\bphi}{\vect{\phi}}
+\newcommand{\bbeta}{\vect{\beta}}
+\newcommand{\bepsilon}{\vect{\epsilon}}
+\newcommand{\bomega}{\vect{\omega}}
+\newcommand{\bmu}{\vect{\mu}}
+\newcommand{\bsig}{\vect{\sigma}}
+\newcommand{\lito}{$o$}
+% chktex 7
+\renewcommand{\v}[1]{\boldsymbol{#1}} % overrides accent intentionally
+\newcommand{\bS}{\v{S}}
+\newcommand{\bL}{\v{L}}
+\newcommand{\bl}{\mbox{\boldmath $\ell$}}
+\newcommand{\bs}{\v{s}}
+\newcommand{\bQ}{\v{Q}}
+\newcommand{\bG}{\v{G}}
+\newcommand{\bg}{\v{g}}
+\newcommand{\bSigma}{\mbox{\boldmath $\Sigma$}}
+\newcommand{\bB}{\v{B}}
+\newcommand{\bz}{\v{z}}
+\newcommand{\bincof}[2]{{{#1} \choose {#2}}}
+
+% Fallback for \mathbbm since bbm is removed
+\providecommand{\mathbbm}[1]{\mathds{#1}}
+
+\newcommand*\xbar[1]{%
+   \hbox{%
+     \vbox{%
+       \hrule height 0.8pt%
+       \kern0.3ex%
+       \hbox{%
+         \kern0em%
+         \ensuremath{#1}%
+         \kern0.0em%
+       }%
+     }%
+   }%
+}
+
+\newcommand{\T}{\top}
+\newcommand{\gr}{\nabla}
+\newcommand{\bK}{\v{K}}
+\newcommand{\bX}{\v{X}}
+\newcommand{\bx}{\v{x}}
+\newcommand{\bk}{\v{k}}
+\newcommand{\bq}{\v{q}}
+\newcommand{\be}{\v{e}}
+\newcommand{\bF}{\v{F}}
+\newcommand{\br}{\v{r}}
+\newcommand{\by}{\v{y}}
+\newcommand{\bZ}{\v{Z}}
+\newcommand{\bu}{\v{u}}
+\newcommand{\bU}{\v{U}}
+\newcommand{\bY}{\v{Y}}
+\newcommand{\bP}{\v{P}}
+\newcommand{\bR}{\v{R}}
+\newcommand{\bV}{\v{V}}
+\newcommand{\bW}{\v{W}}
+\newcommand{\bT}{\v{T}}
+\newcommand{\bt}{\v{t}}
+
+\newcommand{\dotsim}{\stackrel{\centerdot}{\sim}}
+\renewcommand{\le}{\leq}
+\renewcommand{\ge}{\geq}
+\renewcommand{\tilde}{\widetilde}
+\newcommand{\bnu}{\vect{\nu}}
+\newcommand{\btheta}{\vect{\theta}}
+\newcommand{\blambda}{\vect{\lambda}}
+\newcommand{\balpha}{\vect{\alpha}}
+\newcommand{\halmos}{\vspace{3mm}\hfill\(\Box\)}
+
+\newcommand{\bE}{\v{E}}
+\newcommand{\ba}{\v{a}}
+\newcommand{\bh}{\v{h}}
+\newcommand{\bfb}{\v{b}}
+\newcommand{\bA}{\v{A}}
+\newcommand{\bM}{\v{M}}
+\newcommand{\bN}{\v{N}}
+\newcommand{\bc}{\v{c}}
+\newcommand{\bbf}{\v{f}}
+\newcommand{\bd}{\v{d}}
+\newcommand{\bD}{\v{D}}
+\newcommand{\bw}{\v{w}}
+
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\var}{\Var}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\cov}{\Cov}
+
+\newcommand{\Supp}{\mathrm{Supp}}
+\newcommand{\matlab}{\mathrm{M}\mathrm{{\scriptstyle ATLAB}}}
+
+\newcommand{\bp}{\v{p}}
+\newcommand{\bC}{\v{C}}
+\newcommand{\bii}{\v{i}}
+\newcommand{\bjj}{\v{j}}
+\newcommand{\bII}{\v{I}}
+\newcommand{\bv}{\v{v}}
+
+\renewcommand{\epsilon}{\varepsilon}
+% \renewcommand{\rho}{\varrho}
+\renewcommand{\log}{\ln}
+\renewcommand{\hat}{\widehat}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+
+\newcommand{\argmax}{\mathop{\rm argmax}}
+\newcommand{\argmin}{\mathop{\rm argmin}}
+
+\newcommand{\iid}{\text{iid }}
+
+% Distributions
+\newcommand{\Ber}{{\sf Ber}}
+\newcommand{\ber}{\Ber}
+
+\newcommand{\Erl}{{\sf Erl}}
+\newcommand{\erl}{\Erl}
+
+\newcommand{\Bin}{{\sf Bin}}
+\newcommand{\bin}{\Bin}
+
+\newcommand{\Cauchy}{{\sf Cauchy}}
+\newcommand{\cauchy}{\Cauchy}
+
+\newcommand{\NegBin}{{\sf NegBin}}
+\newcommand{\negbin}{\NegBin}
+\newcommand{\negBin}{\NegBin}
+\newcommand{\Negbin}{\NegBin}
+\newcommand{\nbin}{\NegBin}
+\newcommand{\Nbin}{\NegBin}
+\newcommand{\NBin}{\NegBin}
+
+\newcommand{\Mnom}{{\sf Mnom}}
+\newcommand{\mnom}{\Mnom}
+
+\newcommand{\Geo}{{\sf Geom}}
+\newcommand{\geo}{\Geo}
+\newcommand{\Geom}{\Geo}
+\newcommand{\geom}{\Geo}
+\newcommand{\G}{\Geo}
+\newcommand{\NE}{{\sf NE}}
+
+\newcommand{\Hyp}{{\sf Hyp}}
+
+\newcommand{\Poi}{{\sf Poi}}
+\newcommand{\poi}{\Poi}
+\newcommand{\Po}{\Poi}
+\newcommand{\po}{\Poi}
+
+% \newcommand{\U}{{\sf Unif}}
+\newcommand{\U}{\EuScript{U}}
+
+\newcommand{\Ex}{{\sf Exp}}
+\newcommand{\ex}{\Ex}
+
+\newcommand{\SNor}{\EuScript{N}(0,1)}
+\newcommand{\Nor}{\EuScript{N}}
+\newcommand{\nor}{\Nor}
+
+\newcommand{\Pareto}{{\sf Pareto}}
+\newcommand{\pareto}{\Pareto}
+\newcommand{\ParetoI}{{\sf ParetoI}}
+
+\newcommand{\NegHyp}{{\sf NegHyp}}
+
+\newcommand{\DiscPhase}{{\sf DPH}}
+\newcommand{\ContPhase}{{\sf PH}}
+
+\newcommand{\Fdist}{{\sf F}}
+
+\newcommand{\EVI}{{\sf ExValueI}}
+\newcommand{\EVII}{{\sf ExValueII}}
+\newcommand{\EVIII}{{\sf ExValueIII}}
+\newcommand{\Gumbel}{{\sf Gumbel}}
+\newcommand{\Frechet}{\text{\sf Fr\'{e}chet}}
+\newcommand{\gumbel}{\Gumbel}
+\newcommand{\frechet}{\Frechet}
+
+\newcommand{\IGauss}{\Wald}
+\newcommand{\InvGauss}{\Wald}
+\newcommand{\Wald}{{\sf Wald}}
+
+\newcommand{\Logistic}{{\sf Logistic}}
+\newcommand{\logistic}{\Logistic}
+
+\newcommand{\LogN}{{\sf LogN}}
+
+\newcommand{\Ray}{{\sf Rayleigh}}
+
+\newcommand{\Stable}{{\sf Stable}}
+
+\newcommand{\Student}{{\sf t}}
+\newcommand{\student}{\Student}
+
+\newcommand{\vonMises}{{\sf vonMises}}
+
+\newcommand{\Dirichlet}{{\sf Dirichlet}}
+\newcommand{\dirichlet}{\Dirichlet}
+\newcommand{\Dir}{\Dirichlet}
+\newcommand{\dir}{\Dirichlet}
+
+\newcommand{\Gam}{{\sf Gamma}}
+\newcommand{\gam}{\Gam}
+
+\newcommand{\invgam}{{\sf InvGamma}}
+
+\newcommand{\Bet}{{\sf Beta}}
+\newcommand{\bet}{\Bet}
+
+\newcommand{\Weib}{{\sf Weib}}
+\newcommand{\weib}{\Weib}
+
+\newcommand{\DU}{{\sf DU}}
+
+\newcommand{\SE}{{\sf SExp}}
+
+\newcommand{\DE}{{\sf Laplace}}
+\newcommand{\DExp}{\DE}
+\newcommand{\Laplace}{\DE}
+\providecommand{\laplace}{\DE}
+
+\newcommand{\Arcsine}{{\sf Arcsine}}
+
+\newcommand{\Levy}{\text{\sf L\'{e}vy}}
+
+\newcommand{\Dist}{{\sf Dist}}
+
+\newcommand{\Wishart}{{\sf Wishart}}
+
+\newcommand{\Em}{\mathbb{E}}
+\newcommand{\Pm}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rbar}{\overline{\mathbb{R}}}
+
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cE}{\mathcal{E}}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+
+\newcommand{\scA}{\mathscr{A}}
+\newcommand{\scB}{\mathscr{B}}
+\newcommand{\scC}{\mathscr{C}}
+\newcommand{\scD}{\mathscr{D}}
+\newcommand{\scF}{\mathscr{F}}
+\newcommand{\scG}{\mathscr{G}}
+\newcommand{\scH}{\mathscr{H}}
+\newcommand{\scI}{\mathscr{I}}
+\newcommand{\scJ}{\mathscr{J}}
+\newcommand{\scL}{\mathscr{L}}
+\newcommand{\scM}{\mathscr{M}}
+\newcommand{\scP}{\mathscr{P}}
+\newcommand{\scS}{\mathscr{S}}
+\newcommand{\scR}{\mathscr{R}}
+\newcommand{\scU}{\mathscr{U}}
+\newcommand{\scE}{\mathscr{E}}
+\newcommand{\scT}{\mathscr{T}}
+\newcommand{\scV}{\mathscr{V}}
+\newcommand{\scW}{\mathscr{W}}
+\newcommand{\scX}{\mathscr{X}}
+\newcommand{\scY}{\mathscr{Y}}
+\newcommand{\scZ}{\mathscr{Z}}
+
+\newcommand{\gvn}{\,|\,}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+
+\newcommand{\convdistr}{\stackrel{d}{\longrightarrow}}
+\newcommand{\distrconv}{\convdistr}
+\newcommand{\distreq}{\stackrel{d}{=}}
+\newcommand{\eqdistr}{\distreq}
+
+\newcommand{\di}{\mathrm{d}}
+\newcommand{\tr}{\mathrm{tr}}
+
+\newcommand{\utterance}[1]{%
+  \begin{list}{}{\leftmargin\parindent\rightmargin0pt\listparindent0pt\parsep1ex\labelwidth0pt\labelsep0pt}%
+  \item[]\small\sf$\maltese$~#1%
+  \end{list}%
+}
+
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cM}{\mathcal{M}}
+
+\newcommand{\Prob}{\Pm}
+
+\newcommand{\cas}{\stackrel{\mathrm{a.s.}}{\longrightarrow}\:}
+
+\newcommand{\ra}{\rightarrow}
+\newcommand{\lra}{\leftrightarrow}
+\newcommand{\rar}{\rightarrow}
+\newcommand{\Rar}{\Rightarrow}
+\newcommand{\dar}{\downarrow}
+
+\newcommand{\chg}{\marginpar{*}}
+\newcommand{\Ito}{It\^{o}}
+
+\def\eps{\varepsilon}
+
+\newcommand{\matX}{\mathcal{X}}
+
+\newcommand{\I}{\mathds{1}} % requires dsfont
+\newcommand{\ii}{\mathrm{i}}
+
+\newcommand{\appr}{\text{\footnotesize appr.}}
+\newcommand{\approxsim}{\stackrel{\mathrm{approx.}}{\sim}}
+
+\newcommand{\iidsim}{\stackrel{\mathrm{iid}}{\sim}}
+\newcommand{\simiid}{\iidsim}
+\newcommand{\simiidt}{{\:{\sim}_{\mathrm{iid}}\:}}
+\newcommand{\diag}{\mathrm{diag}}
+
+\newcommand{\sech}{\mathrm{sech}}
+
+\newcommand{\chk}[1]{}
+\newcommand{\ver}{}
+
+\newcommand{\idef}{\stackrel{\mathrm{def}}{=}}
+
+\newcommand{\Corr}{\mathrm{Corr}}
+\newcommand{\corr}{\Corr}
+
+\newcommand{\bm}{\v{m}}
+
+\newcommand{\eC}{\EuScript{C}}
+
+\definecolor{beaubleu}{rgb}{0.26,0.31,0.61}
+\definecolor{beauvert}{rgb}{0.27,0.52,0.42}
+\definecolor{datacol}{rgb}{0.8, 0.33, 0.0} % keep one definition
+\definecolor{packcol}{rgb}{0.09, 0.45, 0.27}
+\definecolor{methcol}{rgb}{0.16, 0.32, 0.75}
+
+\usepackage{cprotect}
+\usepackage{textcomp}
+
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\dataset}[1]{\texttt{#1}}
+\newcommand{\datafr}[1]{\textcolor{datacol}{\bf \texttt{#1}}}
+\newcommand{\packagecap}[1]{\textcolor{packcol}{\bf \texttt{#1}}}
+\newcommand{\package}[1]{\lstset{basicstyle=\bfseries\ttfamily\color{packcol}}\lstinline{#1}}
+\newcommand{\method}[1]{\lstset{basicstyle=\bfseries\ttfamily\color{methcol}}\lstinline{#1}}
+% Fix malformed macro argument definition
+\newcommand{\atrr}[1]{\lstset{basicstyle=\bfseries\ttfamily\color{methcol}}\lstinline{#1}}
+\newcommand{\key}[1]{{\normalfont\texttt{\uppercase{#1}}}}
+\newcommand{\menu}[1]{\texttt{#1}}
+\newcommand{\menuentry}[1]{\texttt{#1}}
+
+\definecolor{outcol}{gray}{0.9}
+\definecolor{incol}{rgb}{0.80, 0.91, 0.98}
+
+\lstnewenvironment{Pin}{%
+  \lstset{
+    backgroundcolor=\color{incol},
+    belowskip=0pt,
+    mathescape,
+    xleftmargin=3pt,
+    xrightmargin=3pt,
+    frame=single,
+    framerule=0pt,
+    basicstyle=\footnotesize\ttfamily,
+    columns=fixed
+  }
+}{}
+
+\lstnewenvironment{Pout}{%
+  \lstset{
+    backgroundcolor=\color{outcol},
+    aboveskip=-2pt,
+    xleftmargin=4pt,
+    xrightmargin=4pt,
+    frame=single,
+    upquote,
+    framerule=1pt,
+    basicstyle=\footnotesize\ttfamily,
+    columns=fixed
+  }
+}{}
+
+\definecolor{applegreen}{rgb}{0.55, 0.41, 0.0}
+\definecolor{gray1}{rgb}{0.98, 0.98, 0.98}
+\definecolor{black}{rgb}{0, 0, 0}
+\definecolor{antique1}{rgb}{0.98, 0.92, 0.84}
+\definecolor{cream}{rgb}{1.0, 0.99, 0.82}
+\definecolor{darkpink}{rgb}{0.91, 0.33, 0.5}
+\definecolor{darkorchid}{rgb}{0.6, 0.2, 0.8}
+\definecolor{indigo}{rgb}{0.29, 0.0, 0.51}
+\definecolor{islamicgreen}{rgb}{0.0, 0.56, 0.0}
+\definecolor{vlgray}{gray}{0.9}
+\definecolor{lgray}{gray}{0.7}
+
+\newtcblisting{Pcode}[1]{%
+  breakable,
+  listing only,
+  colback=black!1!cream,
+  colframe=red!5!black,
+  colbacktitle=black,
+  enhanced,
+  attach boxed title to top center={xshift=-3cm,yshift=-2mm},
+  arc=0mm,
+  title={{\ttfamily\large #1}},
+  listing options={%
+    frame=line,
+    language=Python,
+    basicstyle=\footnotesize\ttfamily,
+    numbers=left,
+    numberstyle=\tiny\color{blue},
+    xleftmargin=5pt,
+    aboveskip=0pt,
+    columns=fixed,
+    basewidth=6pt,
+    stepnumber=1,
+    numbersep=7pt,
+    backgroundcolor=\color{cream},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    rulecolor=\color{black},
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    title=\lstname,
+    keywordstyle=\color{blue},
+    commentstyle=\color{islamicgreen},
+    stringstyle=\color{red},
+    morekeywords={np, random, seed, sqrt, randn, linspace, r_, cumsum, exp, cumprod, reshape, axis}
+  }
+}
+
+\newenvironment{PC}{%
+  \tcblisting{
+    breakable,listing only,
+    colback=cream, enhanced, sharpish corners, boxrule=1pt, after,
+    listing options={
+      language=Python,
+      basicstyle=\footnotesize\ttfamily,
+      numbers=none,
+      backgroundcolor=\color{cream},
+      xleftmargin=-10pt,
+      aboveskip=-4pt,
+      belowskip=-6pt,
+      columns=fixed,
+      basewidth=6pt,
+      showspaces=false,
+      showstringspaces=false,
+      showtabs=false,
+      tabsize=2,
+      breaklines=true,
+      breakatwhitespace=false,
+      keywordstyle=\color{blue},
+      upquote,
+      commentstyle=\color{islamicgreen},
+      stringstyle=\color{red},
+      morekeywords={np, random, seed, sqrt, randn, linspace, r_, cumsum, exp, cumprod, reshape, axis}
+    }
+  }
+}{\endtcblisting}
+
+\newenvironment{PC1}[2]{%
+  	cblisting{
+    breakable,listing only,
+    colback=cream, enhanced,
+    attach boxed title to top left={yshift=-0.5mm},
+    title={\href{##1}{\ttfamily ##2}},
+    sharpish corners, boxrule=1pt, after,
+    listing options={
+      language=Python,
+      basicstyle=\footnotesize\ttfamily,
+      numbers=none,
+      xleftmargin=-10pt,
+      aboveskip=-4pt,
+      belowskip=-6pt,
+      columns=fixed,
+      basewidth=6pt,
+      backgroundcolor=\color{cream},
+      showspaces=false,
+      showstringspaces=false,
+      showtabs=false,
+      tabsize=2,
+      breaklines=true,
+      breakatwhitespace=false,
+      keywordstyle=\color{blue},
+      upquote,
+      commentstyle=\color{islamicgreen},
+      stringstyle=\color{red},
+      morekeywords={np, random, seed, sqrt, randn, linspace, r_, cumsum, exp, cumprod, reshape, axis}
+    }
+  }
+}{\endtcblisting}
+
+% Additional colors for theorem boxes etc. (deduplicated)
+\definecolor{shadecolor}{rgb}{0.9,0.9,1}
+\definecolor{thmcolor}{rgb}{0.96, 0.92, 0.86}
+\definecolor{defncolor}{rgb}{0.93, 0.96, 0.98}
+\definecolor{tipcolor}{rgb}{0.94, 0.97, 0.94}
+\definecolor{warncolor}{rgb}{0.98, 0.94, 0.94}
+\definecolor{corcolor}{rgb}{0.96, 0.94, 0.98}
+\definecolor{codekey}{rgb}{0.0, 0.0, 1.0}
+\definecolor{codecomment}{rgb}{0.0, 0.6, 0.0}
+\definecolor{codestring}{rgb}{0.58, 0.0, 0.82}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+
+% tcolorbox and cleveref are already loaded earlier
+\tcbuselibrary{listings,skins,breakable,theorems}
+
+\tcbset{
+  academicbox/.style={
+    enhanced,
+    breakable,
+    colframe=black!35!black,
+    coltitle=white,
+    fonttitle=\bfseries,
+    colbacktitle=black!35!black,
+    boxed title style={sharp corners=north, rounded corners=south},
+    boxrule=0.6mm,
+    before skip=12pt, after skip=12pt,
+    top=6pt, bottom=6pt,
+    left=8pt, right=8pt,
+    drop fuzzy shadow
+  }
+}
+
+\newtcbtheorem[auto counter, number within=section]{thm}{Theorem}{
+  academicbox,
+  colback=thmcolor,
+  label type=theorem
+}{thm}
+
+\newtcbtheorem[auto counter, number within=section]{cor}{Corollary}{
+  academicbox,
+  colback=corcolor,
+  label type=corollary
+}{cor}
+
+\newtcbtheorem[auto counter, number within=section]{lem}{Lemma}{
+  academicbox,
+  colback=thmcolor!70!white,
+  label type=lemma
+}{lem}
+
+\newtcbtheorem[auto counter, number within=section]{prop}{Proposition}{
+  academicbox,
+  colback=thmcolor!50!white,
+  label type=proposition
+}{prop}
+
+\newtcbtheorem[auto counter, number within=section]{defn}{Definition}{
+  academicbox,
+  colback=defncolor,
+  label type=definition
+}{defn}
+
+\newtcolorbox{xattention}{
+  enhanced, breakable,
+  colback=warncolor, colframe=black!35!black,
+  drop shadow, arc=5mm, sharp corners=uphill,
+  boxed title style={boxsep=0pt, right=0pt, left=0pt, toptitle=0pt, colframe=white, colback=white},
+  overlay={
+    \node[anchor=west, xshift=-14mm] at (frame.west) {\includegraphics[scale=0.075, keepaspectratio]{warning.png}};
+  },
+  boxsep=5pt, before skip=10pt, after skip=10pt
+}
+
+\newtcolorbox{xtip}{
+  enhanced, breakable,
+  colback=tipcolor, colframe=black!35!black,
+  drop shadow, arc=5mm, sharp corners=uphill,
+  boxed title style={boxsep=0pt, right=0pt, left=0pt, toptitle=0pt, colframe=white, colback=white},
+  overlay={
+    \node[anchor=west, xshift=-14mm] at (frame.west) {\includegraphics[scale=0.25, keepaspectratio]{idea.jpeg}};
+  },
+  boxsep=5pt, before skip=10pt, after skip=10pt
+}
+
+\lstset{
+  language=Matlab,
+  basicstyle=\footnotesize\ttfamily,
+  numbers=left,
+  numberstyle=\tiny\color{codegray},
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{white},
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  rulecolor=\color{black},
+  tabsize=2,
+  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=false,
+  title=\lstname,
+  keywordstyle=\color{codekey},
+  commentstyle=\color{codecomment},
+  stringstyle=\color{codestring},
+  escapeinside={\%*}{*)},
+  morekeywords={*,...}
+}
+
+\crefname{thm}{Theorem}{Theorems}
+\crefname{cor}{Corollary}{Corollaries}
+\crefname{lem}{Lemma}{Lemmas}
+\crefname{prop}{Proposition}{Propositions}
+\crefname{defn}{Definition}{Definitions}
+
+
