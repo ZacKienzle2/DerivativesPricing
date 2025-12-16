@@ -1,0 +1,78 @@
+/* Professional Financial Dashboard Styles */
+:root {
+    --profit-green: #00D4AA;
+    --loss-red: #FF4B4B;
+    --warning-orange: #FFA500;
+    --info-blue: #1E88E5;
+    --background-dark: #0F1419;
+    --card-background: #1E2328;
+    --text-primary: #E8E8E8;
+    --text-secondary: #B0B0B0;
+    --border-color: #2D3748;
+}
+
+.stApp {
+    background: linear-gradient(135deg, var(--background-dark) 0%, #1A1E23 100%);
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.metric-card {
+    background: rgba(30, 35, 40, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--profit-green) 0%, var(--info-blue) 100%);
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.2);
+    border-color: var(--profit-green);
+}
+
+.profit-positive {
+    color: var(--profit-green) !important;
+    font-weight: 600;
+}
+
+.profit-negative {
+    color: var(--loss-red) !important;
+    font-weight: 600;
+}
+
+.stButton > button {
+    background: linear-gradient(45deg, var(--profit-green) 0%, var(--info-blue) 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .metric-card {
+        padding: 1rem;
+    }
+}

@@ -1,0 +1,75 @@
+# models/pricers/haug_haug_margrabe.py
+from typing import Tuple
+import numpy as np
+from scipy.stats import norm
+
+from models.options import AsianOption
+from .base_pricer import BasePricer
+
+
+class HaugHaugMargrabePricer(BasePricer):
+    """
+    Prices discrete arithmetic Asian options using the Haug-Haug-Margrabe
+    (2007) moment-matching approximation.
+    """
+
+    def __init__(self, option: AsianOption):
+        if not (isinstance(option, AsianOption) and option.avg_type == "arithmetic"):
+            raise TypeError("This pricer is for arithmetic Asian options.")
+        super().__init__(option)
+
+    def _calculate_moments(self) -> Tuple[float, float]:
+        """Calculates the moments of the discrete average asset price."""
+        s, t, r, q, sigma = (
+            self.option.S,
+            self.option.T,
+            self.option.r,
+            self.option.q,
+            self.option.sigma,
+        )
+        b = r - q
+        n = 100  # Number of discrete averaging points
+        dt = t / n
+
+        i_vals = np.arange(1, n + 1)
+        m1 = s * np.sum(np.exp(b * i_vals * dt)) / n
+
+        i, j = np.meshgrid(i_vals, i_vals)
+        min_ij = np.minimum(i, j)
+
+        m2_sum = np.sum(np.exp(b * (i + j) * dt + sigma**2 * min_ij * dt))
+        m2 = (s**2 / n**2) * m2_sum
+
+        return m1, m2
+
+    def price(self) -> Tuple[float, float]:
+        """Calculates the approximate option price."""
+        k, t, r = (self.option.K, self.option.T, self.option.r)
+        m1, m2 = self._calculate_moments()
+
+        if np.isnan(m2) or m1**2 <= 0 or m2 <= 0:
+            return np.nan, 0.0
+
+        try:
+            variance_approx = np.log(m2 / m1**2)
+        except (ValueError, ZeroDivisionError):
+            return np.nan, 0.0
+
+        if variance_approx < 0:
+            return np.nan, 0.0
+
+        sigma_approx = np.sqrt(variance_approx / t)
+
+        if np.isclose(sigma_approx, 0.0):
+            payoff = m1 - k if self.option.option_type == "call" else k - m1
+            return np.exp(-r * t) * max(0, payoff), 0.0
+
+        d1 = (np.log(m1 / k) + 0.5 * variance_approx) / (sigma_approx * np.sqrt(t))
+        d2 = d1 - sigma_approx * np.sqrt(t)
+
+        if self.option.option_type == "call":
+            price = np.exp(-r * t) * (m1 * norm.cdf(d1) - k * norm.cdf(d2))
+        else:
+            price = np.exp(-r * t) * (k * norm.cdf(-d2) - m1 * norm.cdf(-d1))
+
+        return float(price), 0.0

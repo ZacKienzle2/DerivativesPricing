@@ -1,0 +1,51 @@
+# Options Pricing Application Configuration
+
+[server]
+# Essential Network Configuration
+port = 8501
+# address defaults to "localhost" - only change for production
+
+# Performance Settings
+headless = false
+runOnSave = true
+fileWatcherType = "auto"
+
+# Optimized Limits for Financial Data
+maxUploadSize = 200              # MB
+maxMessageSize = 200             # MB
+
+# Security (Essential for production)
+enableStaticServing = false
+
+[browser]
+# Disable analytics for privacy
+gatherUsageStats = false
+
+[theme]
+# Professional Dark Theme with Modern Typography
+base = "dark"
+
+# Refined Color Palette
+primaryColor = "#00D4AA"         # Clean teal for interactive elements
+backgroundColor = "#0E1117"      # True dark background
+secondaryBackgroundColor = "#262730"  # Subtle contrast for cards
+textColor = "#FAFAFA"           # High contrast white text
+
+# Typography - Monospace for financial data precision
+font = "monospace"              # Better for numbers, tables, code
+
+[client]
+# Production-ready settings
+showErrorDetails = false        # Hide technical errors from users
+toolbarMode = "minimal"         # Cleaner interface
+
+[runner]
+# Optimized Execution
+magicEnabled = false            # Security best practice
+fastReruns = true              # Better UX
+postScriptGC = true            # Memory management
+
+[logger]
+# Clean logging
+level = "error"                # Only show critical issues
+messageFormat = "%(message)s"   # Simplified format
