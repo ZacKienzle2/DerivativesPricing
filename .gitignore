@@ -6,3 +6,4 @@ __pycache__/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+.venv/
