@@ -1,5 +1,0 @@
-rng = np.random.default_rng(4)
-N, rhos = 1000, [0.0, 0.8]
-Z = rng.standard_normal((2, N))
-Ls = [np.linalg.cholesky([[1, r], [r, 1]]) for r in rhos]
-Xs = [L @ Z for L in Ls]

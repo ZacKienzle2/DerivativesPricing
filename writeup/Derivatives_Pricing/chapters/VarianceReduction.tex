@@ -1,0 +1,423 @@
+The estimation of performance measures in Monte Carlo simulation can be made more efficient by utilising known information about the simulation model. Variance reduction techniques include antithetic variables, control variables, and importance sampling.
+
+Suppose $Y$ is the output of a simulation experiment. A random variable $\widetilde{Y}$, obtained from the same simulation run, is called a \textit{control variable} for $Y$ if $Y$ and $\widetilde{Y}$ are correlated (negatively or positively) and the expectation of $\widetilde{Y}$ is known. The use of control variables for variance reduction is based on the following theorem.
+
+\begin{thm}{Control Variable Estimation}{ControlVariableEstimation}
+Let $Y_1, \dots, Y_N$ be the output of $N$ independent simulation runs and let $\widetilde{Y}_1, \dots, \widetilde{Y}_N$ be the corresponding control variables, with $\E \widetilde{Y}_k = \widetilde{\mu}$ known. Let $\varrho_{Y, \widetilde{Y}}$ be the correlation coefficient between each $Y_k$ and $\widetilde{Y}_k$. For each $\alpha \in \R$ the estimator
+\begin{equation} \label{eq:ControlVariateEstimator}
+    \widehat{\mu}^{(c)} = \frac{1}{N} \sum_{k=1}^N \left[ Y_k - \alpha \left( \widetilde{Y}_k - \widetilde{\mu} \right) \right]
+\end{equation}
+is an unbiased estimator for $\mu = \E Y$. The minimal variance of $\widehat{\mu}^{(c)}$ is
+\begin{equation} \label{eq:MinimalVarianceControlVariate}
+    \Var \widehat{\mu}^{(c)} = \frac{1}{N} (1 - \varrho_{Y, \widetilde{Y}}^2) \Var Y,
+\end{equation}
+which is obtained for $\alpha = \varrho_{Y, \widetilde{Y}} \sqrt{\Var Y / \Var \widetilde{Y}}$.
+\end{thm}
+
+\subsubsection{Antithetics}
+When we use Monte Carlo averages of quantities $f(\bX_i)$, the randomness in the algorithm leads to some error cancellation. In antithetic sampling, we aim to achieve even greater cancellation. An antithetic sample is one that somehow gives the opposite value of $f(\bx)$, being low when $f(\bx)$ is high and vice versa. Ordinarily, we get an opposite $f$ by sampling at a point $\tilde{\bx}$ that is somehow opposite to $\bx$.
+
+Let $\mu = \E(\bX)$ for $\bX \sim p$, where $p$ is a symmetric density on the symmetric set $\c{D}$. Here, symmetry is with respect to reflection through the center point $\bc$ of $\c{D}$. If we reflect $\bx \in \c{D}$ through $\bc$ we get the point $\tilde{\bx}$ with $\tilde{\bx} - \bc = -(\bx - \bc)$, that is $\tilde{\bx} = 2\bc - \bx$. Symmetry means that $p(\tilde{\bx}) = p(\bx)$ including the constraint that $\bx \in \c{D}$ if and only if $\tilde{\bx} \in \c{D}$. For basic examples, when $p$ is $\Nor(0, \Sigma)$ then $\tilde{\bx} = -\bx$, and when $p$ is $\U(0, 1)^d$ we have $\tilde{\bx} = 1 - \bx$ componentwise. The antithetic counterpart of a random curve could be its reflection in the horizontal axis. From the symmetry it follows that $\tilde{\tilde{\bx}} = \bx$.
+
+The \textit{antithetic sampling} estimate of $\mu$ is
+\begin{equation} \label{eq:AntitheticSamplingEstimate}
+\hat{\mu}_{\mathrm{anti}} = \frac{1}{n} \sum_{i=1}^{n/2} (f(\bX_i) + f(\tilde{\bX}_i)),
+\end{equation}
+where $\bX_i \iidsim p$, and $n$ is an even number.
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/antitheticVariates.pgf}
+    \caption{The left panel shows 10 points $\bu_i \in [0, 1]^2$ as solid points, connected to their antithetic counterparts $\widetilde{\bu}_i = 1 - \bu_i$, shown as open circles. The right panel shows one random trajectory of 30 points joined by solid lines and connected to the origin, along with its antithetic mirror image in open points.}
+    \label{fig:AntitheticVariates}
+\end{figure}
+
+The rationale for antithetic sampling is that each value of $\bx$ is balanced by its opposite $\tilde{\bx}$ satisfying $(\bx + \tilde{\bx})/2 = \bc$. Whether this balance is helpful depends on $f$. Clearly, if $f$ is nearly linear, we could obtain a large improvement. Suppose that $\sigma^2 = \E((f(\bX) - \mu)^2) < \infty$. Then the variance in antithetic sampling is
+\begin{align}
+\Var(\hat{\mu}_{\mathrm{anti}}) &= \Var\left(\frac{1}{n} \sum_{i=1}^{n/2} f(\bX_i) + f(\tilde{\bX}_i)\right) \notag \\
+&= \frac{n/2}{n^2} \Var(f(\bX) + f(\tilde{\bX})) \notag \\
+&= \frac{1}{2n} \left(\Var(f(\bX)) + \Var(f(\tilde{\bX})) + 2\Cov(f(\bX), f(\tilde{\bX}))\right) \notag \\
+&= \frac{\sigma^2}{n} (1+\rho) \label{eq:AntiVar}
+\end{align}
+
+where $\rho = \Corr(f(\bX), f(\tilde{\bX}))$.
+
+From $-1 \le \rho \le 1$ we obtain $0 \le \sigma^2(1+\rho) \le 2\sigma^2$. In the best case, antithetic sampling gives the exact answer from just one pair of function evaluations. In the worst case, it doubles the variance. Both cases do arise.
+
+It is clear that a negative correlation is favourable. If $f$ happens to be monotone in all $d$ components of $\bx$, then it is known that $\rho < 0$. Monotonicity of $f$ is a safe harbour, wherein if $f$ is monotone, then we're sure antithetic sampling will reduce the variance. We can often establish monotonicity theoretically, for example, by differentiating $f$. But $\rho < 0$ can hold without $f$ being monotone in any of its inputs. Conversely, $\rho$ can be just barely negative when $f$ is monotone. As a result, monotonicity alone is not a reliable guide to determining whether antithetic sampling will yield a significant gain.
+
+To get a qualitative understanding of antithetic sampling, break $f$ into even and odd parts via
+\begin{align} \label{eq:EvenOddDecomposition}
+f(\bx) &= \frac{f(\bx) + f(\tilde{\bx})}{2} + \frac{f(\bx) - f(\tilde{\bx})}{2} \notag \\
+&\equiv f_{\mathrm{E}}(\bx) + f_{\mathrm{O}}(\bx).
+\end{align}
+The even part satisfies $f_{\mathrm{E}}(\bx) = f_{\mathrm{E}}(\tilde{\bx})$ and $\int_{\c{D}} f_{\mathrm{E}}(\bx)p(\bx) \di \bx = \mu$. The odd part satisfies $f_{\mathrm{O}}(\bx) = -f_{\mathrm{O}}(\tilde{\bx})$ and $\int_{\c{D}} f_{\mathrm{O}}(\bx)p(\bx) \di \bx = 0$.
+
+The even and odd parts of $f$ are orthogonal. This is not a surprise, because the product $f_{\mathrm{O}}(\bx)f_{\mathrm{E}}(\bx)$ is an odd function. But to be careful and rule out $\E(|f_{\mathrm{O}}(\bX)f_{\mathrm{E}}(\bX)|) = \infty$, we compute directly that
+\begin{align*}
+\int_{\c{D}} f_{\mathrm{E}}(\bx)f_{\mathrm{O}}(\bx)p(\bx) \di \bx &= \int_{\c{D}} \left(\frac{f(\bx) + f(\tilde{\bx})}{2}\right) \left(\frac{f(\bx) - f(\tilde{\bx})}{2}\right) p(\bx) \di \bx \\
+&= \frac{1}{4} \int_{\c{D}} (f(\bx)^2 - f(\tilde{\bx})^2) p(\bx) \di \bx = 0.
+\end{align*}
+Now it follows easily that $\sigma^2 = \sigma_{\mathrm{E}}^2 + \sigma_{\mathrm{O}}^2$ where $\sigma_{\mathrm{E}}^2 = \int_{\c{D}} (f_{\mathrm{E}}(\bx) - \mu)^2 p(\bx) \di \bx$ and $\sigma_{\mathrm{O}}^2 = \int_{\c{D}} f_{\mathrm{O}}(\bx)^2 p(\bx) \di \bx$.
+
+Reworking \cref{eq:EvenOddDecomposition} yields $\hat{\mu}_{\mathrm{anti}} = (2/n) \sum_{i=1}^{n/2} f_{\mathrm{E}}(\bX_i)$. Therefore $\Var(\hat{\mu}_{\mathrm{anti}}) = 2\sigma_{\mathrm{E}}^2/n$ and we can combine this with the variance of ordinary Monte Carlo sampling as follows
+\begin{equation} \label{eq:VarianceComparison}
+\begin{pmatrix} V(\hat{\mu}) \\ V(\hat{\mu}_{\mathrm{anti}}) \end{pmatrix} = \frac{1}{n} \begin{pmatrix} 1 & 1 \\ 2 & 0 \end{pmatrix} \begin{pmatrix} \sigma_{\mathrm{E}}^2 \\ \sigma_{\mathrm{O}}^2 \end{pmatrix}.
+\end{equation}
+We see from \cref{eq:VarianceComparison} that antithetic sampling eliminates the variance contribution of $f_{\mathrm{O}}$ but doubles the contribution from $f_{\mathrm{E}}$. Antithetic sampling is extremely beneficial for integrands that are primarily odd functions of their inputs, having $\sigma_{\mathrm{O}}^2 \gg \sigma_{\mathrm{E}}^2$. The connection to correlation is via $\rho = (\sigma_{\mathrm{E}}^2 - \sigma_{\mathrm{O}}^2)/(\sigma_{\mathrm{E}}^2 + \sigma_{\mathrm{O}}^2)$.
+
+The analysis above shows that antithetic sampling reduces variance if $\rho = \Corr(f(\bX), f(\tilde{\bX})) < 0$, or equivalently, if $\sigma_{\mathrm{O}}^2 > \sigma_{\mathrm{E}}^2$. That analysis is appropriate when the most of the computation is in evaluating $f$ and there is no economy in evaluating both $f(\bX)$ and $f(\tilde{\bX})$.
+
+Variance reduction is only part of the story because the cost of antithetic sampling using $n$ points could well be smaller than the cost of plain Monte Carlo with $n$ points. That will happen if it is expensive to generate $\bX$, compared to the cost of computing $f$, but inexpensive to generate $\tilde{\bX}$. For example, $\bX$ might be a carefully constructed and expensive sample path from a Gaussian process while $\tilde{\bX} = -\bX$.
+
+We can explore this effect by letting $c_x$ be the cost of generating $\bX$, and $c_f$ be the cost of computing $f(\bX)$ once we have $\bX$. We also let $\tilde{c}_x$ and $\tilde{c}_f$ be the corresponding costs for the antithetic sample. For illustration, suppose that to a reasonable approximation $\tilde{c}_x = 0$ and $\tilde{c}_f = c_f$. In special circumstances $\tilde{c}_f < c_f$ because it may be possible to reuse some computation.
+
+Under the assumptions we are exploring, the efficiency of antithetic sampling relative to plain Monte Carlo is
+\begin{equation} \label{eq:EfficiencyRatio}
+E_{\mathrm{anti}} = \frac{2c_x + 2c_f}{c_x + 2c_f} \cdot \frac{\sigma_{\mathrm{O}}^2 + \sigma_{\mathrm{E}}^2}{2\sigma_{\mathrm{E}}^2}.
+\end{equation}
+Then antithetic sampling is more efficient than plain Monte Carlo if
+\begin{equation*}
+\frac{\sigma_{\mathrm{O}}^2}{\sigma_{\mathrm{E}}^2} > \frac{c_f}{c_x + c_f}.
+\end{equation*}
+If generating $\bx$ costs ten times as much as computing $f$ then antithetic sampling pays off when $\sigma_{\mathrm{O}}^2/\sigma_{\mathrm{E}}^2 > 1/11$.
+
+Because antithetic samples have dependent values within pairs, the usual variance estimate must be modified. The most straightforward approach is to analyze the data as a sample of size $m = n/2$ values of $f_{\mathrm{E}}(\bX)$. Let $Y_i = f_{\mathrm{E}}(\bX_i) = (f(\bX_i) + f(\tilde{\bX}_i))/2$ for $i = 1, \dots, m = n/2$. Then take
+\begin{equation*}
+\hat{\mu}_{\mathrm{anti}} = \frac{1}{m} \sum_{i=1}^m Y_i, \quad \text{and}
+\end{equation*}
+\begin{equation*}
+s_{\mathrm{anti}}^2 = \frac{1}{m-1} \sum_{i=1}^m (Y_i - \hat{\mu}_{\mathrm{anti}})^2,
+\end{equation*}
+and use $s_{\mathrm{anti}}^2/m$ as the estimate of $\Var(\hat{\mu}_{\mathrm{anti}})$.
+
+\subsubsection{Common Random Numbers}
+Suppose that $f$ and $g$ are closely related functions and that we want to find $\E(f(X) - g(X))$ for $X \sim p$. Perhaps $f(x) = h(x, \theta)$ for a parameter $\theta \in \R^p$, and then to study the effect of $\theta$ we look at $g(x) = h(x, \widetilde{\theta})$ for some $\widetilde{\theta} \neq \theta$. We assume at first that neither $f$ nor $g$ (nor $h$) makes any use of random numbers other than $X$. Later we relax that assumption.
+
+Because $\E(f(X)-g(X)) = \E(f(X))-\E(g(X))$ we clearly have two different ways to go. We could estimate the difference by
+\begin{equation}
+\widehat{D}_{\text{com}} = \frac{1}{n} \sum_{i=1}^n f(X_i) - g(X_i),
+\label{eq:8.19}
+\end{equation}
+for $X_i \iidsim p$, or by differencing averages
+\begin{equation}
+\widehat{D}_{\text{ind}} = \frac{1}{n_1} \sum_{i=1}^{n_1} f(X_{i1}) - \frac{1}{n_2} \sum_{i=1}^{n_2} g(X_{i2})
+\label{eq:8.20}
+\end{equation}
+for $X_{ij} \iidsim p$. Taking $n = n_1 = n_2$ makes the computing costs in \eqref{eq:8.19} and \eqref{eq:8.20} comparable, assuming that costs of computing $f$ and $g$ dominate those of generating $X$.
+
+The sampling variances of these methods are
+\begin{equation}
+\begin{aligned}
+\Var(\widehat{D}_{\text{com}}) &= \frac{1}{n} \left(\sigma_f^2 + \sigma_g^2 - 2\rho\sigma_f\sigma_g\right) \\
+\Var(\widehat{D}_{\text{ind}}) &= \frac{1}{n} \left(\sigma_f^2 + \sigma_g^2\right),
+\end{aligned}
+\label{eq:8.21}
+\end{equation}
+where $\sigma_f^2$ and $\sigma_g^2$ are individual function variances and $\rho = \Corr(f(X), g(X))$. When $\rho > 0$ we are better off using common random numbers. There is no guarantee that $\rho > 0$. When $f$ and $g$ compute similar quantities then we anticipate that $\rho > 0$, and if so, then $\widehat{D}_{\text{com}}$ is more effective than $\widehat{D}_{\text{ind}}$.
+
+Most people would instinctively use the common variates. So at first sight, the method looks more like avoiding a variance increase than engineering a variance decrease. Later, when we relax the rule forbidding $f$, $g$, and $h$ to use other sources of randomness, we will find that retaining some common random numbers requires considerable care in synchronization. The added complexity might well tip the balance against using common random numbers.
+
+Much the same problem arises if we are comparing $\E(f(X))$ for $X \sim p$ and $\E(f(\widetilde{X}))$ for $\widetilde{X} \sim \tilde{p}$. Sometimes we can rewrite that problem in terms of common random variables that get transformed to a different distribution before $f$ is applied. For instance, if the first simulation has $X_i \iidsim \Nor(\mu, \sigma^2)$ and the second has $\widetilde{X}_i \iidsim \Nor(\tilde{\mu}, \tilde{\sigma}^2)$ then we can sample $Z_i \iidsim \Nor(0, 1)$ and use
+\begin{equation*}
+\widehat{D}_{\text{com}} = \frac{1}{n} \sum_{i=1}^n f(\mu + \sigma Z_i) - f(\tilde{\mu} + \tilde{\sigma} Z_i).
+\end{equation*}
+
+More generally, when $X_i$ is generated via a transformation $\Psi(U_i; \theta)$ of $U_i \sim \U(0, 1)^s$ then we can average $f(\Psi(U_i; \theta)) - f(\Psi(U_i; \widetilde{\theta}))$.
+Acceptance-rejection sampling of $X$ does not fit cleanly into this framework, because the number $s$ of needed uniform random variables is not fixed and may vary with $\theta$.
+
+The construction above is a \textit{coupling} of the random vectors $X$ and $\widetilde{X}$. Any joint distribution on $(X, \widetilde{X})$ with $X \sim p$ and $\widetilde{X} \sim \tilde{p}$ is a coupling. Common random numbers provide a particularly close coupling between $X$ and $\widetilde{X}$.
+
+We want to estimate $\mu_j = \E(h(X, \theta_j))$ for $j = 1, \dots, m$ using $n$ random inputs $X_i$, for $i = 1, \dots, n$. The content uniformity example had a large value of $m$ but in the simplest case, $m=2$ and we're interested in $\mu_1 - \mu_2$. We still assume that $h$ really is a function of $X$ and $\theta$ and in particular our implementation of $h$ does not cause more random numbers to be generated.
+
+\begin{algorithm}[H]
+\caption{Common Random Numbers Algorithm I}
+\label{alg:CommonRandomNumbersI}
+\begin{algorithmic}[1]
+\State \Call{SetSeed}{seed}
+\State $\hat{\mu}_j \gets 0, \quad 1 \le j \le m$
+\For{$i \gets 1, n$}
+    \State $X_i \sim p$
+    \State $\hat{\mu}_j \gets \hat{\mu}_j + h(X_i, \theta_j), \quad 1 \le j \le m$
+\EndFor
+\State $\hat{\mu}_j \gets \hat{\mu}_j / n, \quad 1 \le j \le m$
+\State \Return $\hat{\mu}_1, \dots, \hat{\mu}_m$
+\end{algorithmic}
+\end{algorithm}
+
+We can run a nested loop over samples indexed by $i$ and parameter values indexed by $j$. There are two main approaches that we can take, depending on which is the outer loop.
+
+\cref{alg:CommonRandomNumbersI} shows common random numbers with the outer loop over $X_i$ for $i = 1, \dots, n$. When $X_i$ is multi-dimensional we have to make sure that every component of $X$ needed for any value of $\theta_j$ is provided. In the content uniformity problem (page 18) we generate $Z_{11}$ for every simulated batch even though some only use $Z_1, \dots, Z_{10}$.
+
+A vectorized implementation of \cref{alg:CommonRandomNumbersI} is advantageous. It uses a function $H$ that takes $X$ and a list $\Theta = (\theta_1, \dots, \theta_m)$ of parameter values. This $H$ returns a list $(h(X, \theta_1), \dots, h(X, \theta_m))$ and the simulation computes
+\begin{equation}
+(\hat{\mu}_1, \dots, \hat{\mu}_m) = \frac{1}{n} \sum_{i=1}^n H(X_i, \Theta).
+\label{eq:VectorizedCommonRandomNumbers}
+\end{equation}
+This vectorized $H$ makes it easier to separate the code that creates $\Theta$ from that which evaluates $h$.
+
+\subsubsection{Control Variates}
+Control variates provide another way to exploit closed-form results. With control variates, we use some other problem, quite similar to our given one, but for which an exact answer is known. The precise meaning of 'similar' depends on how we intend to use this other problem, and more than one method is provided below. As for 'exact', we will mean it literally, but in practice it may just mean known with an error negligible compared to Monte Carlo errors.
+
+Suppose first that we want to find $\mu = \E(f(\v{X}))$ and that we know the value $\theta = \E(h(\v{X}))$ where $h(\v{X}) \approx f(\v{X})$. Letting $\hat{\mu} = (1/n)\sum_{i=1}^n f(\v{X}_i)$ and $\hat{\theta} = (1/n)\sum_{i=1}^n h(\v{X}_i)$ we can estimate $\mu$ by the \textit{difference estimator}
+\begin{equation}
+\hat{\mu}_{\text{diff}} = \frac{1}{n} \sum_{i=1}^n (f(\v{X}_i) - h(\v{X}_i)) + \theta = \hat{\mu} - \hat{\theta} + \theta.
+\label{eq:DifferenceEstimator}
+\end{equation}
+
+The expected value of $\hat{\mu}_{\text{diff}}$ is $\mu$. The variance of $\hat{\mu}_{\text{diff}}$ is
+\begin{equation}
+\Var(\hat{\mu}_{\text{diff}}) = \frac{1}{n} \Var(f(\v{X}) - h(\v{X})).
+\label{eq:DifferenceEstimatorVariance}
+\end{equation}
+So if $h$ is similar to $f$ in the sense that the difference $f(\v{X}) - h(\v{X})$ has smaller variance than $f(\v{X})$ has, we will get reduced variance by using $\hat{\mu}_{\text{diff}}$. In this setting $h(\v{X})$, the random variable whose mean is known, is the \textit{control variate}. The difference estimator is not the only way to use a control variate. The ratio and product estimators
+\begin{align}
+\hat{\mu}_{\text{ratio}} &= \hat{\mu} / \hat{\theta}, \quad \text{and} \label{eq:RatioEstimator} \\
+\hat{\mu}_{\text{prod}} &= \hat{\mu} \hat{\theta} / \theta \label{eq:ProductEstimator}
+\end{align}
+respectively, are also used. These estimators are undefined when $\theta = 0$, but otherwise they generally converge to $\mu$ as $n \to \infty$. The ratio and product estimators are usually biased because $\E(\hat{\mu} / \hat{\theta}) \neq \E(\hat{\mu}) / \E(\hat{\theta})$ in general. It is possible to generalize the control variate method in very complicated ways. Maybe we could use $\hat{\mu} \cos(\hat{\theta} - \theta)$ or some more imaginative quantity. But we don't. By far the most common way of using a control variate is through the regression estimator, considered next.
+For a value $\beta \in \R$, the \textit{regression estimator} of $\mu$ is
+\begin{equation}
+\hat{\mu}_{\beta} = \frac{1}{n} \sum_{i=1}^n (f(\v{X}_i) - \beta h(\v{X}_i)) + \beta \theta.
+\label{eq:RegressionEstimator}
+\end{equation}
+Taking $\beta = 0$ yields the simple MC estimator $\hat{\mu}$ and $\beta = 1$ gives the difference estimator. The regression estimator is unbiased: $\E(\hat{\mu}_{\beta}) = \mu$ for all $\beta$ because $\E(h(\v{X}) - \theta) = 0$.
+
+The variance of the regression estimator is
+\begin{equation}
+\Var(\hat{\mu}_{\beta}) = \frac{1}{n} \left(\Var(f(\v{X})) - 2\beta \Cov(f(\v{X}), h(\v{X})) + \beta^2 \Var(h(\v{X}))\right).
+\label{eq:RegressionEstimatorVariance}
+\end{equation}
+By differentiating, we find that the best value of $\beta$ is
+\begin{equation}
+\beta_{\text{opt}} = \frac{\Cov(f(\v{X}), h(\v{X}))}{\Var(h(\v{X}))} = \frac{\E((f(\v{X}) - \mu) (h(\v{X}) - \theta))}{\E((h(\v{X}) - \theta)^2)},
+\label{eq:BetaOptFormula}
+\end{equation}
+and after some algebra, the resulting minimal variance is
+\begin{equation}
+\Var(\hat{\mu}_{\beta_{\text{opt}}}) = \frac{\sigma^2}{n} (1 - \rho^2),
+\label{eq:MinVarianceRho}
+\end{equation}
+where $\rho = \Corr(f(\v{X}), h(\v{X}))$. In the regression estimator, any control variate that correlates with $f$ is helpful, even one that correlates negatively.
+
+\begin{algorithm}[H]
+\caption{Control Variates by Regression}
+\label{alg:ControlVariatesbyRegression}
+\begin{algorithmic}[1]
+\Require Given $f(\v{X}_i), h_j(\v{X}_i), \theta_j$ for $i=1,\dots,n, j=1,\dots,J$
+\State $\bar{f} \la \frac{1}{n}\sum f(\v{X}_i); \quad \bar{h}_j \la \frac{1}{n}\sum h_j(\v{X}_i)$
+\State $Y_{i} \la f(\v{X}_i); \quad Z_{i j} \la h_j(\v{X}_i) - \bar{h}_j \quad \text{for all } i, j$
+\State $\hat{\mu} \la \text{estimated intercept from MLR}$
+\State $\hat{\beta} \la \text{estimated slope vector from MLR}$
+\State $\hat{\mu} \la \hat{\mu} + \hat{\beta}^{\T} (\v{\theta} - \bar{\v{h}})$
+\State \Return $\hat{\mu} \text{ and intercept standard error from MLR}$
+\end{algorithmic}
+\end{algorithm}
+
+This algorithm demonstrates how to utilise linear regression software for control variate computation. It is \textit{essential} to centre the control variates. It may be necessary to drop one or more control variates if they are linearly dependent in the sample.
+
+To minimize \cref{eq:RegressionEstimatorVariance} with respect to $\beta$ is a least squares problem and the solution vector $\beta$ satisfies $\Var(h(\v{X}))\beta = \Cov(h(\v{X}), f(\v{X}))$. If the $J$ by $J$ matrix $\Var(h(\v{X}))$ is singular, then one of the $h_j$ is a linear combination of the other $J-1$ control variates. In the former case, the best value of $\beta$ is
+\begin{equation}
+\beta_{\text{opt}} = \Var(h(\v{X}))^{-1} \Cov(h(\v{X}), f(\v{X})) - \Var(h(\v{X}))^{-1} \E(h(\v{X}) - \v{\theta}) \E(f(\v{X})).
+\label{eq:BetaOptMatrix}
+\end{equation}
+In applications, we ordinarily do not know $\beta_{\text{opt}}$. The usual way to estimate it is by replacing expectations by sample averages:
+\begin{equation}
+\hat{\beta} = \left(\frac{1}{n} \sum_{i=1}^n (h(\v{X}_i) - \bar{\v{H}}) (h(\v{X}_i) - \bar{\v{H}})^{\T}\right)^{-1} \frac{1}{n} \sum_{i=1}^n (h(\v{X}_i) - \bar{\v{H}}) f(\v{X}_i).
+\label{eq:BetaHatEstimate}
+\end{equation}
+Equation \cref{eq:BetaHatEstimate} is the least squares estimate of $\beta_{\text{opt}}$. The usual estimate of $\mu$ with control variates is $\hat{\mu}_{\hat{\beta}}$. The estimated variance is
+\begin{equation}
+\widehat{\Var}(\hat{\mu}_{\hat{\beta}}) = \frac{1}{n^2} \sum_{i=1}^n (f(\v{X}_i) - \hat{\mu}_{\hat{\beta}} - \hat{\beta}^{\T} (h(\v{X}_i) - \bar{h}))^2,
+\label{eq:EstimatedVarianceBeta}
+\end{equation}
+and its standard error $\sqrt{\widehat{\Var}(\hat{\mu}_{\hat{\beta}})}$, can be computed using standard multiple linear regression software. See \cref{alg:ControlVariatesbyRegression}. The key insight is to treat $\mu$ as the intercept in a multiple linear regression relating $f(\v{X})$ to predictors $h_j(\v{X}) - \theta_j$. The regression formula is $f(\v{X}) \approx \mu + \beta^{\T} (h(\v{X}) - \theta)$. It is crucial to subtract $\theta_j$ from the random variable in order to make $\E(f(\v{X})) = \mu$ match the regression intercept.
+
+The error of the regression estimator using $\hat{\beta} = \hat{\beta}$ is
+\begin{equation}
+\hat{\mu}_{\hat{\beta}} - \mu = (\hat{\beta} - \beta_{\text{opt}})^{\T}(\v{\theta} - \bar{\v{H}}) + \hat{\mu}_{\beta_{\text{opt}}} - \mu.
+\label{eq:ErrorExpansion}
+\end{equation}
+The first term in \cref{eq:ErrorExpansion} is the product of two components of mean zero, while the second term is the error in the unknown optimal regression estimator. The second term has a mean of zero, but the first does not in general, because the expected value of a product is not necessarily the same as the product of the expected values. As a result, the control variate estimator is usually biased.
+
+Although estimating $\beta$ from the sample data brings a bias, that bias is ordinarily negligible. Each of the factors $\hat{\beta} - \beta_{\text{opt}}$ and $\bar{h} - \v{\theta}$ is of order $\bigO(n^{-1/2})$. For applications with $J \ll \sqrt{n}$, it is common to neglect the bias from using estimated control variate coefficients.
+
+When an unbiased estimator is required, then we can get one by using an estimate of $\beta_{\text{opt}}$ that is independent of the $\v{X}_i$ used in $\hat{\mu}_{\hat{\beta}}$. For example $\hat{\beta}$ can be computed from \cref{eq:BetaHatEstimate} using only a pilot sample $\widetilde{\v{X}}_1, \dots, \widetilde{\v{X}}_m \sim p$ independent of the $\v{X}_i$. Then $\hat{\mu}_{\hat{\beta}}$ can be computed by \cref{eq:RegressionEstimator} using $\v{X}_1, \dots, \v{X}_n$ and taking $\beta = \hat{\beta}$. Now $\E(\hat{\mu}_{\hat{\beta}}) = \mu$ and
+\begin{equation}
+\Var(\hat{\mu}_{\hat{\beta}}) = \E(\Var(\hat{\mu}_{\hat{\beta}} \mid \widetilde{\v{X}}_1, \dots, \widetilde{\v{X}}_m)) = \frac{1}{n} \E(\sigma^2_{\hat{\beta}}).
+\label{eq:VarianceTotalBeta}
+\end{equation}
+
+If $f(\v{X}_i)$ and $h(\v{X}_i)$ have finite fourth moments then $\hat{\beta} = \beta_{\text{opt}} + \bigO(1/\sqrt{m})$. The variance with a control variate is $\sigma^2(1-\rho^2)/n$, which is never worse than $\sigma^2/n$ and usually better. Whether the control variate is helpful ultimately depends on how much it costs to use it. Suppose that the total cost of generating $\v{X}_i$ and then computing $f(\v{X}_i)$ is, on average, $c_f$. Let $c_h$ be the average extra cost incurred by the control variate. That includes the cost to evaluate $h(\v{X}_i)$ but not the cost of sampling $\v{X}_i$. We will suppose that the cost to compute $\hat{\beta}$ is small. If not, then $c_h$ should be increased to reflect it. Control variates improve efficiency when $(1-\rho^2)(c_f + c_h) < c_f$, that is when $|\rho| > \sqrt{c_h / (c_f + c_h)}$. For illustration, if $c_h = c_f$ then we need $|\rho| > \sqrt{1/2} \approx 0.71$ in order to benefit from the control variate.
+
+The estimated variance of $\hat{\mu}_{\hat{\beta}}$ is
+\begin{equation}
+\widehat{\Var}(\hat{\mu}_{\hat{\beta}}) = \frac{1}{n^2} \sum_{i=1}^n (f(\v{X}_i) - \hat{\mu}_{\hat{\beta}} - \hat{\beta}^{\T} (h(\v{X}_i) - \bar{h}))^2,
+\label{eq:FinalSampledVarianceBeta}
+\end{equation}
+and a 99\% confidence interval is $\hat{\mu}_{\hat{\beta}} \pm 2.58 \sqrt{\cref{eq:FinalSampledVarianceBeta}}$.
+
+\subsubsection{Importance Sampling}
+Suppose that our problem is to find $\mu = \E(f(\bX)) = \int_{\mathcal{D}} f(\bx)p(\bx) \, \di \bx$ where $p$ is a probability density function on $\mathcal{D} \subseteq \R^d$ and $f$ is the integrand. We take $p(\bx) = 0$ for all $\bx \notin \mathcal{D}$. If $q$ is a positive probability density function on $\R^d$, then
+\begin{equation}
+    \mu = \int_{\mathcal{D}} f(\bx)p(\bx) \, \di \bx = \int_{\mathcal{D}} \frac{f(\bx)p(\bx)}{q(\bx)} q(\bx) \, \di \bx = \E_q \left( \frac{f(\bX)p(\bX)}{q(\bX)} \right),
+    \label{eq:ImportanceSamplingIdentity}
+\end{equation}
+where $\E_q(\cdot)$ denotes expectation for $\bX \sim q$. We also write $\Var_q(\cdot)$, $\Cov_q(\cdot, \cdot)$, and $\Corr_q(\cdot, \cdot)$ for variance, covariance and correlation when $\bX \sim q$. Our original goal then is to find $\E_p(f(\bX))$. By making a multiplicative adjustment to $f$ we compensate for sampling from $q$ instead of $p$. The adjustment factor $p(\bx)/q(\bx)$ is called the \textit{likelihood ratio}. The distribution $q$ is the \textit{importance distribution} and $p$ is the \textit{nominal distribution}.
+
+The importance distribution $q$ does not have to be positive everywhere. It is enough to have $q(\bx) > 0$ whenever $f(\bx)p(\bx) \neq 0$. That is, for $Q = \{ \bx \mid q(\bx) > 0 \}$ we have $\bx \in Q$ whenever $f(\bx)p(\bx) \neq 0$. So if $\bx \in \mathcal{D} \cap Q^c$ we know that $f(\bx) = 0$, while if $\bx \in Q \cap \mathcal{D}^c$ we have $p(\bx) = 0$. Now
+\begin{align}
+    \E_q \left( \frac{f(\bX)p(\bX)}{q(\bX)} \right) &= \int_Q \frac{f(\bx)p(\bx)}{q(\bx)} q(\bx) \, \di \bx = \int_Q f(\bx)p(\bx) \, \di \bx \nonumber \\
+    &= \int_{\mathcal{D}} f(\bx)p(\bx) \, \di \bx + \int_{Q \cap \mathcal{D}^c} f(\bx)p(\bx) \, \di \bx - \int_{\mathcal{D} \cap Q^c} f(\bx)p(\bx) \, \di \bx \nonumber \\
+    &= \int_{\mathcal{D}} f(\bx)p(\bx) \, \di \bx = \mu.
+    \label{eq:ImportanceSamplingDerivation}
+\end{align}
+
+It is natural to wonder what happens for $\bx$ with $q(\bx) = 0$ in the denominator. The answer is that there are no such points $\bx \in Q$ and we will never see one when sampling $\bX \sim q$. Later we will see examples where $q(\bx)$ close to $0$ causes extreme difficulties, but $q(\bx) = 0$ is not a problem if $f(\bx)p(\bx) = 0$ too.
+
+When we want $q$ to work for many different functions $f_j$ then we need $q(\bx) > 0$ at every $\bx$ where any $f_j(\bx)p(\bx) \neq 0$. Then, a density $q$ with $q(\bx) > 0$ whenever $p(\bx) > 0$ will suffice, allowing us to add new functions $f_j$ to our list after the sample has been drawn.
+
+The \textit{importance sampling estimate} of $\mu = \E_p(f(\bX))$ is
+\begin{equation}
+    \hat{\mu}_q = \frac{1}{n} \sum_{i=1}^n \frac{f(\bX_i)p(\bX_i)}{q(\bX_i)}, \quad \bX_i \sim q.
+    \label{eq:ImportanceSamplingEstimator}
+\end{equation}
+
+To use \eqref{eq:ImportanceSamplingEstimator} we must be able to compute $fp/q$. Assuming that we can compute $f$, this estimate requires that we can compute $p(\bx)/q(\bx)$ at any $\bx$ we might sample. When $p$ or $q$ has an unknown normalization constant, then we will resort to a ratio estimate. For now, we assume that $p/q$ is computable, and study the variance of $\hat{\mu}_q$. Exponential tilting is one way to choose $q$ with computable $p/q$ even when $p$ is unnormalized.
+
+\begin{thm}{Variance of Importance Sampling}{ISVariance}
+Let $\hat{\mu}_q$ be given by \eqref{eq:ImportanceSamplingEstimator} where $\mu = \int_{\mathcal{D}} f(\bx)p(\bx) \, \di \bx$ and $q(\bx) > 0$ whenever $f(\bx)p(\bx) \neq 0$. Then $\E_q(\hat{\mu}_q) = \mu$, and $\Var_q(\hat{\mu}_q) = \sigma_q^2/n$ where
+\begin{equation}
+    \sigma_q^2 = \int_Q \frac{(f(\bx)p(\bx))^2}{q(\bx)} \di \bx - \mu^2 = \int_Q \frac{(f(\bx)p(\bx) - \mu q(\bx))^2}{q(\bx)} \di \bx,
+    \label{eq:ISVarianceFormula}
+\end{equation}
+where $Q = \{ \bx \mid q(\bx) > 0 \}$. The domain $Q$ can be replaced by $\mathcal{D}$ in the above integrals.
+\end{thm}
+
+\begin{proof}
+That $\E_q(\hat{\mu}_q) = \mu$ follows directly from \eqref{eq:ImportanceSamplingDerivation}. Next,
+\[
+    \Var_q(\hat{\mu}_q) = \frac{1}{n} \left[ \int_Q \left( \frac{f(\bx)p(\bx)}{q(\bx)} \right)^2 q(\bx) \, \di \bx - \mu^2 \right].
+\]
+The first expression in equation \eqref{eq:ISVarianceFormula} follows by the definition of $\sigma_q^2$ and the second by simple rearrangement. Because $q > 0$ whenever $fp \neq 0$, we can replace $Q$ by $\mathcal{D}$ in the integrals.
+\end{proof}
+
+To form a confidence interval for $\mu$, we need to estimate $\sigma_q^2$. From the second expression in \eqref{eq:ISVarianceFormula} we find that
+\[
+    \sigma_q^2 = \E_q((f(\bX)p(\bX) - \mu q(\bX))^2 / q(\bX)^2).
+\]
+Because $\bx_i$ are sampled from $q$, the natural variance estimate is
+\begin{equation}
+    \hat{\sigma}_q^2 = \frac{1}{n} \sum_{i=1}^n \left( \frac{f(\bx_i)p(\bx_i)}{q(\bx_i)} - \hat{\mu}_q \right)^2 = \frac{1}{n} \sum_{i=1}^n (w_i f(\bx_i) - \hat{\mu}_q)^2,
+    \label{eq:ISVarianceEstimator}
+\end{equation}
+where $w_i = p(\bx_i)/q(\bx_i)$. Then an approximate $99\%$ confidence interval for $\mu$ is $\hat{\mu}_q \pm 2.58 \hat{\sigma}_q / \sqrt{n}$.
+
+Theorem \ref{thm:ISVariance} guides us in selecting a good importance sampling rule. The first expression in \eqref{eq:ISVarianceFormula} is simpler to study. A better $q$ is one that gives a smaller value of $\int_{\mathcal{D}} (fp)^2/q \, \di \bx$. When we want upper bounds on $\sigma_q^2$ we can bound $\int_{\mathcal{D}} (fp)^2/q \, \di \bx$.
+
+The second integral expression in \eqref{eq:ISVarianceFormula} illustrates how importance sampling can succeed or fail. The numerator in the integrand at the right of \eqref{eq:ISVarianceFormula} is small when $f(\bx)p(\bx) - \mu q(\bx)$ is close to zero, that is, when $q(\bx)$ is nearly proportional to $f(\bx)p(\bx)$. From the denominator, we see that regions with small values of $q(\bx)$ greatly magnify whatever lack of proportionality appears in the numerator.
+
+Suppose that $f(\bx) \geq 0$ for all $\bx$, and to rule out a trivial case, assume that $\mu > 0$ too. Then $q_{\mathrm{opt}}(\bx) = f(\bx)p(\bx)/\mu$ is a probability density, and it has $\sigma_{q_{\mathrm{opt}}}^2 = 0$. It is optimal, but not really usable because $\hat{\mu}_{q_{\mathrm{opt}}}$ becomes an average of $f(\bx_i)p(\bx_i)/q(\bx_i) = \mu$ meaning that we could compute $\mu$ directly from $f$, $p$, and $q$ without any sampling. Likewise, for $f(\bx) \leq 0$ with $\mu < 0$, a zero variance is obtained for the density $q = -fp/\mu$.
+
+Although zero-variance importance sampling densities are not usable, they provide valuable insight into the design of an effective importance sampling scheme. Suppose that $f(\bx) \ge 0$. It may be beneficial for $q$ to have spikes in the same places as $f$ or $p$, but it is even better to have them where $fp$ does. Moreover, the best $q$ is proportional to $fp$, not $\sqrt{fp}$ or $f^2p$ or some other combination.
+
+Choosing a good importance sampling distribution requires some educated guessing and possibly numerical search. In many applications, there is domain knowledge about where the spikes are. In a financial setting, we may know which stock fluctuations will cause an option to go to its maximum value. For a queuing system, it may be easy to determine which combination of arrivals will cause the system to become overloaded.
+
+In general, the density $q^*$ that minimizes $\sigma_q^2$ is proportional to $|f(\bx)|p(\bx)$ \citep{kahnMethodsReducingSample1953}, outside of trivial cases where $\int |f(\bx)|p(\bx) \di \bx = 0$. This optimal density does not have $\sigma_{q^*}^2 = 0$ on problems where $fp$ can be positive for some $\bx$ and negative for other $\bx$. When $fp$ takes both positive and negative values, a zero variance method is still possible, but it requires sampling at two points.
+
+To prove that $q^*(\bx) = |f(\bx)|p(\bx)/\E_p(|f(\bX)|)$ is optimal, let $q$ be any density that is positive when $fp \neq 0$. Then
+\begin{align*}
+    \mu^2 + \sigma_{q^*}^2 &= \int \frac{f(\bx)^2p(\bx)^2}{q^*(\bx)} \di \bx = \int \frac{f(\bx)^2p(\bx)^2}{|f(\bx)|p(\bx)/\E_p(|f(\bX)|)} \di \bx \\
+    &= \E_p(|f(\bX)|)^2 = \E_q(|f(\bX)|p(\bX)/q(\bX))^2 \\
+    &\leq \E_q(f(\bX)^2p(\bX)^2/q(\bX)^2) = \mu^2 + \sigma_q^2,
+\end{align*}
+and so $\sigma_{q^*}^2 \leq \sigma_q^2$. This proof is a straightforward consequence of the Cauchy-Schwarz inequality. However, it requires that we know the optimal density before applying the Cauchy-Schwarz inequality. For a principled way to find candidates for $q^*$ in problems like importance sampling, we can turn to the calculus of variations.
+
+We may use the likelihood ratio $w(\bx) = p(\bx)/q(\bx)$ as a means to understand which importance sampling densities are good or bad choices. The first term in $\sigma_q^2$ is $\int f(\bx)^2p(\bx)^2/q(\bx) \di \bx$. We may write this term as $\E_p(f(\bX)^2w(\bX)) = \E_q(f(\bX)^2w(\bX)^2)$. The appearance of $q$ in the denominator of $w$ means that light-tailed importance densities $q$ are dangerous. If we are clever or lucky, then $f$ might be small just where it needs to be to offset the small denominator. But we often need to use the same sample with multiple integrands $f$, and so, as a rule, $q$ should have tails at least as heavy as $p$ does.
+
+When $p$ is a Gaussian distribution, then a common tactic is to take $q$ to be a Student's $t$ distribution. Such a $q$ has heavier tails than $p$. It even has heavier tails than $fp$ for integrands of the form $f(\bx) = \exp(\bx^\top \btheta)$, because then $fp$ is proportional to another Gaussian density.
+
+The reverse practice, of using a Gaussian importance distribution $q$ for a student's $t$ nominal distribution, can easily lead to $\sigma_q^2 = \infty$. Even when $q$ is nearly proportional to $fp$ we may still have $\sigma_q^2 = \infty$. The irony is that the infinite variance could be largely attributable to the unimportant region of $\mathcal{D}$ where $|f|p$ is small (but $q$ is extremely small).
+
+Bounded weights are especially valuable. If $w(\bx) \leq c$ the $\sigma_q^2 \leq c \sigma_p^2$.
+
+The likelihood ratio also reveals a dimension effect for importance sampling. Suppose that $\bx \in \R^d$ and to keep things simple, that the components of $\bX$ are independent under both $p$ and $q$. Then $w(\bX) = \prod_{j=1}^d p_j(X_j)/q_j(X_j)$. Though $f$ plays a role, the value of $\sigma_q^2$ is also driven largely by $\E_q(w(\bX)^2) = \prod_{j=1}^d \E_q(w_j(X_j)^2)$ where $w_j = p_j/q_j$. Each $\E_q(w_j(X_j)) = 1$ and $\E_q(w(\bX)^2) = \prod_{j=1}^d (1 + \Var_q(w_j(X_j)))$. This quantity will grow exponentially with $d$ unless we arrange for the variances of $w_j(X_j)$ to eventually decrease sharply as $j$ increases.
+
+Although we can get a lot of insight from the likelihood ratio $w(\bx)$, the efficiency of importance sampling compared to alternatives still depends on $f$. We will see another example of that phenomenon in \S 9.3 where we discuss some measures of effective sample size for importance sampling.
+
+Sometimes we can only compute an unnormalized version of $p$, $p_u(\bx) = cp(\bx)$ where $c > 0$ is unknown. The same may be true of $q$. Suppose that we can compute $q_u(\bx) = bq(\bx)$ where $b > 0$ might be unknown. If we are fortunate or clever enough to have $b = c$, then $p(\bx)/q(\bx) = p_u(\bx)/q_u(\bx)$ and we can still use \eqref{eq:ImportanceSamplingEstimator}. Otherwise we may compute the ratio $w_u(\bx) = p_u(\bx)/q_u(\bx) = (c/b)p(\bx)/q(\bx)$ and consider the \textit{self-normalized importance sampling estimate}
+\begin{equation}
+    \tilde{\mu}_q = \frac{\sum_{i=1}^n f(\bX_i)w_u(\bX_i)}{\sum_{i=1}^n w_u(\bX_i)}
+    \label{eq:SelfNormalizedIS}
+\end{equation}
+where $\bX_i \sim q$ are independent. The factor $c/b$ cancels from numerator and denominator in \eqref{eq:SelfNormalizedIS}, leading to the same estimate as if we had used the desired ratio $w(\bx) = p(\bx)/q(\bx)$ instead of the computable alternative $w_u(\bx)$. As a result we can write
+\begin{equation}
+    \tilde{\mu}_q = \frac{\frac{1}{n} \sum_{i=1}^n f(\bX_i)w(\bX_i)}{\frac{1}{n} \sum_{i=1}^n w(\bX_i)}.
+    \label{eq:SelfNormalizedISStandard}
+\end{equation}
+
+\begin{thm}{Consistency of Self-Normalized Importance Sampling}{SelfNormalizedIS}
+Let $p$ be a probability density function on $\R^d$ and let $f(\bx)$ be a function such that $\mu = \int f(\bx)p(\bx) \di \bx$ exists. Suppose that $q(\bx)$ is a probability density function on $\R^d$ with $q(\bx) > 0$ whenever $p(\bx) > 0$. Let $\bX_1, \dots, \bX_n \sim q$ be independent and let $\tilde{\mu}_q$ be the self-normalized importance sampling estimate \eqref{eq:SelfNormalizedIS}. Then
+\[
+    \Pm \left( \lim_{n \to \infty} \tilde{\mu}_q = \mu \right) = 1.
+\]
+\end{thm}
+
+\begin{proof}
+We may use expression \eqref{eq:SelfNormalizedISStandard} for $\tilde{\mu}_q$. The numerator in \eqref{eq:SelfNormalizedISStandard} is the average $\hat{\mu}_q$ of $f(\bX_i)p(\bX_i)/q(\bX_i)$ under sampling from $q$. These are \iid with mean $\mu$ by \eqref{eq:ImportanceSamplingDerivation}. The strong law of large numbers gives $\Pm(\lim_{n \to \infty} \hat{\mu}_q = \mu) = 1$. The denominator of \eqref{eq:SelfNormalizedISStandard} converges to 1, using the argument for the numerator on the function $f$ with $f(\bx) \equiv 1$.
+\end{proof}
+
+Importance sampling uses unequally weighted observations. The weights are $w_i = p(\bX_i)/q(\bX_i) \geq 0$ for $i=1, \dots, n$. In extreme settings, one of the $w_i$ may be vastly larger than all the others and then we have effectively only got one observation. We would like to have a diagnostic to tell when the weights are problematic. It is even possible that $w_1 = w_2 = \dots = w_n = 0$. In that case, importance sampling has clearly failed and we don't need a diagnostic to tell us so. Hence, we may assume that $\sum_{i=1}^n w_i > 0$.
+
+Consider a hypothetical linear combination
+\begin{equation}
+    S_w = \frac{\sum_{i=1}^n w_i Z_i}{\sum_{i=1}^n w_i}
+    \label{eq:HypotheticalLinearComb}
+\end{equation}
+where $Z_i$ are independent random variables with a common mean and common variance $\sigma^2 > 0$, and $\bw \in [0, \infty)^n$ is the vector of weights. The unweighted average of $n_e$ independent random variables $Z_i$ has variance $\sigma^2/n_e$. Setting $\Var(S_w) = \sigma^2/n_e$ and solving for $n_e$ yields the \textit{effective sample size}
+\begin{equation}
+    n_e = \frac{(\sum_{i=1}^n w_i)^2}{\sum_{i=1}^n w_i^2} = \frac{n \bar{w}^2}{\overline{w^2}}
+    \label{eq:EffectiveSampleSize}
+\end{equation}
+where $\bar{w} = (1/n) \sum_{i=1}^n w_i$ and $\overline{w^2} = (1/n) \sum_{i=1}^n w_i^2$. If the weights are too imbalanced, then the result is similar to averaging only $n_e \ll n$ observations and might therefore be unreliable. The point at which $n_e$ becomes alarmingly small is hard to specify, because it is application-specific.
+
+The effective sample size \cref{eq:EffectiveSampleSize} is computed from the generated values. For simple enough distributions, we can obtain a population version of $n_e$, as
+\begin{equation}
+    n_e^* = \frac{n \E_q(w)^2}{\E_q(w^2)} = \frac{n}{\E_q(w^2)} = \frac{n}{\E_p(w)}.
+    \label{eq:PopulationESS}
+\end{equation}
+If $n_e^*$ is too small, then we know $q$ will produce imbalanced weights. Another effective sample size formula is
+\begin{equation}
+    \frac{n}{1 + \mathrm{cv}(\bw)^2}
+    \label{eq:ESS_CV}
+\end{equation}
+where $\mathrm{cv}(\bw) = ((n-1)^{-1} \sum_{i=1}^n (w_i - \bar{w})^2)^{1/2} / \bar{w}$ is the coefficient of variation of the weights. If we replace the $n-1$ by $n$ in $\mathrm{cv}(\bw)$ and substitute into $n/(1+\mathrm{cv}(\bw)^2)$, the result is $n_e$ of \cref{eq:EffectiveSampleSize}, so the two formulas are essentially the same.
+
+Instead of using an effective sample size, we might just estimate the variance of $\hat{\mu}_q$ (or of $\tilde{\mu}_q$) and use the variance as a diagnostic. When that variance is quite large, we would conclude that the importance sampling had not worked well. Unfortunately, the variance estimate is based on the same weights as the estimate itself. Badly skewed weights can lead to a badly estimated mean, along with a poor variance estimate that masks the problem.
+
+The variance estimate for $\tilde{\mu}_q$ uses a weighted average of $(f(\bx_i) - \tilde{\mu}_q)^2$ with weights equal to $w_i^2$. Similarly, for $\hat{\mu}_q$ we have $\hat{\sigma}_q^2 = (1/n) \sum_{i=1}^n w_i^2 f(\bx_i)^2 - \hat{\mu}_q^2$ which again depends on weights $w_i^2$. We can compute an effective sample size for variance estimates by
+\begin{equation}
+    n_{e, \sigma} = \frac{(\sum_{i=1}^n w_i^2)^2}{\sum_{i=1}^n w_i^4}.
+    \label{eq:ESS_Variance}
+\end{equation}
+If $n_{e, \sigma}$ is small, then we cannot trust the variance estimate. Estimating a variance well is typically a harder problem than estimating a mean well, and here we have $n_{e, \sigma} \leq n_{e, \mu}$.
+
+The accuracy of the central limit theorem for a mean depends on the skewness of the random variables being summed. To gauge the reliability of the CLT for $\hat{\mu}_q$ and $\tilde{\mu}_q$ we find that the skewness of $S_w$ matches that of the average of
+\[
+    n_{e, \gamma} = \frac{(\sum w_i^2)^3}{(\sum w_i^3)^2}
+\]
+equally weighted observations.
+
+Effective sample sizes are imperfect diagnostics. When they are too small, then we have a sign that the importance sampling weights are problematic. When they are large, we still cannot conclude that importance sampling has worked. It remains possible that some important region was missed by all of $\bX_1, \dots, \bX_n$.
+
+The diagnostics above used the weights $w_i$ only through their relative values $w_i / \sum_j w_j$. In cases where $w_i$ is computable, it is the observed value of a random variable with mean $\E_q(p(\bX)/q(\bX)) = 1$. If the sample mean of the weights is far from 1, then that is a sign that $q$ was poorly chosen. That is, $\bar{w} = (1/n) \sum_{i=1}^n w_i$ is another diagnostic.
+
+These weight-based diagnostics are the same for every function $f$. They are convenient summaries, but the effectiveness of importance sampling also depends on $f$. If every $f(\bX_i)p(\bX_i)/q(\bX_i) = 0$, it is likely that our importance sampling has failed, and no further diagnostic is needed. Otherwise, for a diagnostic that is specific to $f$ let
+\[
+    \tilde{w}_i(f) = \frac{|f(\bX_i)|p(\bX_i)/q(\bX_i)}{\sum_{j=1}^n |f(\bX_j)|p(\bX_j)/q(\bX_j)}.
+\]
+After some algebra, the sample coefficient of variation of these weights is $\mathrm{cv}(\bw, f) = \sqrt{n \sum_{i=1}^n \tilde{w}_i^2 - 1}$. An effective sample size customised to $f$ is
+\begin{equation}
+    n_e(f) = \frac{n}{1 + \mathrm{cv}(\bw, f)^2} = \frac{1}{\sum_{i=1}^n \tilde{w}_i(f)^2}.
+    \label{eq:ESSFunctionSpecific}
+\end{equation}

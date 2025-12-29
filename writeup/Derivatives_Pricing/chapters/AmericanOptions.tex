@@ -1,0 +1,93 @@
+Whereas a European option can be exercised only at a fixed date, an American option can be exercised any time up to its expiration. The value of an American option is the value achieved by exercising optimally. Finding this value entails finding the optimal exercise rule by solving an optimal stopping problem and computing the expected discounted payoff of the option under this rule. The embedded optimisation problem makes this a difficult problem for simulation.
+
+\subsection{Approximate Continuation Values}
+Regression-based methods posit an expression for the continuation value of the form
+\begin{equation} \label{eq:ContinuationValueExpectation}
+    \E[V_{i+1}(X_{i+1}) \mid X_i = x] = \sum_{r=1}^M \beta_{ir} \psi_r(x),
+\end{equation}
+for some basis functions $\psi_r : \R^d \to \R$ and constants $\beta_{ir}, r = 1, \dots, M$. Using the notation $C_i$ for the continuation value at time $i$, we may equivalently write \cref{eq:ContinuationValueExpectation} as
+\begin{equation} \label{eq:ContinuationValueVectorForm}
+    C_i(x) = \beta_i^\top \psi(x),
+\end{equation}
+with
+\begin{equation*}
+    \beta_i^\top = (\beta_{i1}, \dots, \beta_{iM}), \quad \psi(x) = (\psi_1(x), \dots, \psi_M(x))^\top.
+\end{equation*}
+One could use different basis functions at different exercise dates, but to simplify notation, we suppress any dependence of $\psi$ on $i$.
+
+Assuming a relation of the form \cref{eq:ContinuationValueExpectation} holds, the vector $\beta_i$ is given by
+\begin{equation} \label{eq:BetaVectorDefinition}
+    \beta_i = (\E[\psi(X_i)\psi(X_i)^\top])^{-1} \E[\psi(X_i)V_{i+1}(X_{i+1})] \equiv B_\psi^{-1} B_{\psi V}.
+\end{equation}
+Here, $B_\psi$ is the indicated $M \times M$ matrix (assumed nonsingular) and $B_{\psi V}$ the indicated vector of length $M$. The variables $(X_i, X_{i+1})$ inside the expectations have a joint distribution corresponding to the state of the underlying Markov chain at dates $i$ and $i+1$.
+
+The coefficients $\beta_{ir}$ could be estimated from observations of pairs $(X_{ij}, V_{i+1}(X_{i+1,j}))$, $j = 1, \dots, b$, each consisting of the state at time $i$ and the corresponding option value at time $i+1$. Consider, in particular, independent paths $(X_{1j}, \dots, X_{mj})$, $j = 1, \dots, b$, and suppose for a moment that the values $V_{i+1}(X_{i+1,j})$ are known. The least-squares estimate of $\beta_i$ is then given by
+\begin{equation*}
+    \hat{\beta}_i = \hat{B}_\psi^{-1} \hat{B}_{\psi V},
+\end{equation*}
+where $\hat{B}_\psi$ and $\hat{B}_{\psi V}$ are the sample counterparts of $B_\psi$ and $B_{\psi V}$. More explicitly, $\hat{B}_\psi$ is the $M \times M$ matrix with $qr$ entry
+\begin{equation*}
+    \frac{1}{b} \sum_{j=1}^b \psi_q(X_{ij}) \psi_r(X_{ij})
+\end{equation*}
+and $\hat{B}_{\psi V}$ is the $M$-vector with $r$th entry
+\begin{equation} \label{eq:SampleCounterpartVector}
+    \frac{1}{b} \sum_{k=1}^b \psi_r(X_{ik}) V_{i+1}(X_{i+1, k}).
+\end{equation}
+All of these quantities can be calculated from function values at pairs of consecutive nodes $(X_{ij}, X_{i+1, j})$, $j = 1, \dots, b$. In practice, $V_{i+1}$ is unknown and must be replaced by estimated values $\hat{V}_{i+1}$ at downstream nodes. The estimate $\hat{\beta}_i$ then defines an estimate
+\begin{equation} \label{eq:EstimatedContinuationValue}
+    \hat{C}_i(x) = \hat{\beta}_i^\top \psi(x),
+\end{equation}
+of the continuation value at an arbitrary point $x$ in the state space $\R^d$. This, in turn, defines a procedure for estimating the option value.
+
+\begin{algorithm}[H]
+    \caption{Regression-Based Pricing Algorithm}
+    \label{alg:GeneralRegressionPricing}
+    \begin{algorithmic}[1]
+        \State Simulate $b$ independent paths $\{X_{1j}, \dots, X_{mj}\}, j = 1, \dots, b$, of the Markov chain.
+        \State At terminal nodes, set $\hat{V}_{mj} = h_m(X_{mj})$ for $j = 1, \dots, b$.
+        \For{$i = m-1$ \textbf{down to} $1$}
+            \State Given estimated values $\hat{V}_{i+1, j}, j = 1, \dots, b$, use regression to calculate $\hat{\beta}_i = \hat{B}_\psi^{-1} \hat{B}_{\psi V}$.
+            \State Compute estimated continuation values $\hat{C}_i(X_{ij})$ using \cref{eq:EstimatedContinuationValue}.
+            \For{$j = 1, \dots, b$}
+                \State Set value based on immediate exercise versus estimated continuation:
+                \begin{equation} \label{eq:GeneralRegressionUpdate}
+                    \hat{V}_{ij} = \max \left\{ h_i(X_{ij}), \hat{C}_i(X_{ij}) \right\}.
+                \end{equation}
+            \EndFor
+        \EndFor
+        \State Set $\hat{V}_0 = (\hat{V}_{11} + \dots + \hat{V}_{1b}) / b$.
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{defn}{American Contingent Claim}{AmericanContingentClaim}
+An \textit{American contingent claim} $X^a = (X, \mathcal{T}_{[0,T]})$ expiring at time $T$ consists of a sequence of payoffs $(X_t)_{t=0}^T$, where $X_t$ is an $\cF_t$-measurable random variable for $t = 0, 1, \dots, T$, and of the set $\mathcal{T}_{[0,T]}$ of admissible exercise policies.
+\end{defn}
+
+
+
+\begin{prop}{Arbitrage Price of American Put}{ArbitragePriceAmericanPut}
+The arbitrage price $P_t^a$ of an American put option equals
+\begin{equation} \label{eq:AmericanPutArbitragePrice}
+    P_t^a = \max_{\tau \in \mathcal{T}_{[t,T]}} \E_{\Pm^*} \left( \hat{r}^{-(\tau-t)} (K - S_\tau)^+ \mid \cF_t \right), \quad \forall t \le T.
+\end{equation}
+Moreover, for any $t \le T$ the stopping time $\tau_t^*$ that realizes the maximum in \cref{eq:AmericanPutArbitragePrice} is given by the expression (by convention $\min \emptyset = T$)
+\begin{equation} \label{eq:OptimalStoppingTime}
+    \tau_t^* = \min \left\{ u \in \{t, t + 1, \dots, T\} \mid (K - S_u)^+ \ge P_u^a \right\}.
+\end{equation}
+\end{prop}
+
+\begin{prop}{Arbitrage Price of American Claim in CRR}{ArbitragePriceAmericanClaimCRR}
+For every $t \le T$, the arbitrage price $\pi(X^a)$ of an arbitrary American claim $X^a$ in the CRR model equals
+\begin{equation} \label{eq:GeneralAmericanArbitragePrice}
+    \pi_t(X^a) = \max_{\tau \in \mathcal{T}_{[t,T]}} \E_{\Pm^*} \left( \hat{r}^{-(\tau-t)} X_\tau \mid \cF_t \right).
+\end{equation}
+The price process $\pi(X^a)$ can be determined using the following recurrence relation, for every $t \le T - 1$,
+\begin{equation} \label{eq:SnellEnvelopeRecurrence}
+    \pi_t(X^a) = \max \left\{ X_t, \E_{\Pm^*} \left( \hat{r}^{-1} \pi_{t+1}(X^a) \mid \cF_t \right) \right\}
+\end{equation}
+subject to the terminal condition $\pi_T(X^a) = X_T$. In the case of a path-independent American claim $X^a$ with the reward function $h$ we have that, for every $t \le T - 1$,
+\begin{equation} \label{eq:PathIndependentRecurrence}
+    \pi_t(X^a) = \max \left\{ h(S_t, t), \hat{r}^{-1} \left( p_* \pi_{t+1}^u(X^a) + (1 - p_*) \pi_{t+1}^d(X^a) \right) \right\},
+\end{equation}
+where, for a generic stock price value $S_t$ at time $t$, we write $\pi_{t+1}^u(X^a)$ and $\pi_{t+1}^d(X^a)$ to denote the values of the price process $\pi(X^a)$ at time $t + 1$ in the nodes that correspond to the upward and downward movements of the stock price during the time-period $[t, t + 1]$, that is, for the values $uS_t$ and $dS_t$ of the stock price at time $t + 1$, respectively.
+\end{prop}

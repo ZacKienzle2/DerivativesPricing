@@ -1,0 +1,184 @@
+For a multivariate function $f$ that maps a vector $\v{x} = [x_1, \dots, x_n]^\T$ to a real number $f(\v{x})$, the \textit{partial derivative} with respect to $x_i$, denoted $\frac{\partial f}{\partial x_i}$, is the derivative taken with respect to $x_i$ while all other variables are held constant. We can write all the $n$ partial derivatives neatly using the ``scalar/vector'' derivative notation:
+\begin{equation}
+    \text{scalar/vector:} \qquad \frac{\partial f}{\partial \v{x}} \coloneqq
+    \begin{bmatrix}
+        \frac{\partial f}{\partial x_1} \\
+        \vdots \\
+        \frac{\partial f}{\partial x_n}
+    \end{bmatrix}. \label{eq:GradientDef}
+\end{equation}
+This vector of partial derivatives is known as the \textit{gradient} of $f$ at $\v{x}$ and is sometimes written as $\nabla f(\v{x})$.
+
+Next, suppose that $\v{f}$ is a multivalued (vector-valued) function taking values in $\R^m$, defined by
+\begin{equation*}
+    \v{x} =
+    \begin{bmatrix}
+        x_1 \\
+        x_2 \\
+        \vdots \\
+        x_n
+    \end{bmatrix}
+    \mapsto
+    \begin{bmatrix}
+        f_1(\v{x}) \\
+        f_2(\v{x}) \\
+        \vdots \\
+        f_m(\v{x})
+    \end{bmatrix}
+    \eqqcolon \v{f}(\v{x}).
+\end{equation*}
+We can compute each of the partial derivatives $\partial f_i / \partial x_j$ and organize them neatly in a ``vector/vector'' derivative notation:
+\begin{equation}
+    \text{vector/vector:} \qquad \frac{\partial \v{f}}{\partial \v{x}} \coloneqq
+    \begin{bmatrix}
+        \frac{\partial f_1}{\partial x_1} & \frac{\partial f_2}{\partial x_1} & \dots & \frac{\partial f_m}{\partial x_1} \\
+        \frac{\partial f_1}{\partial x_2} & \frac{\partial f_2}{\partial x_2} & \dots & \frac{\partial f_m}{\partial x_2} \\
+        \vdots & \vdots & \dots & \vdots \\
+        \frac{\partial f_1}{\partial x_n} & \frac{\partial f_2}{\partial x_n} & \dots & \frac{\partial f_m}{\partial x_n}
+    \end{bmatrix}. \label{eq:VectorVectorDerivative}
+\end{equation}
+The transpose of this matrix is known as the \textit{matrix of Jacobi} of $\v{f}$ at $\v{x}$ (sometimes called the \textit{Fr\'{e}chet derivative} of $\v{f}$ at $\v{x}$); that is,
+\begin{equation}
+    \v{J}_{\v{f}}(\v{x}) \coloneqq \left[ \frac{\partial \v{f}}{\partial \v{x}} \right]^\T =
+    \begin{bmatrix}
+        \frac{\partial f_1}{\partial x_1} & \frac{\partial f_1}{\partial x_2} & \dots & \frac{\partial f_1}{\partial x_n} \\
+        \frac{\partial f_2}{\partial x_1} & \frac{\partial f_2}{\partial x_2} & \dots & \frac{\partial f_2}{\partial x_n} \\
+        \vdots & \vdots & \dots & \vdots \\
+        \frac{\partial f_m}{\partial x_1} & \frac{\partial f_m}{\partial x_2} & \dots & \frac{\partial f_m}{\partial x_n}
+    \end{bmatrix}. \label{eq:JacobianMatrix}
+\end{equation}
+If we define $\v{g}(\v{x}) \coloneqq \nabla f(\v{x})$ and take the ``vector/vector'' derivative of $\v{g}$ with respect to $\v{x}$, we obtain the matrix of second-order partial derivatives of $f$:
+\begin{equation}
+    \v{H}_f(\v{x}) \coloneqq \frac{\partial \v{g}}{\partial \v{x}} =
+    \begin{bmatrix}
+        \frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1 \partial x_2} & \dots & \frac{\partial^2 f}{\partial x_1 \partial x_m} \\
+        \frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \dots & \frac{\partial^2 f}{\partial x_2 \partial x_m} \\
+        \vdots & \vdots & \dots & \vdots \\
+        \frac{\partial^2 f}{\partial x_m \partial x_1} & \frac{\partial^2 f}{\partial x_m \partial x_2} & \dots & \frac{\partial^2 f}{\partial x_m^2}
+    \end{bmatrix}, \label{eq:HessianMatrix}
+\end{equation}
+which is known as the \textit{Hessian matrix} of $f$ at $\v{x}$, also denoted as $\nabla^2 f(\v{x})$. If these second-order partial derivatives are \textit{continuous} in a region around $\v{x}$, then $\frac{\partial f}{\partial x_i \partial x_j} = \frac{\partial f}{\partial x_j \partial x_i}$ and, hence, the Hessian matrix $\v{H}_f(\v{x})$ is symmetric.
+
+Finally, note that we can also define a ``scalar/matrix'' derivative of $y$ with respect to $\v{X} \in \R^{m \times n}$ with $(i, j)$-th entry $x_{ij}$:
+\begin{equation*}
+    \frac{\partial y}{\partial \v{X}} \coloneqq
+    \begin{bmatrix}
+        \frac{\partial y}{\partial x_{11}} & \frac{\partial y}{\partial x_{12}} & \dots & \frac{\partial y}{\partial x_{1n}} \\
+        \frac{\partial y}{\partial x_{21}} & \frac{\partial y}{\partial x_{22}} & \dots & \frac{\partial y}{\partial x_{2n}} \\
+        \vdots & \vdots & \dots & \vdots \\
+        \frac{\partial y}{\partial x_{m1}} & \frac{\partial y}{\partial x_{m2}} & \dots & \frac{\partial y}{\partial x_{mn}}
+    \end{bmatrix}
+\end{equation*}
+and a ``matrix/scalar'' derivative:
+\begin{equation*}
+    \frac{\partial \v{X}}{\partial y} \coloneqq
+    \begin{bmatrix}
+        \frac{\partial x_{11}}{\partial y} & \frac{\partial x_{12}}{\partial y} & \dots & \frac{\partial x_{1n}}{\partial y} \\
+        \frac{\partial x_{21}}{\partial y} & \frac{\partial x_{22}}{\partial y} & \dots & \frac{\partial x_{2n}}{\partial y} \\
+        \vdots & \vdots & \dots & \vdots \\
+        \frac{\partial x_{m1}}{\partial y} & \frac{\partial x_{m2}}{\partial y} & \dots & \frac{\partial x_{mn}}{\partial y}
+    \end{bmatrix}.
+\end{equation*}
+
+\subsection{Optimisation Theory} \label{sec:OptimisationTheory}
+Optimisation is concerned with finding minimal or maximal solutions of a real-valued \textit{objective function} $f$ in some set $\mathcal{X}$:
+\begin{equation}
+    \min_{x \in \mathcal{X}} f(x) \qquad \text{or} \qquad \max_{x \in \mathcal{X}} f(x). \label{eq:OptimizationDef}
+\end{equation}
+Since any maximisation problem can easily be converted into a minimisation problem via the equivalence $\max_x f(x) = -\min_x -f(x)$, we focus only on minimisation problems. We use the following terminology. A \textit{local minimiser} of $f(x)$ is an element $x^* \in \mathcal{X}$ such that $f(x^*) \le f(x)$ for all $x$ in some neighborhood of $x^*$. If $f(x^*) \le f(x)$ for all $x \in \mathcal{X}$, then $x^*$ is called a \textit{global minimiser} or \textit{global solution}. The set of global minimiser is denoted by
+\begin{equation*}
+    \argmin_{x \in \mathcal{X}} f(x).
+\end{equation*}
+The function value $f(x^*)$ corresponding to a local/global minimiser $x^*$ is referred to as the \textit{local/global minimum} of $f(x)$.
+
+Optimisation problems may be classified by the set $\mathcal{X}$ and the objective function $f$. If $\mathcal{X}$ is countable, the optimisation problem is called \textit{discrete} or \textit{combinatorial}. If instead $\mathcal{X}$ is a nondenumerable set such as $\R^n$ and $f$ takes values in a nondenumerable set, then the problem is said to be \textit{continuous}. Optimisation problems that are neither discrete nor continuous are said to be \textit{mixed}.
+
+The search set $\mathcal{X}$ is often defined by means of \textit{constraints}. A standard setting for \textit{constrained optimisation} (minimisation) is the following:
+\begin{equation}
+    \begin{split}
+        &\min_{x \in \mathcal{Y}} f(x) \\
+        \text{subject to: } & h_i(\v{x}) = 0, \quad i = 1, \dots, m, \\
+        & g_i(\v{x}) \le 0, \quad i = 1, \dots, k.
+    \end{split} \label{eq:ConstrainedOptimization}
+\end{equation}
+Here, $f$ is the objective function, and $\{g_i\}$ and $\{h_i\}$ are given functions so that $h_i(\v{x}) = 0$ and $g_i(\v{x}) \le 0$ represent the \textit{equality} and \textit{inequality constraints}, respectively. The region $\mathcal{X} \subseteq \mathcal{Y}$ where the objective function is defined and where all the constraints are satisfied is called the \textit{feasible region}. An optimisation problem without constraints is said to be an \textit{unconstrained problem}.
+
+For an unconstrained continuous optimisation problem, the search space $\mathcal{X}$ is often taken to be (a subset of) $\R^n$, and $f$ is assumed to be a $C^k$ function for sufficiently high $k$ (typically $k=2$ or $3$ suffices); that is, its $k$-th order derivative is continuous. For a $C^1$ function the standard approach to minimising $f(\v{x})$ is to solve the equation
+\begin{equation}
+    \nabla f(\v{x}) = \v{0}, \label{eq:GradientZero}
+\end{equation}
+where $\nabla f(\v{x})$ is the \textit{gradient} of $f$ at $\v{x}$. The solutions $\v{x}^*$ to \cref{eq:GradientZero} are called \textit{stationary points}. Stationary points can be local/global minimisers, local/global maximisers, or \textit{saddle points} (which are neither). If, in addition, the function is $C^2$, the condition
+\begin{equation}
+    \v{y}^\T (\nabla^2 f(\v{x}^*)) \v{y} > 0 \quad \text{for all } \v{y} \neq \v{0} \label{eq:PositiveDefiniteHessian}
+\end{equation}
+ensures that the stationary point $\v{x}^*$ is a local minimiser of $f$. The condition \cref{eq:PositiveDefiniteHessian} states that the \textit{Hessian matrix} of $f$ at $\v{x}^*$ is \textit{positive definite}. Recall that we write $\v{H} \succ 0$ to indicate that a matrix $\v{H}$ is positive definite.
+
+\subsection{Numerical Root-Finding and Minimisation}
+In order to minimize a $C^1$ function $f : \R^n \to \R$ one may solve
+\begin{equation*}
+    \nabla f(\v{x}) = \v{0},
+\end{equation*}
+which gives a stationary point of $f$. As a consequence, any technique for root-finding can be transformed into an unconstrained optimization method by attempting to locate roots of the gradient. However, as noted in \cref{sec:OptimisationTheory}, not all stationary points are minima, and so additional information (such as is contained in the Hessian, if $f$ is $C^2$) needs to be considered in order to establish the type of stationary point.
+
+Alternatively, a root of a continuous function $\v{g} : \R^n \to \R^n$ may be found by minimizing the norm of $\v{g}(\v{x})$ over all $\v{x}$; that is, by solving $\min_{\v{x}} f(\v{x})$, with $f(\v{x}) \coloneqq \|\v{g}(\v{x})\|_p$, where for $p \ge 1$ the $p$-\textit{norm} of $\v{y} = [y_1, \dots, y_n]^\T$ is defined as
+\begin{equation*}
+    \|\v{y}\|_p \coloneqq \left( \sum_{i=1}^n |y_i|^p \right)^{1/p}.
+\end{equation*}
+Hence, any (un)constrained optimization method can be transformed into a technique for locating the roots of a function.
+
+Starting with an initial guess $\v{x}_0$, most minimization and root-finding algorithms create a sequence $\v{x}_0, \v{x}_1, \dots$ using the iterative updating rule:
+\begin{equation}
+    \v{x}_{t+1} = \v{x}_t + \alpha_t \v{d}_t, \quad t = 0, 1, 2, \dots, \label{eq:IterativeUpdate}
+\end{equation}
+where $\alpha_t > 0$ is a (typically small) step size, called the \textit{learning rate}, and the vector $\v{d}_t$ is the \textit{search direction} at step $t$. The iteration \cref{eq:IterativeUpdate} continues until the sequence $\{\v{x}_t\}$ is deemed to have converged to a solution, or a computational budget has been exhausted. The performance of all such iterative methods depends crucially on the quality of the initial guess $\v{x}_0$.
+
+There are two broad categories of iterative optimization algorithms of the form \cref{eq:IterativeUpdate}:
+\begin{itemize}
+    \item Those of \textit{line search} type, where at iteration $t$ we first compute a direction $\v{d}_t$ and then determine a reasonable step size $\alpha_t$ along this direction. For example, in the case of minimization, $\alpha_t > 0$ may be chosen to approximately minimize $f(\v{x}_t + \alpha \v{d}_t)$ for fixed $\v{x}_t$ and $\v{d}_t$.
+    \item Those of \textit{trust region} type, where at each iteration $t$ we first determine a suitable step size $\alpha_t$ and then compute an approximately optimal direction $\v{d}_t$.
+\end{itemize}
+
+In the following sections, we review several widely-used root-finding and optimization algorithms of the line search type.
+
+\subsubsection{Newton-Like Methods}
+Suppose we wish to find roots of a function $\v{f} : \R^n \to \R^n$. If $\v{f}$ is in $C^1$, we can approximate $\v{f}$ around a point $\v{x}_t$ as
+\begin{equation*}
+    \v{f}(\v{x}) \approx \v{f}(\v{x}_t) + \v{J}_{\v{f}}(\v{x}_t)(\v{x} - \v{x}_t),
+\end{equation*}
+where $\v{J}_{\v{f}}$ is the \textit{matrix of Jacobi}, the matrix of partial derivatives of $\v{f}$; see \cref{eq:JacobianMatrix}. When $\v{J}_{\v{f}}(\v{x}_t)$ is invertible, this linear approximation has root $\v{x}_t - \v{J}_{\v{f}}^{-1}(\v{x}_t) \v{f}(\v{x}_t)$. This gives the iterative updating formula \cref{eq:IterativeUpdate} for finding roots of $\v{f}$ with direction $\v{d}_t = -\v{J}_{\v{f}}^{-1}(\v{x}_t) \v{f}(\v{x}_t)$ and learning rate $\alpha_t = 1$. This is known as \textit{Newton's method} (or the \textit{Newton--Raphson method}) for root-finding.
+
+Instead of a unit learning rate, sometimes it is more effective to use an $\alpha_t$ that satisfies the \textit{Armijo inexact line search condition}:
+\begin{equation*}
+    \|\v{f}(\v{x}_t + \alpha_t \v{d}_t)\| < (1 - \varepsilon_1 \alpha_t) \|\v{f}(\v{x}_t)\|,
+\end{equation*}
+where $\varepsilon_1$ is a small heuristically chosen constant, say $\varepsilon_1 = 10^{-4}$. For $C^1$ functions, such an $\alpha_t$ always exists by continuity and can be computed as in the following algorithm.
+
+\begin{algorithm}[H]
+    \caption{Newton--Raphson for Finding Roots of $\v{f}(\v{x}) = \v{0}$}
+    \label{alg:NewtonRaphson}
+    \begin{algorithmic}[1]
+        \Require An initial guess $\v{x}$ and stopping error $\varepsilon > 0$.
+        \Ensure The approximate root of $\v{f}(\v{x}) = \v{0}$.
+        \While{$\|\v{f}(\v{x})\| > \varepsilon$ and budget is not exhausted}
+            \State Solve the linear system $\v{J}_{\v{f}}(\v{x}) \v{d} = -\v{f}(\v{x})$.
+            \State $\alpha \gets 1$
+            \While{$\|\v{f}(\v{x} + \alpha \v{d})\| > (1 - 10^{-4}\alpha) \|\v{f}(\v{x})\|$}
+                \State $\alpha \gets \alpha/2$
+            \EndWhile
+            \State $\v{x} \gets \v{x} + \alpha \v{d}$
+        \EndWhile
+        \State \Return $\v{x}$
+    \end{algorithmic}
+\end{algorithm}
+
+We can adapt a root-finding Newton-like method in order to minimise a differentiable function $f : \R^n \to \R$. We simply try to locate a zero of the gradient of $f$. When $f$ is a $C^2$ function, the function $\nabla f : \R^n \to \R^n$ is continuous, and so the root of $\nabla f$ leads to the search direction
+\begin{equation}
+    \v{d}_t = -\v{H}_t^{-1} \nabla f(\v{x}_t), \label{eq:NewtonSearchDirection}
+\end{equation}
+where $\v{H}_t$ is the Hessian matrix at $\v{x}_t$ (the matrix of Jacobi of the gradient is the Hessian). When the learning rate $\alpha_t$ is equal to 1, the update $\v{x}_t - \v{H}_t^{-1} \nabla f(\v{x}_t)$ can alternatively be derived by assuming that $f(\v{x})$ is approximately quadratic and convex in the neighborhood of $\v{x}_t$, that is,
+\begin{equation}
+    f(\v{x}) \approx f(\v{x}_t) + (\v{x} - \v{x}_t)^\T \nabla f(\v{x}_t) + \frac{1}{2} (\v{x} - \v{x}_t)^\T \v{H}_t (\v{x} - \v{x}_t), \label{eq:QuadraticApproximation}
+\end{equation}
+and then minimizing the right-hand side of \cref{eq:QuadraticApproximation} with respect to $\v{x}$.
+
+\subsection{Constrained Minimisation via Penalty Functions}

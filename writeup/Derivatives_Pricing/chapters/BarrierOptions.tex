@@ -1,0 +1,204 @@
+The generic term "barrier options" refers to a class of options whose payoff depends on whether the underlying price hits a prespecified barrier during the option’s lifetime.
+
+\subsection{Knock-out Barrier}
+\subsubsection{Up-and-out barrier call option}
+Let us consider an up-and-out barrier call option with maturity $T$, strike price $K$, barrier (or call level) $B$, and payoff
+
+\begin{equation*}
+    C = (S_T - K)^+ \I_{\left\{ \max\limits_{0 \le t \le T} S_t < B \right\}} =
+    \begin{dcases}
+        S_T - K & \text{if } \max\limits_{0 \le t \le T} S_t \le B, \\
+        0 & \text{if } \max\limits_{0 \le t \le T} S_t > B,
+    \end{dcases}
+\end{equation*}
+
+with $B \ge K$.
+
+\begin{prop}{Up-and-Out Barrier Call Option Pricing}{Up-and-Out Barrier Call Option Pricing}
+    When $K < B$, the price
+    \begin{equation}
+        \e^{-(T-t)r} \I_{\{M_0^t < B\}} \E^* \left[ \left( \frac{S_{T-t}}{S_0} - K \right)^+ \I_{\left\{ x \max\limits_{0 \le u \le T-t} \frac{S_u}{S_0} < B \right\}} \Bigg|_{x=S_t} \right]
+    \end{equation}
+    of the up-and-out barrier call option with maturity $T$, strike price $K$, and barrier level $B$ is given by the following formula, where $\tau = T-t$:
+    \begin{align}
+        C_{UO}(t) &= S_t \I_{\{M_0^t < B\}} \Bigg\{ \left[ \Phi \left( d_1(S_t, K) \right) - \Phi \left( d_1(S_t, B) \right) \right] \nonumber \\
+        &\quad - \left( \frac{B}{S_t} \right)^{1+\frac{2r}{\sigma^2}} \left[ \Phi \left( d_1\left(\frac{B^2}{S_t}, K\right) \right) - \Phi \left( d_1\left(\frac{B^2}{S_t}, B\right) \right) \right] \Bigg\} \nonumber \\
+        &\quad - \e^{-r\tau} K \I_{\{M_0^t < B\}} \Bigg\{ \left[ \Phi \left( d_2(S_t, K) \right) - \Phi \left( d_2(S_t, B) \right) \right] \nonumber \\
+        &\quad - \left( \frac{S_t}{B} \right)^{1-\frac{2r}{\sigma^2}} \left[ \Phi \left( d_2\left(\frac{B^2}{S_t}, K\right) \right) - \Phi \left( d_2\left(\frac{B^2}{S_t}, B\right) \right) \right] \Bigg\},
+    \end{align}
+    If $K \ge B$:
+    \begin{equation}
+        C_{UO}(t, S_t) = 0.
+    \end{equation}
+    where $d_{1,2}(S, X)$ corresponds to the definitions in \cref{eq:D1TermDefinition,eq:ExplicitD2TermDefinition} with spot price $S$, strike price $K$, and time to maturity $\tau$. The price of the up-and-out barrier call option vanishes when $B \le K$.
+\end{prop}
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/upAndOutCallBarrierSurface.pgf}
+    \caption{Graph of the up-and-out call option price}
+    \label{fig:upAndOutCallBarrierSurface}
+\end{figure}
+
+\clearpage
+\subsubsection{Up-and-out barrier put option}
+This option is also known as a \textit{Callable Bear Contract}, or a Bear CBBC with no residual value, or a turbo warrant with no rebate. In this context, $B$ denotes the call level for pricing Bear CBBCs (up-and-out barrier put options). The payoff is given by
+
+\begin{equation*}
+    P = (K - S_T)^+ \I_{\left\{ \max\limits_{0 \le t \le T} S_t < B \right\}} =
+    \begin{dcases}
+        K - S_T & \text{if } \max\limits_{0 \le t \le T} S_t \le B, \\
+        0 & \text{if } \max\limits_{0 \le t \le T} S_t > B.
+    \end{dcases}
+\end{equation*}
+
+\begin{prop}{Up-and-Out Barrier Put Option Pricing}{Up-and-Out Barrier Put Option Pricing}
+    The price of the up-and-out barrier put option with maturity $T$, strike price $K$, and barrier level $B$ is given by the following formulas, where $\tau = T-t$.
+
+    If $B < K$, the price is given by
+    \begin{align}
+        P_{UO}(t) &= S_t \I_{\{M_0^t < B\}} \Bigg\{
+        -\Phi \left( -d_1\left(S_t, B\right) \right)
+        + \left( \frac{B}{S_t} \right)^{1+\frac{2r}{\sigma^2}} \Phi \left( -d_1\left(\frac{B^2}{S_t}, B\right) \right) \Bigg\} \nonumber \\
+        &\quad + K e^{-r\tau} \I_{\{M_0^t < B\}} \Bigg\{
+        \Phi \left( -d_2\left(S_t, B\right) \right)
+        - \left( \frac{S_t}{B} \right)^{1-\frac{2r}{\sigma^2}} \Phi \left( -d_2\left(\frac{B^2}{S_t}, B\right) \right)
+        \Bigg\}.
+    \end{align}
+
+    If $B \ge K$, the price is given by
+    \begin{align}
+        P_{UO}(t) &= S_t \I_{\{M_0^t < B\}} \Bigg\{
+        -\Phi \left( -d_1\left(S_t, K\right) \right)
+        + \left( \frac{B}{S_t} \right)^{1+\frac{2r}{\sigma^2}} \Phi \left( -d_1\left(\frac{B^2}{S_t}, K\right) \right) \Bigg\} \nonumber \\
+        &\quad + K e^{-r\tau} \I_{\{M_0^t < B\}} \Bigg\{
+        \Phi \left( -d_2\left(S_t, K\right) \right)
+        - \left( \frac{S_t}{B} \right)^{1-\frac{2r}{\sigma^2}} \Phi \left( -d_2\left(\frac{B^2}{S_t}, K\right) \right)
+        \Bigg\}.
+    \end{align}
+    This corresponds to the value of a vanilla put option minus the value of the "knock-out" component.
+\end{prop}
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/upAndOutPutBarrierSurface.pgf}
+    \caption{Graph of the up-and-out put option price}
+    \label{fig:upAndOutPutBarrierSurface}
+\end{figure}
+
+\clearpage
+\subsubsection{Down-and-out barrier call option}
+Let us now consider a down-and-out barrier call option on the underlying asset price $S_t$ with exercise date $T$, strike price $K$, barrier level $B$, and payoff
+\begin{equation}
+    C = (S_T - K)^+ \mathbbm{1}_{\left\{\min\limits_{0 \le t \le T} S_t > B\right\}} =
+    \begin{dcases}
+        S_T - K & \text{if } \min\limits_{0 \le t \le T} S_t > B, \\
+        0 & \text{if } \min\limits_{0 \le t \le T} S_t \le B,
+    \end{dcases}
+\end{equation}
+with $0 \le B \le K$. The down-and-out barrier call option is also called a \textit{Callable Bull Contract}, or a Bull CBBC with no residual value, or a turbo warrant with no rebate, in which $B$ denotes the call level.
+
+\begin{comment}
+    \begin{prop}{Down-and-Out Barrier Call Option Pricing}{DownAndOutBarrierCallOptionPricing}
+    The price of the down-and-out barrier call option with maturity $T$, strike price $K$, and barrier level $B$ is given by the following formulas, where $\tau = T-t$. When $B \le K$, we have
+    \begin{align}
+        \MoveEqLeft \e^{-(T-t)r} \E^* \left[ (S_T - K)^+ \mathbbm{1}_{\left\{ \min\limits_{0 \le t \le T} S_t > B \right\}} \bigg| \mathcal{F}_t \right] \nonumber \\
+        &= S_t \mathbbm{1}_{\{m_0^t > B\}} \Phi \left( d_1 \left( \frac{S_t}{K}, T-t \right) \right) - \e^{-(T-t)r} K \mathbbm{1}_{\{m_0^t > B\}} \Phi \left( d_2 \left( \frac{S_t}{K}, T-t \right) \right) \nonumber \\
+        &\quad - B \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{2r/\sigma^2} \Phi \left( d_1 \left( \frac{B^2}{K S_t}, T-t \right) \right) \nonumber \\
+        &\quad + \e^{-(T-t)r} K \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \Phi \left( d_2 \left( \frac{B^2}{K S_t}, T-t \right) \right) \nonumber \\
+        &= \mathbbm{1}_{\{m_0^t > B\}} \mathrm{Bl}(S_t, K, r, T-t, \sigma) \nonumber \\
+        &\quad - S_t \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{1 + 2r/\sigma^2} \Phi \left( d_1 \left( \frac{B^2}{K S_t}, T-t \right) \right) \nonumber \\
+        &\quad + K \e^{-r(T-t)} \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{-1 + 2r/\sigma^2} \Phi \left( d_2 \left( \frac{B^2}{K S_t}, T-t \right) \right) \nonumber \\
+        &= \mathbbm{1}_{\{m_0^t > B\}} \mathrm{Bl}(S_t, K, r, T-t, \sigma) \nonumber \\
+        &\quad - \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1 - 2r/\sigma^2} \mathrm{Bl} \left( \frac{B^2}{S_t}, K, r, T-t, \sigma \right),
+    \end{align}
+    for $0 \le t \le T$. When $B \ge K$, we find
+    \begin{align}
+        \MoveEqLeft \e^{-(T-t)r} \E^* \left[ (S_T - K)^+ \mathbbm{1}_{\left\{ \min\limits_{0 \le t \le T} S_t > B \right\}} \bigg| \mathcal{F}_t \right] \nonumber \\
+        &= S_t \mathbbm{1}_{\{m_0^t > B\}} \Phi \left( d_1 \left( \frac{S_t}{B}, T-t \right) \right) - \e^{-(T-t)r} K \mathbbm{1}_{\{m_0^t > B\}} \Phi \left( d_2 \left( \frac{S_t}{B}, T-t \right) \right) \nonumber \\
+        &\quad - B \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{2r/\sigma^2} \Phi \left( d_1 \left( \frac{B}{S_t}, T-t \right) \right) \nonumber \\
+        &\quad + \e^{-(T-t)r} K \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \Phi \left( d_2 \left( \frac{B}{S_t}, T-t \right) \right),
+    \end{align}
+    for $S_t > B$, $0 \le t \le T$. Here $m_0^t = \min\limits_{0 \le u \le t} S_u$ and we recall $d_{1,2}(x, \tau)$ are defined as in \cref{eq:D1TermDefinition,eq:ExplicitD2TermDefinition} with the spot price term $S/K$ replaced by the ratio argument $x$.
+\end{prop}
+\end{comment}
+
+\begin{prop}{Down-and-Out Barrier Call Option Pricing}{DownAndOutBarrierCall}
+    The price of the down-and-out barrier call option with maturity $T$, strike price $K$, and barrier level $B$ is given by the following formulas, where $\tau = T-t$.
+
+    When $B \le K$, we have:
+    \begin{align}
+        \MoveEqLeft C_{DO}(t, S_t) = \mathbbm{1}_{\{m_0^t > B\}} \mathrm{Bl}(S_t, K, r, \tau, \sigma) \nonumber \\
+        &- B \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{1+2r/\sigma^2} \Phi \left( d_1 \left( \frac{B^2}{K S_t}, \tau \right) \right) \nonumber \\
+        &+ K \e^{-r\tau} \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{-1+2r/\sigma^2} \Phi \left( d_2 \left( \frac{B^2}{K S_t}, \tau \right) \right).
+    \end{align}
+
+    When $B \ge K$, we find:
+    \begin{align}
+        \MoveEqLeft C_{DO}(t, S_t) = S_t \mathbbm{1}_{\{m_0^t > B\}} \Phi \left( d_1 \left( \frac{S_t}{B}, \tau \right) \right) - K \e^{-r\tau} \mathbbm{1}_{\{m_0^t > B\}} \Phi \left( d_2 \left( \frac{S_t}{B}, \tau \right) \right) \nonumber \\
+        &- B \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{2r/\sigma^2} \Phi \left( d_1 \left( \frac{B}{S_t}, \tau \right) \right) \nonumber \\
+        &+ K \e^{-r\tau} \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \Phi \left( d_2 \left( \frac{B}{S_t}, \tau \right) \right).
+    \end{align}
+    Here $\mathrm{Bl}$ denotes the standard Black-Scholes call price, and $d_{1,2}(x, \tau)$ are defined as in \cref{eq:D1TermDefinition,eq:ExplicitD2TermDefinition} with the spot price term replaced by the ratio argument $x$. If $m_0^t \le B$, the price is $0$.
+\end{prop}
+
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/downAndOutCallBarrierSurface.pgf}
+    \caption{Graph of the down-and-out call option price}
+    \label{fig:downAndOutCallBarrierSurface}
+\end{figure}
+
+\clearpage
+\subsubsection{Down-and-out barrier put option}
+The down-and-out barrier put option with exercise date $T$, strike price $K$, and barrier level $B$ has the payoff:
+\begin{equation}
+    P = (K - S_T)^+ \mathbbm{1}_{\left\{\min_{0 \le t \le T} S_t > B\right\}} =
+    \begin{dcases}
+        K - S_T & \text{if } \min_{0 \le t \le T} S_t > B, \\
+        0 & \text{if } \min_{0 \le t \le T} S_t \le B.
+    \end{dcases}
+\end{equation}
+For this option to have non-zero value, we typically require $S_0 > B$. Since it is a put option, the intrinsic value is positive when $S_T < K$. If $B \ge K$, the condition $S_T < K$ combined with the knock-out condition $\min S_t > B \ge K$ makes the payoff always zero (as $S_T > B \ge K \implies K - S_T < 0$). Thus, we only consider the case $B < K$.
+
+\begin{comment}
+    \begin{prop}{Down-and-Out Barrier Put Option Pricing}{DownAndOutBarrierPutOptionPricing}
+    The price of the down-and-out barrier put option with maturity $T$, strike price $K$, and barrier level $B$ is given by the following formula, where $\tau = T-t$. When $B \le K$, we have
+    \begin{align}
+        \MoveEqLeft \e^{-(T-t)r} \E^* \left[ (K - S_T)^+ \mathbbm{1}_{\left\{ \min\limits_{0 \le t \le T} S_t > B \right\}} \bigg| \mathcal{F}_t \right] \nonumber \\
+        &= K \e^{-(T-t)r} \mathbbm{1}_{\{m_0^t > B\}} \left[ \Phi \left( -d_2 \left( \frac{S_t}{K}, T-t \right) \right) - \Phi \left( -d_2 \left( \frac{S_t}{B}, T-t \right) \right) \right] \nonumber \\
+        &\quad - S_t \mathbbm{1}_{\{m_0^t > B\}} \left[ \Phi \left( -d_1 \left( \frac{S_t}{K}, T-t \right) \right) - \Phi \left( -d_1 \left( \frac{S_t}{B}, T-t \right) \right) \right] \nonumber \\
+        &\quad - K \e^{-(T-t)r} \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \left[ \Phi \left( d_2 \left( \frac{B^2}{K S_t}, T-t \right) \right) - \Phi \left( d_2 \left( \frac{B}{S_t}, T-t \right) \right) \right] \nonumber \\
+        &\quad + S_t \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{1+2r/\sigma^2} \left[ \Phi \left( d_1 \left( \frac{B^2}{K S_t}, T-t \right) \right) - \Phi \left( d_1 \left( \frac{B}{S_t}, T-t \right) \right) \right] \nonumber \\
+        &= \mathbbm{1}_{\{m_0^t > B\}} \mathrm{Bl_{put}}(S_t, K, r, T-t, \sigma) \nonumber \\
+        &\quad - \mathbbm{1}_{\{m_0^t > B\}} \mathrm{Bl_{put}}(S_t, B, r, T-t, \sigma) \nonumber \\
+        &\quad + (B - K) \e^{-r(T-t)} \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \Phi \left( d_2 \left( \frac{B}{S_t}, T-t \right) \right) \nonumber \\
+        &\quad + \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \mathrm{Bl} \left( \frac{B^2}{S_t}, K, r, T-t, \sigma \right) \nonumber \\
+        &\quad - \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \mathrm{Bl} \left( \frac{B^2}{S_t}, B, r, T-t, \sigma \right),
+    \end{align}
+    for $S_t > B$, $0 \le t \le T$. If $K < B$, the option price is 0.
+\end{prop}
+\end{comment}
+\begin{prop}{Down-and-Out Barrier Put Option Pricing}{DownAndOutBarrierPut}
+    The price of the down-and-out barrier put option with maturity $T$, strike price $K$, and barrier level $B$ (where $B \le K$) is given by
+    \begin{align}
+        \MoveEqLeft P_{DO}(t, S_t) = K \e^{-r\tau} \mathbbm{1}_{\{m_0^t > B\}} \left[ \Phi \left( -d_2 \left( \frac{S_t}{K}, \tau \right) \right) - \Phi \left( -d_2 \left( \frac{S_t}{B}, \tau \right) \right) \right] \nonumber \\
+        &- S_t \mathbbm{1}_{\{m_0^t > B\}} \left[ \Phi \left( -d_1 \left( \frac{S_t}{K}, \tau \right) \right) - \Phi \left( -d_1 \left( \frac{S_t}{B}, \tau \right) \right) \right] \nonumber \\
+        &- K \e^{-r\tau} \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{S_t}{B} \right)^{1-2r/\sigma^2} \left[ \Phi \left( d_2 \left( \frac{B^2}{K S_t}, \tau \right) \right) - \Phi \left( d_2 \left( \frac{B}{S_t}, \tau \right) \right) \right] \nonumber \\
+        &+ S_t \mathbbm{1}_{\{m_0^t > B\}} \left( \frac{B}{S_t} \right)^{1+2r/\sigma^2} \left[ \Phi \left( d_1 \left( \frac{B^2}{K S_t}, \tau \right) \right) - \Phi \left( d_1 \left( \frac{B}{S_t}, \tau \right) \right) \right].
+    \end{align}
+    Here $\tau = T-t$, and $d_{1,2}(x, \tau)$ correspond to the definitions with the spot price term replaced by the ratio argument $x$.
+
+    If $B > K$, the price vanishes: $P_{DO}(t, S_t) = 0$.
+\end{prop}
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/downAndOutPutBarrierSurface.pgf}
+    \caption{Graph of the down-and-out put option price}
+    \label{fig:downAndOutPutBarrierSurface}
+\end{figure}
+
+\clearpage
+\subsection{Knock-in Barrier}

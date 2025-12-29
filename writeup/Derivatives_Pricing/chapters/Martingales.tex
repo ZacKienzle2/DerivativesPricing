@@ -1,0 +1,247 @@
+\begin{defn}{Stopping Time}{StoppingTime}
+    A random time $T : \Omega \to \overline{\bb{T}}$ is called a \emph{stopping time} of $\cF$ if
+    \begin{equation*}
+        \{T \le t\} \in \cF_t \quad \text{for each } t \in \bb{T}.
+    \end{equation*}
+\end{defn}
+
+\begin{defn}{Past until $T$}{PastUntilT}
+    Let $\cF$ be a filtration on $\overline{\bb{T}}$, and let $T$ be a stopping time of it. The $\sigma$-algebra of \emph{past information until} $T$ is defined as
+    \begin{equation*}
+        \cF_T \coloneqq \{H \in \cH : H \cap \{T \le t\} \in \cF_t \text{ for every } t \in \overline{\bb{T}}\}.
+    \end{equation*}
+\end{defn}
+
+\begin{thm}{$\cF_T$ Random Variables}{FTRandomVariables}
+    A random variable $V$ belongs to $\cF_T$ if and only if
+    \begin{equation*}
+        X_t \coloneqq V \I_{\{T \le t\}} \in \cF_t \text{ for every } t \in \overline{\bb{T}}.
+    \end{equation*}
+\end{thm}
+
+\begin{defn}{(Sub/Super)Martingale}{SubSuperMartingale}
+    Let $X \coloneqq (X_t, t \in \bb{T})$ be a real-valued stochastic process that is adapted to a filtration $\cF$, and for which each $X_t$ is integrable. The process $X$ is called an $\cF$-(sub/super)martingale if for all $t > s$:
+    \begin{equation}\label{eq:MartingaleDef}
+        \begin{aligned}
+            \E_s[X_t - X_s] &\ge 0 && \text{(submartingale)}, \\
+            \E_s[X_t - X_s] &= 0 && \text{(martingale)}, \\
+            \E_s[X_t - X_s] &\le 0 && \text{(supermartingale)}.
+        \end{aligned}
+    \end{equation}
+\end{defn}
+
+\begin{thm}{Properties of (Sub)Martingales}{PropertiesOfSubMartingales}
+    \begin{enumerate}
+        \item When $\bb{T} = \N$, the martingale equality $\E_s [X_t - X_s] = 0$ holds if and only if $\E_k [X_{k+1} - X_k] = 0, k \in \N$.
+        \item If $X$ and $Y$ are $\cF$-submartingales, then so is $aX + bY$ for $a, b \ge 0$.
+        \item If $X$ and $Y$ are $\cF$-submartingales, then so is $X \lor Y$.
+        \item Let $f$ be a convex function on $\R$ and $X$ an $\cF$-martingale. If $f(X_t)$ is integrable for all $t$, then $f(X) \coloneqq (f(X_t))$ is an $\cF$-submartingale.
+    \end{enumerate}
+\end{thm}
+
+\begin{defn}{Predictable Process}{PredictableProcess}
+    Let $\cF \coloneqq (\cF_t, t \ge 0)$ be a filtration. A real-valued stochastic process $F$ is said to be $\cF$-\emph{predictable} (or simply \emph{predictable}) if it is measurable with respect to the $\sigma$-algebra
+    \begin{equation}\label{eq:PredictableSigmaAlgebra}
+        \cF^P \coloneqq \sigma(H \times (a, b] : a, b \in \R_+, H \in \cF_a) \lor \sigma(H \times \{0\} : H \in \cF_0).
+    \end{equation}
+\end{defn}
+
+\begin{defn}{Discrete Predictable Process}{DiscretePredictableProcess}
+    Given a filtration $\cF \coloneqq (\cF_n, n \in \N)$, a process $F \coloneqq (F_n, n \in \N)$ is said to be \emph{predictable} if $F_0 \in \cF_0$ and $F_n \in \cF_{n-1}, n = 1, 2, \dots$
+\end{defn}
+
+\begin{thm}{Integral Transform of a Martingale}{IntegralTransformOfAMartingale}
+    Let $F$ be a bounded predictable process and $X$ a martingale adapted to a filtration $\cF$. Then, the integral transform $Z_n \coloneqq \int_0^n F_k \di X_k, n \in \N$ is an $\cF$-martingale as well.
+\end{thm}
+
+\begin{defn}{Stopped Stochastic Process}{StoppedStochasticProcess}
+    Let $X \coloneqq (X_t, t \in \bb{T})$ be a stochastic process and $T$ a random time with values in $\overline{\bb{T}}$. By the process $X$ \emph{stopped at time $T$} we mean the process $(X^\dagger_t, t \in \bb{T})$ defined by
+    \begin{equation}\label{eq:StoppedProcessDefinition}
+        X^\dagger_t(\omega) \coloneqq X_{T(\omega) \land t}(\omega) =
+        \begin{cases}
+            X_t(\omega) & \text{if } t \le T(\omega), \\
+            X_{T(\omega)}(\omega) & \text{if } t > T(\omega).
+        \end{cases}
+    \end{equation}
+\end{defn}
+
+\begin{thm}{Stopped Martingale}{StoppedMartingale}
+    Let $M \coloneqq (M_n, n \in \N)$ be a martingale and $T$ a stopping time with values in $\overline{\N}$. Then, the process $M$ stopped at time $T$ is again a martingale.
+\end{thm}
+
+\begin{prop}{Stochastic Integral for Predictable Integrands}{StochasticIntegralForPredictableIntegrands}
+    Let $N$ be defined as above. Then, for any positive $\cF$-predictable process $(F_t)$,
+    \begin{equation}\label{eq:StochasticIntegralExpectation}
+        \E \int_{\R_+} F_t \di N_t = \E \int_{\R_+} F_t \di \nu_t.
+    \end{equation}
+\end{prop}
+
+\begin{thm}{Integral Transform of a Continuous Martingale}{IntegralTransformOfAContinuousMartingale}
+    Let $\overline{N}$ be an $\cF$-martingale, as defined above. For any bounded $\cF$-predictable process $F$, the integral transform
+    \begin{equation}\label{eq:ContinuousMartingaleTransform}
+        Z_t \coloneqq \int_0^t F_s \di \overline{N}_s, \quad t \ge 0,
+    \end{equation}
+    is a martingale.
+\end{thm}
+
+\begin{thm}{Doob's Stopping Theorem}{DoobsStoppingTheorem}
+    A stochastic process $M \coloneqq (M_n, n \in \N)$ is a martingale if and only if for every pair of \emph{bounded} stopping times $S$ and $T$ with $S \le T$ the random variables $M_S$ and $M_T$ are integrable, and
+    \begin{equation}\label{eq:DoobsStoppingEquality}
+        \E_S(M_T - M_S) = 0.
+    \end{equation}
+\end{thm}
+
+\begin{lem}{Maximum Inequality for Positive Submartingales}{MaximumInequalityForPositiveSubmartingales}
+    Let $(Y_k, k \in \N)$ be a positive submartingale and define $Y_n^* \coloneqq \max_{k \le n} Y_k$. Then, for any $b > 0$,
+    \begin{equation}\label{eq:MaxInequalityPositiveSub}
+        b \Pm(Y_n^* \ge b) \le \E[Y_n \I_{\{Y^* \ge b\}}] \le \E Y_n.
+    \end{equation}
+\end{lem}
+
+\begin{thm}{Doob--Kolmogorov Inequality}{DoobKolmogorovInequality}
+    Let $M \coloneqq (M_k)$ be a martingale in $L^p$ for some $p \in [1, \infty)$. Then, for $b > 0$,
+    \begin{equation}\label{eq:DoobKolmogorovInequality}
+        \Pm(\max_{k \le n} |M_k| > b) \le \frac{\E|M_n|^p}{b^p}.
+    \end{equation}
+\end{thm}
+
+\begin{thm}{Expected Upcrossings of a Submartingale}{ExpectedUpcrossingsOfASubmartingale}
+    Suppose that $X$ is a submartingale. Then, the expected number of upcrossings $U_n(a, b)$ of $(a, b)$ satisfies:
+    \begin{equation}\label{eq:UpcrossingsInequality}
+        (b - a) \E U_n(a, b) \le \E[(X_n - a)^+ - (X_0 - a)^+].
+    \end{equation}
+\end{thm}
+
+\begin{thm}{(Sub)Martingale Convergence}{SubMartingaleConvergence}
+    Let $X \coloneqq (X_n, n \in \N)$ be a submartingale. Suppose that $\sup_n \E X_n^+ < \infty$. Then, $X$ converges almost surely to an integrable random variable $X_\infty$.
+\end{thm}
+
+\begin{thm}{(Sub)Martingale Convergence and Uniform Integrability}{SubMartingaleConvergenceAndUniformIntegrability}
+    Let $X \coloneqq (X_n, n \in \N)$ be a submartingale. Then, $X$ converges almost surely and in $L^1$ if and only if it is uniformly integrable. Moreover, if $X$ converges, setting $X_\infty \coloneqq \lim X_n$ extends $X$ to a submartingale $\overline{X} \coloneqq (X_n, n \in \overline{\N})$.
+\end{thm}
+
+\begin{thm}{Uniformly Integrable Martingale}{UniformlyIntegrableMartingale}
+    A process $M \coloneqq (M_n, n \in \N)$ is a UI martingale if and only if there exists an integrable random variable $Z$ such that
+    \begin{equation}\label{eq:UIMartingaleDef}
+        M_n = \E_n Z, \quad n \in \N.
+    \end{equation}
+    Moreover, then $M$ converges almost surely and in $L^1$ to an integrable random variable
+    \begin{equation}\label{eq:MartingaleLimit}
+        M_\infty \coloneqq \E_\infty Z,
+    \end{equation}
+    and $(M_n, n \in \overline{\N})$ is again a UI martingale. If $Z \in \cF_\infty$, then $M_\infty = Z$.
+\end{thm}
+
+\begin{thm}{Convergence for Martingales in Reversed Time}{ConvergenceForMartingalesInReversedTime}
+    For $\bb{T} = \{\dots, -2, -1, 0\}$, let $M \coloneqq (M_n, n \in \bb{T})$ be a martingale with respect to the filtration $(\cF_n, n \in \bb{T})$. Then, $M$ is UI and, moreover, as $n \downarrow -\infty$ it converges almost surely and in $L^1$ to the integrable random variable $M_{-\infty} \coloneqq \E_{-\infty} M_0$, where $\cF_{-\infty} \coloneqq \cap_{n \in \bb{T}} \cF_n$.
+\end{thm}
+
+\begin{thm}{Stopping for Uniformly Integrable Martingales}{StoppingForUniformlyIntegrableMartingales}
+    If $M \coloneqq (M_n, n \in \overline{\N})$ is a uniformly integrable martingale, then for \emph{every} pair of stopping times $S$ and $T$ with $S \le T$ it holds that
+    \begin{equation*}
+        \E_S M_T = M_S
+    \end{equation*}
+    In particular,
+    \begin{equation*}
+        \E M_T = \E M_0.
+    \end{equation*}
+\end{thm}
+
+\begin{thm}{Kolmogorov's 0--1 Law}{KolmogorovsZeroOneLaw}
+    If $H \in \mathcal{T}$, then $\Pm(H)$ is either $0$ or $1$. Consequently, a numerical random variable $Z$ that is $\mathcal{T}$-measurable must be almost surely constant.
+\end{thm}
+
+\begin{defn}{Separable $\sigma$-Algebra}{SeparableSigmaAlgebra}
+    A $\sigma$-algebra on $\Omega$ is said to be \emph{separable} if it is generated by a sequence $(H_n)$ of subsets of $\Omega$.
+\end{defn}
+
+\begin{thm}{Radon--Nikodym}{RadonNikodym}
+    Let $(\Omega, \cH, \Pm)$ be a probability space, where $\cH$ is separable, and let $Q$ be a finite measure on $(\Omega, \cH)$ with $Q \ll \Pm$. Then, there exists a positive random variable $Z \in \cH$, written $Z = \di Q / \di \Pm$, such that $Q = Z \Pm$; that is,
+    \begin{equation}\label{eq:RadonNikodymFormula}
+        Q(H) = \int_H Z \di \Pm = \E \I_H Z, \quad H \in \cH.
+    \end{equation}
+\end{thm}
+
+\begin{defn}{Right-continuous Filtration}{RightContinuousFiltration}
+    A filtration $\cF \coloneqq (\cF_t)$ is said to be \emph{right-continuous} if for all $t$,
+    \begin{equation*}
+        \bigcap_{\varepsilon > 0} \cF_{t+\varepsilon} = \cF_t.
+    \end{equation*}
+\end{defn}
+
+\begin{defn}{Local Martingale}{LocalMartingale}
+    A process $(Z_t, t \ge 0)$ is called a \emph{local martingale} if there exists a sequence of stopping times $(T_n, n \in \N)$, called a \emph{localizing sequence}, such that $T_n \to \infty$ almost surely and each stopped process $(Z_{t \land T_n}, t \ge 0)$ is a martingale.
+\end{defn}
+
+\begin{thm}{Properties of Local Martingales}{PropertiesOfLocalMartingales}
+    Let $Z \coloneqq (Z_t, t \ge 0)$ be a local martingale with localizing sequence $(T_n, n \in \N)$. Then, the following hold:
+    \begin{enumerate}
+        \item If $Z \ge 0$ and $\E Z_0 < \infty$, then $Z$ is a supermartingale.
+        \item If for each $t \ge 0$ the sequence $(Z_{t \land T_n}, n \in \N)$ is uniformly integrable, then $Z$ is a martingale.
+    \end{enumerate}
+\end{thm}
+
+\begin{defn}{Doob Martingale}{DoobMartingale}
+    Let $\zeta$ be a stopping time. A process $M \coloneqq (M_t, t \in \bb{T})$ is called a \emph{Doob martingale} on $[0, \zeta]$ if for all stopping times $0 \le S \le T \le \zeta$ it holds that
+    \begin{equation}\label{eq:DoobMartingaleCondition}
+        \E_S M_T = M_S,
+    \end{equation}
+    where $M_S$ and $M_T$ are integrable.
+\end{defn}
+
+\begin{thm}{Characterization of a Doob Martingale}{CharacterizationOfADoobMartingale}
+    Let $\zeta$ be a stopping time. A process $M \coloneqq (M_t, t \in \bb{T})$ is a Doob martingale on $[0, \zeta]$ if and only if for every stopping time $T \le \zeta$,
+    \begin{equation}\label{eq:DoobMartingaleExpectation}
+        \E M_T = \E M_0.
+    \end{equation}
+\end{thm}
+
+\begin{thm}{Doob's Stopping Theorem for Continuous Martingales}{DoobsStoppingTheoremForContinuousMartingales}
+    A martingale $M \coloneqq (M_t, t \in \R_+)$ is a Doob martingale on $[0, b]$ for every $b \in \R_+$ and satisfies
+    \begin{equation}\label{eq:DoobStoppingContinuous}
+        \E_S M_T = M_S
+    \end{equation}
+    for every pair $(S, T)$ of bounded stopping times with $S \le T$.
+\end{thm}
+
+\begin{prop}{Doob's Maximal Inequality}{DoobsMaximalInequality}
+    Let $X \coloneqq (X_t, t \ge 0)$ be a submartingale that is positive and continuous. Then, for $p \ge 1$ and $b > 0$,
+    \begin{equation}\label{eq:DoobsMaximalInequality}
+        \Pm(\max_{0 \le s \le t} X_s \ge b) \le \frac{\E X_t^p}{b^p}.
+    \end{equation}
+\end{prop}
+
+\begin{prop}{Doob's Norm Inequality}{DoobsNormInequality}
+    Let $M \coloneqq (M_t, t \ge 0)$ be a continuous martingale in $L^p$ for some $p > 1$ and let $Z_t \coloneqq \max_{s \le t} |M_s|$. Then,
+    \begin{equation}\label{eq:DoobsNormInequality}
+        \E Z_t^p \le q^p \E |M_t|^p, \text{ with } q \coloneqq p/(p-1).
+    \end{equation}
+\end{prop}
+
+\begin{lem}{Continuous Martingales with Finite Variation}{ContinuousMartingalesWithFiniteVariation}
+    Let $X \coloneqq (X_t, t \ge 0)$ be a martingale with continuous paths and total variation $V_t < \infty$ on each interval $[0, t]$. Then, $X$ is almost surely constant.
+\end{lem}
+
+\begin{prop}{Doob Martingale on $\overline{\R}_+$}{DoobMartingaleOnRBar}
+    A process $M$ is a Doob martingale on $\overline{\R}_+$ if and only if it is a martingale on $\overline{\R}_+$. If so, then
+    \begin{equation}\label{eq:DoobMartingaleRBarProp}
+        \E_S M_T = M_S
+    \end{equation}
+    for arbitrary stopping times with $S \le T$.
+\end{prop}
+
+\begin{thm}{Extension of UI Martingales}{ExtensionOfUIMartingales}
+    A martingale $M$ on $\R_+$ can be extended to a Doob martingale $\overline{M}$ on $\overline{\R}_+$ if and only if it is uniformly integrable; that is, if and only if
+    \begin{equation}\label{eq:UIMartingaleExtension}
+        M_t = \E_t Z, \quad t \in \R_+
+    \end{equation}
+    for some integrable random variable $Z$. Moreover, then, it converges almost surely and in $L^1$ to an integrable random variable $M_\infty$ and can be extended to a UI martingale on $\overline{\R}_+$.
+\end{thm}
+
+\begin{prop}{Sufficient Condition for Being Doob}{SufficientConditionForBeingDoob}
+    Let $M$ be a martingale on $\R_+$ and $\zeta$ a stopping time. If, almost surely,
+    \begin{equation}\label{eq:DoobDominationCondition}
+        \sup_{t \in [0, \zeta] \cap \R_+} |M_t| \le Z,
+    \end{equation}
+    where $\E Z < \infty$ (i.e., $M$ is dominated by an integrable random variable $Z$), then $M_\zeta = \lim M_{\zeta \land t}$ exists and is integrable. Moreover, $M$ is a Doob martingale on $[0, \zeta]$.
+\end{prop}
