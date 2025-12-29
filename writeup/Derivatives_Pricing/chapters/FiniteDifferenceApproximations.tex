@@ -1,0 +1,86 @@
+\lettrine[lines=2, lhang=0.1]{C}{onsider} a model that depends on a parameter $\theta$ ranging over some interval of the real line. Suppose that for each value of $\theta$ we have a mechanism for generating a random variable $Y(\theta)$, representing the output of the model at
+parameter $\theta$. Let
+\begin{equation}
+    \alpha(\theta) = \mathbb{E}[Y(\theta)]
+    \label{eq:ExpectedModelOutput} \nonumber
+\end{equation}
+
+The derivative estimation problem consists of finding a way to estimate $a'(\theta)$, the derivative of a with respect to $\theta$.
+
+In the application to option pricing, $Y(\theta)$ is the discounted payoff of an option, $\alpha(\theta)$ is its price, and $\theta$ could be any of the many model or market parameters that influence the price. When $\theta$ is the initial price of an underlying asset, then $\alpha'(\theta)$ is the option's delta (with respect to that asset). The second derivative $\alpha"(\theta)$ is the option's gamma. When $\theta$ is a volatility parameter, $\alpha'(\theta)$ is often called "vega." For interest rate derivatives, the sensitivities of prices to the initial term structure (as represented by, e.g., a yield curve or forward curve) are important.
+
+\subsection{Bias and Variance}
+
+An obvious approach to derivative estimation proceeds as follows. Simulate independent replications $Y_1(\theta),\dots,Y_n(\theta)$ of the model at parameter $\theta$ and $n$ additional replications $Y_1(\theta+h),\dots,Y_n(\theta+h)$ at $\theta + h$, for some $h>0$. Average each set of replications to get $\bar{Y}_n(\theta)$ and $\bar{Y}_n(\theta + h)$ and form the forward-difference estimator.
+
+\begin{equation}
+\hat{\Delta}_F = \hat{\Delta}_F(n,h) = \frac{\bar{Y}_n(\theta+h) - \bar{Y}_n(\theta)}{h}
+\label{eq:ForwardDiffEstimator}
+\end{equation}
+
+This estimator has an expectation.
+
+\begin{equation}
+\mathbb{E}[\hat{\Delta}_F] = h^{-1}[\alpha(\theta+h) - \alpha(\theta)].
+\label{eq:ForwardDiffExpectation}
+\end{equation}
+
+We have not specified what relation, if any, holds between the outcomes $Y_i(\theta)$ and $Y_i(\theta+h)$; this will be important when we consider variance, but \Cref{eq:ForwardDiffExpectation}
+is purely a property of the marginal distributions of the outcomes at $\theta$ and $\theta+h$.
+
+If $\alpha$ is twice differentiable at $\theta$, then
+
+\begin{equation*}
+\alpha(\theta+h) = \alpha(\theta) + \alpha'(\theta)h + \frac{1}{2}\alpha''(\theta)h^2 + \mathcal{O}(h^2).
+\end{equation*}
+
+In this case, it follows from \Cref{eq:ForwardDiffExpectation} that the bias in the forward-difference estimator is
+
+\begin{equation}
+\text{Bias}(\hat{\Delta}_F) = \mathbb{E}[\hat{\Delta}_F - \alpha'(\theta)] = \frac{1}{2}\alpha''(\theta)h + \mathcal{O}(h).
+\label{eq:ForwardDiffBias}
+\end{equation}
+
+By simulating at $\theta - h$ and $\theta + h$, we can form a central-difference estimator
+
+\begin{equation}
+    \hat{\Delta}_C \equiv \hat{\Delta}_C (n,h) = \frac{\bar{Y}_n(\theta+h) - \bar{Y}_n(\theta-h)}{2h}.
+    \label{eq:CentralDiffEstimator}
+\end{equation}
+
+This estimator is often more costly than the forward-difference estimator in the following sense. If we are ultimately interested in estimating $\alpha(\theta)$ and $\alpha'(\theta)$, then we would ordinarily simulate at $\theta$ to estimate $\alpha(\theta)$, so the forward-difference estimator requires simulating at just one additional point $\theta + h$. Conversely, the central-difference estimator requires simulating at two additional points. However, this additional computational effort improves the convergence rate of the bias. If $\alpha$ is at least twice differentiable in a neighbourhood of $\theta$, then
+
+\begin{align*}
+    \alpha(\theta + h) &= \alpha(\theta) + \alpha'(\theta) h +\alpha''(\theta)h^2/2 + \mathcal{O}(h^2)\\
+    \alpha(\theta - h) &= \alpha(\theta) - \alpha'(\theta) h +\alpha''(\theta)h^2/2 + \mathcal{O}(h^2)
+\end{align*}
+
+so subtraction eliminates the second-order terms, leading
+
+\begin{equation}
+    \text{Bias} (\hat{\Delta}_C) = \frac{\alpha(\theta+h) - \alpha(\theta-h)}{2h} - \alpha'(\theta) = \mathcal{O}(h),
+    \label{eq:CentralDiffBias}
+\end{equation}
+
+which is of smaller order than \Cref{eq:ForwardDiffBias}. If $\alpha''$ is itself differentiable at $\theta$, we can refine \Cref{eq:CentralDiffBias} to
+
+\begin{equation}
+    \text{Bias} (\hat{\Delta}_C) = \frac{1}{6} \alpha'''(\theta)h^2 + \mathcal{O}(h^2).
+    \label{eq:CentralDiffBiasOrder}
+\end{equation}
+
+\paragraph{Variance}
+
+The form of the bias of the forward- and central-difference estimators would lead us to take ever smaller values of $h$ to improve accuracy, at least if we ignore the limits of machine precision. But the effect of $h$ on bias must be weighed against its effect on variance.
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/finiteDifference.pgf}
+    \caption{Comparison of central-difference approximations (dashed) and forward-difference approximation (dotted) with exact tangent value to the Black-Scholes formula.}
+    \label{fig:finiteDifference}
+\end{figure}
+
+
+
+\subsection{Optimal Mean Square Error}
+sdfdsf

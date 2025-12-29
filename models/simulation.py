@@ -2,10 +2,10 @@
 
 import numpy as np
 import numpy.typing as npt
-from numba import jit, prange
+from numba import prange
 
 
-@jit(nopython=True, fastmath=True, parallel=True)
+@njit(nopython=True, fastmath=True, parallel=True)
 def generate_paths_jit(
     s0: float,
     t: float,
@@ -50,7 +50,7 @@ def generate_paths_jit(
     return paths
 
 
-@jit(nopython=True, fastmath=True, parallel=True)
+@njit(nopython=True, fastmath=True, parallel=True)
 def generate_final_prices_jit(
     s0: float,
     t: float,

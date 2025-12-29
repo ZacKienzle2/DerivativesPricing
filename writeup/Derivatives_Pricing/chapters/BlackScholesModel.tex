@@ -1,0 +1,359 @@
+We start by describing processes that model the prices of primary securities, a savings account (equivalently, a risk-free bond), and a common stock.
+
+\subsection{Risk-free Bond}
+The first primary security represents in our model an accumulation factor corresponding to a \emph{savings account} (a \emph{money market account}). We assume that the \emph{short-term interest rate} $r$ is constant (but not necessarily nonnegative) over the trading interval $[0, T^*]$. The risk-free security is assumed to continuously compound in value at the rate $r$; that is, $\di B_t = r B_t \di t$. We adopt the usual convention that $B_0 = 1$, so that its price equals $B_t = \e^{rt}$ for every $t \in [0, T^*]$ \citep{mertonTheoryRationalOption1973a}. When dealing with the Black-Scholes model, we may equally well replace the savings account by the \emph{risk-free bond}. A unit zero-coupon bond maturing at time $T$ is a security that pays its holder $1$ unit of cash at a predetermined date $T$ in the future, known as the bond's \emph{maturity date}. Let $B(t, T)$ stand for the price at time $t \in [0, T]$ of a bond maturing at time $T$ \citep{brennanContinuousTimeApproach1979}. It is easily seen that to replicate the payoff $1$ at time $T$ it suffices to invest $B_t/B_T$ units of cash at time $t$ in the savings account $B$. This shows that, in the absence of arbitrage opportunities, the price of the bond satisfies
+\begin{equation} \label{eq:BondPriceNoArbitrage}
+B(t, T) = \e^{-r(T-t)}, \quad \forall t \in [0, T].
+\end{equation}
+Note that for any fixed $T$, the bond price solves the ordinary differential equation
+\begin{equation} \label{eq:BondODE}
+\di B(t, T) = r B(t, T) \di t, \quad B(0, T) = \e^{-rT}.
+\end{equation}
+We consider here a \emph{risk-free bond}, meaning that its issuer will not default on its obligation to pay to the bondholder the face value at maturity date \citep{bieleckiHedgingDefaultableClaims2004}.
+
+\subsection{Common Stock Price}
+Let us fix the horizon date $T^* > 0$. The continuous-time evolution of the stock price process $(S_t)_{t\in[0,T^*]}$ is described by the following linear \emph{stochastic differential equation} (SDE)
+\begin{equation} \label{eq:LinearSDE}
+\di S_t = \mu S_t \di t + \sigma S_t \di W_t, \quad S_0 > 0,
+\end{equation}
+where $\mu \in \R$ is a constant \emph{appreciation rate} of the stock price, $\sigma > 0$ is a constant \emph{volatility}, and $S_0$ is the initial value of the stock price \citep{blackPricingOptionsCorporate1973b}. As we shall see in what follows, the restrictive condition that $\mu$ and $\sigma$ are constant can be weakened substantially \citep{hestonClosedFormSolutionOptions1993a, bensoussanStochasticEquityVolatility1994}.
+
+The driving noise $W_t, \ t \in [0, T^*]$, is a one-dimensional standard Brownian motion defined on a filtered probability space $(\Omega, \F, \Pm)$.
+
+We refer to \cref{eq:LinearSDE} as an SDE; however, expression \cref{eq:LinearSDE} is merely a shorthand notation for the following \emph{stochastic integral equation} (see \cref{sec:StochasticDifferentialEquations})
+\begin{equation} \label{eq:StochasticIntegralEquation}
+S_t = S_0 + \int_0^t \mu S_u \di u + \int_0^t \sigma S_u \di W_u, \quad \forall t \in [0, T^*].
+\end{equation}
+In other words, by a stochastic differential equation of the form \cref{eq:LinearSDE} we mean in fact the stochastic integral equation \cref{eq:StochasticIntegralEquation}. The definition of the second integral in \cref{eq:StochasticIntegralEquation}, interpreted here as the \emph{\Ito\ stochastic integral}, can be found in \cref{sec:StochasticDifferentialEquations}. Let us only mention here that if $X$ is a continuous, $\cF$-adapted process that satisfies suitable integrability conditions, then
+\begin{equation} \label{eq:ItoIntegralDefinition}
+\int_0^t X_u \di W_u = \lim_{n \to +\infty} \sum_{j=0}^{n-1} X_{t_j^n} (W_{t_{j+1}^n} - W_{t_j^n}),
+\end{equation}
+where the limit is in fact taken over an arbitrary sequence of finite partitions $\{t_0^n = 0 < t_1^n < \dots < t_n^n = t\}$ of the interval $[0, t]$ such that $\lim\limits_{n \to \infty} \max\limits_{k=0, \dots, n-1} (t_{k+1}^n - t_k^n) = 0$.
+
+\begin{prop}{Solution of the SDE}{SolutionOfTheSDE}
+The process $S$ given by the formula
+\begin{equation} \label{eq:GeometricBrownianMotionExplicit}
+S_t = S_0 \exp \left(\sigma W_t + \left(\mu - \frac{1}{2}\sigma^2\right)t\right), \quad \forall t \in [0, T^*],
+\end{equation}
+is the unique solution of the stochastic differential equation \cref{eq:LinearSDE}, or equivalently, the stochastic integral equation \cref{eq:StochasticIntegralEquation}.
+\end{prop}
+
+\begin{proof}
+    We will first check that the process given by \cref{eq:GeometricBrownianMotionExplicit} satisfies \cref{eq:LinearSDE}. As customary, we use the differential notation, rather than the integral notation. Let us introduce the auxiliary process $X$ by setting
+    \begin{equation*}
+        \di X_t = \left(\mu - \frac{1}{2}\sigma^2\right) \di t + \sigma \di W_t
+    \end{equation*}
+    with $X_0 = 0$. Then the process $S$ given by \cref{eq:GeometricBrownianMotionExplicit} satisfies $S_t = g(X_t)$ for $t \in [0, T^*]$, where the function $g : \R \to \R$ is defined as $g(x) = S_0 e^x$. Obviously, $g(x) = g'(x) = g''(x)$ and thus \Ito's formula yields
+    \begin{align*}
+        \di S_t &= \di g(X_t) \\
+        &= g'(X_t)\left(\mu - \frac{1}{2}\sigma^2\right) \di t + g'(X_t)\sigma \di W_t + \frac{1}{2}g''(X_t)\sigma^2 \di t \\
+        &= g(X_t)(\mu \di t + \sigma \di W_t) \\
+        &= S_t(\mu \di t + \sigma \di W_t),
+    \end{align*}
+    as expected. Uniqueness of solutions to \cref{eq:StochasticIntegralEquation} is an immediate consequence of the general result, due to \Ito, stating that an SDE with Lipschitz continuous coefficients has a unique solution.
+
+    Alternatively, one can prove the uniqueness by applying the \Ito\ formula to the ratio of two solutions to \cref{eq:StochasticIntegralEquation}. Let us assume that $Y$ is another solution to \cref{eq:LinearSDE} with the initial value $Y_0 = S_0$. We wish to show that the \Ito\ differential of the ratio $Y/S$ is equal to zero. To this end, we will first compute the \Ito\ differential of the process $1/S$. Using \Ito's formula again, we obtain (note that now we take $g(s) = 1/s$)
+    \begin{align*}
+    \di \left(\frac{1}{S_t}\right) &= -\frac{1}{S_t^2} \di S_t + \frac{1}{S_t^3} \di \langle S \rangle_t = -\frac{1}{S_t^2} (\mu S_t \di t + \sigma S_t \di W_t) + \frac{1}{S_t^3} \sigma^2 S_t^2 \di t \\
+    &= -\frac{1}{S_t} \bigl((\mu - \sigma^2) \di t + \sigma \di W_t \bigr),
+    \end{align*}
+    where we used the fact that the quadratic variation of $S$ equals
+    \begin{equation} \label{eq:QuadraticVariationS}
+    \langle S \rangle_t = \int_0^t \sigma^2 S_u^2 \di \langle W \rangle_u = \int_0^t \sigma^2 S_u^2 \di u.
+    \end{equation}
+
+    By applying \Ito's integration by parts formula to processes $Y$ and $1/S$, we get
+    \begin{align*}
+        \di \left(\frac{Y_t}{S_t}\right) &= \frac{1}{S_t} \di Y_t + Y_t \di \left(\frac{1}{S_t}\right) + \di \langle Y, 1/S \rangle_t \\
+        &= \frac{Y_t}{S_t}(\mu \di t + \sigma \di W_t) - \frac{Y_t}{S_t}((\mu - \sigma^2) \di t + \sigma \di W_t) - \frac{Y_t}{S_t}\sigma^2 \di t \\
+        &= 0,
+    \end{align*}
+    since the cross-variation of $Y$ and $1/S$ equals (recall that $\langle W \rangle_t = t$)
+    \begin{equation} \label{eq:CrossVariation}
+        \langle Y, 1/S \rangle_t = - \int_0^t \sigma^2 \frac{Y_u}{S_u} \di \langle W \rangle_u = - \int_0^t \sigma^2 \frac{Y_u}{S_u} \di u.
+    \end{equation}
+    Since the \Ito\ differential of the ratio $Y/S$ is zero, this process is constant, and thus it equals its initial value, which is $1$. We conclude that $Y_t = S_t$ for every $t \in [0, T^*]$, and thus the uniqueness of a solution to \cref{eq:StochasticIntegralEquation} is established.
+\end{proof}
+
+We make the standing assumption that the underlying filtration $\cF = (\cF_t)_{t \in [0, T^*]}$ is the natural filtration $\cF^W$ of the driving Brownian motion. More precisely, $\cF$ is the standard augmentation of the natural filtration of $W$, but it will still be denoted by $\cF^W$. For any fixed $t \in [0, T^*]$, we have $S_t = f(W_t)$ for some function $f : \R \to \R_+$ that determines the one-to-one correspondence between the values $S_t$ of the stock price and the values $W_t$ of the Brownian motion. Specifically, the strictly increasing function $f$ is given by the formula
+\begin{equation} \label{eq:StockBrownianCorrespondence}
+f(x) = S_0 \exp \left(\sigma x + \left(\mu - \frac{1}{2}\sigma^2\right)t\right), \quad \forall x \in \R.
+\end{equation}
+Consequently, for any natural $n$, any dates $0 \le t_1 < t_2 < \dots < t_n \le T^*$, and any real numbers $x_1, x_2, \dots, x_n$, we have
+\begin{equation} \label{eq:EventEquivalence}
+{\omega \in \Omega \mid S_{t_1} < x_1, \dots, S_{t_n} < x_n } = {\omega \in \Omega \mid W_{t_1} < y_1, \dots, W_{t_n} < y_n },
+\end{equation}
+where we set $y_i = f^{-1}(x_i)$. It is thus clear that we have, for every $t \in [0, T^*]$,
+\begin{equation} \label{eq:FiltrationEquality}
+\cF_t^W = \sigma{W_u \mid u \le t} = \sigma{S_u \mid u \le t} = \cF_t^S.
+\end{equation}
+We conclude that the filtration generated by the stock price coincides with the natural filtration of the driving noise $W$, and thus $\cF^S = \cF^W = \cF$. This means that the information structure of the model is based on observations of the stock price process only.
+
+It is readily verified that the Brownian motion $W$ is a martingale with respect to the underlying filtration $\cF$. Indeed, for any $t$, the random variable $W_t$ is $\Pm$-integrable, and for any $u \le t$:
+\begin{equation} \label{eq:BrownianMartingaleProperty}
+    \E_{\Pm}(W_t \mid \cF_u) = \E_{\Pm}(W_t - W_u \mid \cF_u) + \E_{\Pm}(W_u \mid \cF_u) = W_u.
+\end{equation}
+Define an auxiliary process \(M\) by setting:
+\begin{equation} \label{eq:AuxiliaryProcessM}
+    M_t = \exp \left(\sigma W_t - \frac{1}{2}\sigma^2 t\right), \quad \forall t \in [0, T^*].
+\end{equation}
+
+\begin{lem}{Martingale Property}{MartingaleProperty}
+The process $M$ is a martingale under $\Pm$ with respect to the filtration $\cF$.
+\end{lem}
+
+\begin{proof}
+    In order to show that $M$ is a martingale under $\Pm$ with respect to $\F$, it suffices to note that
+    \begin{equation} \label{eq:MartingaleCheck}
+        \E_{\Pm} \bigl( \e^{\sigma (W_t - W_u)} \mid \cF_u \bigr) = \E_{\Pm} \bigl( \e^{\sigma (W_t - W_u)} \bigr) = \exp \Bigl( \tfrac{1}{2} \sigma^2 (t - u) \Bigr),
+    \end{equation}
+    where the first equality is a consequence of the independence of the increment $W_t - W_u$ of the $\sigma$-field $\cF_u$ and the second follows from the fact that $W_t - W_u$ has the Gaussian distribution $\Nor(0, t - u)$.
+\end{proof}
+
+Since $S_t = \e^{\mu t} M_t$, we have, for every $u \le t \le T^*$,
+\begin{equation} \label{eq:StockExpectation}
+    \E_{\Pm}(S_t \mid \cF_u) = \E_{\Pm}(\e^{\mu t} M_t \mid \cF_u) = \e^{\mu t} M_u = S_u \e^{\mu(t-u)}.
+\end{equation}
+
+\begin{cor}{Martingale Property of Stock Price}{MartingalePropertyOfStockPrice}
+    The stock price $S$ follows a martingale under the actual probability $\Pm$ with respect to the filtration $\F$ if and only if its appreciation rate $\mu = 0$. If $\mu > 0$ (respectively $\mu < 0$) then $\E_{\Pm}(S_t \mid \cF_u) > S_u$ (respectively $\E_{\Pm}(S_t \mid \cF_u) < S_u$) for every $t > u$ and thus the stock price $S$ is a submartingale (respectively a supermartingale) under the actual probability $\Pm$.
+\end{cor}
+
+It is apparent from \cref{eq:GeometricBrownianMotionExplicit} that the logarithmic stock returns are Gaussian, meaning that the random variable $\ln(S_t/S_u)$ has under $\Pm$ a Gaussian probability distribution for any choice of dates $u < t \le T^*$. Moreover, $S$ is a \emph{time-homogeneous Markov process} under $\Pm$ with respect to the filtration $\F$ with the transition probability density function, for $x, y > 0$ and $t > u$,
+\begin{equation} \label{eq:GBMTransitionDensity}
+    p_S(u, x, t, y) = \frac{1}{\sqrt{2\pi (t-u)} \sigma y} \exp \left\{ - \frac{\left( \ln(y/x) - \mu(t-u) + \frac{1}{2}\sigma^2(t-u) \right)^2}{2\sigma^2(t-u)} \right\}
+\end{equation}
+where formally $p_S(u, x, t, y) = \Pm \{S_t = y \mid S_u = x\}$. It is important to observe that even if the appreciation rate $\mu$ is replaced by an adapted stochastic process $\mu_t$ and the stock price $S$ is no longer Markovian under the actual probability $\Pm$, it will always be a time-homogeneous Markov process under the martingale measure $\Pm^*$ for the discounted stock price.
+
+\subsection{Self-financing Trading Strategies}
+By a \textit{trading strategy} we mean a pair $\phi = (\phi^1, \phi^2)$ of $\mathcal{F}$-progressively measurable stochastic processes on the underlying probability space $(\Omega, \mathcal{F}, \mathbb{P})$. The concept of a self-financing trading strategy in the Black–Scholes market is formally based on the notion of the \Ito \; integral. Intuitively, this choice of stochastic integral is supported by the fact that, in the case of the \Ito \; integral (as opposed, for instance, to the Fisk–Stratonovich integral), the underlying process is integrated in a predictable way, meaning that we take its values on the left-hand end of each (infinitesimal) time interval. Unless explicitly stated otherwise, we will assume that a stock $S$ does not pay dividends (at least during the option's lifetime).
+
+\begin{defn}{Self-Financing Trading Strategy}{SelfFinancing}
+We say that a trading strategy $\phi = (\phi^1, \phi^2)$ over the time interval $[0, T]$ is \textit{self-financing} if its wealth process $V(\phi)$, which is set to equal
+\begin{equation}
+  V_t(\phi) = \phi^1_t S_t + \phi^2_t B_t, \quad \forall t \in [0, T],
+  \label{eq:WealthProcess}
+\end{equation}
+satisfies the following condition
+\begin{equation}
+  V_t(\phi) = V_0(\phi) + \int_0^t \phi^1_u \, \mathrm{d} S_u + \int_0^t \phi^2_u \, \mathrm{d} B_u, \quad \forall t \in [0, T],
+  \label{eq:SelfFinancingCondition}
+\end{equation}
+where the first integral is understood in the \Ito \; sense and the second is the path-wise Riemann (or Lebesgue) integral.
+\end{defn}
+
+\subsection{Martingale Measure for the Black-Scholes Model}
+We find it convenient to introduce the concept of the \textit{admissibility} of a trading strategy directly in terms of a martingale measure. For this reason, our next goal is to study the concept of a martingale measure within the Black-Scholes set-up.
+
+Let $S^* = S/B$ denote the discounted stock price. Using the geometric Brownian motion solution \cref{eq:GeometricBrownianMotionExplicit} and $B_t = \e^{rt}$, we obtain for every $t \in [0, T^*]$
+\begin{equation}
+  S^*_t = S^*_0 \exp\left(\sigma W_t + \left(\mu - r - \frac{1}{2}\sigma^2\right) t\right).
+  \label{eq:DiscountedGBMSolution}
+\end{equation}
+Equivalently, the process $S^*$ is the unique solution to the SDE
+\begin{equation}
+  \di S^*_t = (\mu - r) S^*_t \, \di t + \sigma S^*_t \, \di W_t, \quad S^*_0 = S_0.
+  \label{eq:DiscountedSDE}
+\end{equation}
+The martingale property of $S^*$ under $\Pm$ allows for analysis identical to the stock price $S$.
+\begin{cor}{Martingale Property of Discounted Stock}{DiscountedMartingale}
+  The discounted stock price $S^*$ is a martingale under the actual probability $\Pm$ with respect to the filtration $\cF$ if and only if $\mu = r$. If $\mu > r$ (respectively $\mu < r$), then $\E_{\Pm}(S^*_t \gvn \cF_u) > S^*_u$ (respectively $\E_{\Pm}(S^*_t \gvn \cF_u) < S^*_u$) for every $t > u$, implying $S^*$ is a sub-martingale (respectively a super-martingale) under $\Pm$.
+\end{cor}
+
+The subsequent definition directly addresses the martingale property of the discounted stock price $S^*$. We seek a probability measure under which the drift term in the governing equation \cref{eq:DiscountedSDE} disappears.
+
+\begin{defn}{Martingale Measure for $S^*$}{MartingaleMeasure}
+    A probability measure $\Q$ on $(\Omega, \cF_{T^*})$, equivalent to $\Pm$, is called a \textit{martingale measure for $S^*$} if $S^*$ is a local martingale under $\Q$.
+\end{defn}
+
+To analyse the no-arbitrage property of the model and derive the risk-neutral valuation formula, we focus on the martingale property of the discounted wealth process.
+
+\begin{defn}{Spot Martingale Measure}{SpotMartingaleMeasure}
+    A probability measure $\Pm^*$ on $(\Omega, \cF_{T^*})$, equivalent to $\Pm$, is called a \textit{spot martingale measure} if the discounted wealth $V^*_t(\phi) = V_t(\phi)/B_t$ of any self-financing trading strategy $\phi$ is a local martingale under $\Pm^*$.
+\end{defn}
+
+These notions coincide within the present setup, provided the stock $S$ pays no dividends during the period $[0, T^*]$. The case of a dividend-paying stock is analysed in subsequent sections.
+
+\begin{lem}{Equivalence of Martingale Measures}{SpotMartingaleEquivalence}
+  A probability measure is a spot martingale measure if and only if it is a martingale measure for the discounted stock price $S^*$.
+\end{lem}
+
+\begin{proof}
+  Let $\phi$ be a self-financing strategy and let $V^* = V^*(\phi)$. Using \Ito's integration by parts formula, we get (note that $\di B_t^{-1} = -r B_t^{-1} \, \di t$)
+  \begin{equation*}
+    \begin{aligned}
+      \di V^*_t &= \di(V_t B_t^{-1}) = V_t \, \di B_t^{-1} + B_t^{-1} \, \di V_t \\
+      &= (\phi^1_t S_t + \phi^2_t B_t) \, \di B_t^{-1} + B_t^{-1} (\phi^1_t \, \di S_t + \phi^2_t \, \di B_t) \\
+      &= \phi^1_t (B_t^{-1} \, \di S_t + S_t \, \di B_t^{-1}) = \phi^1_t \, \di S^*_t.
+    \end{aligned}
+  \end{equation*}
+  We thus obtain the following equality
+  \begin{equation*}
+    V^*_t(\phi) = V^*_0(\phi) + \int_0^t \phi^1_u \, \di S^*_u, \quad \forall t \in [0, T^*].
+  \end{equation*}
+  It suffices to make use of the local martingale property of the \Ito{} integral.
+\end{proof}
+
+In the Black-Scholes setting, the martingale measure for the discounted stock price is unique and can be explicitly derived using the Girsanov theorem.
+
+\begin{lem}{Unique Martingale Measure}{UniqueMartingaleMeasure}
+  \begin{enumerate}[label=(\roman*), nosep, wide]
+    \item The unique martingale measure $\Q$ for the discounted stock price process $S^*$ is given by the Radon-Nikod\'ym derivative
+    \begin{equation}
+      \frac{\di \Q}{\di \Pm} \overset{\text{a.s.}}{=} \exp \left( \frac{r - \mu}{\sigma} W_{T^*} - \frac{1}{2} \left( \frac{r - \mu}{\sigma} \right)^2 T^* \right)
+      \label{eq:RadonNikodymDerivative}
+    \end{equation}
+    \item Under the martingale measure $\Q$, the discounted stock price $S^*$ satisfies
+    \begin{equation}
+      \di S^*_t = \sigma S^*_t \, \di W^*_t,
+      \label{eq:DiscountedDynamicsQ}
+    \end{equation}
+    where the continuous, $\cF$-adapted process $W^*$ defined by
+    \begin{equation}
+      W^*_t = W_t - \frac{r - \mu}{\sigma} t, \quad \forall t \in [0, T^*],
+      \label{eq:GirsanovBrownianMotion}
+    \end{equation}
+    is a standard Brownian motion on the probability space $(\Omega, \cF, \Q)$.
+  \end{enumerate}
+\end{lem}
+
+\begin{proof}
+  Let us first prove part (i).
+  \begin{equation*}
+    \frac{\di \Q}{\di \Pm}\bigg|_{\cF_t} = \mathcal{E}_t\left( \int_0^t \gamma_u \di W_u - \frac{1}{2} \int_0^t \gamma_u^2 \di u \right), \quad \Pm \; \text{a.s.}
+  \end{equation*}
+  Moreover, by Girsanov's theorem, the process $W^*$ defined by
+  \begin{equation*}
+    W^*_t = W_t - \int_0^t \gamma_u \di u, \quad \forall t \in [0, T^*],
+  \end{equation*}
+  is a standard Brownian motion under $\Q$.
+  Substituting $\di W_t = \di W^*_t + \gamma_t \di t$ into the dynamics of $S^*$ in \cref{eq:DiscountedSDE}, we obtain
+  \begin{equation*}
+    \di S^*_t = (\mu - r + \gamma_t \sigma) S^*_t \di t + \sigma S^*_t \di W^*_t, \quad S_0^*=S_0.
+  \end{equation*}
+\end{proof}
+
+\begin{defn}{Admissible Trading Strategy}{AdmissibleTradingStrategy}
+A trading strategy $\phi \in \Phi$ is called $\bb{P}^*$-\textit{admissible} if the discounted wealth process
+\[
+V_t^*(\phi) = B_t^{-1} V_t(\phi), \quad \forall t \in [0, T],
+\]
+follows a martingale under $\bb{P}^*$. We write $\Phi(\bb{P}^*)$ to denote the class of all $\bb{P}^*$-admissible trading strategies. The triple $\mathcal{M}_{BS} = (S, B, \Phi(\bb{P}^*))$ is called the \textit{arbitrage-free Black-Scholes model} of a financial market, or briefly, the \textit{Black-Scholes model}.
+\end{defn}
+
+For brevity, we shall say that $\phi$ is \textit{admissible} rather than $\bb{P}^*$-admissible if no confusion may arise. It is easy to check that by restricting our attention to the class of all admissible strategies, we have ensured the absence of arbitrage opportunities in the Black-Scholes model.
+
+We say that a European contingent claim $X$ that settles at time $T \leq T^*$ is \textit{attainable} in the Black-Scholes model if it can be replicated by means of an admissible strategy. Given an attainable European contingent claim, we can uniquely define its arbitrage price in the Black-Scholes model.
+
+\begin{defn}{Arbitrage Price Process}{ArbitragePriceProcess}
+Let $X$ be an attainable European contingent claim that settles at time $T \leq T^*$. Then its \textit{arbitrage price process} in the Black-Scholes model $\cM_{BS}$, denoted as $\pi_t(X)$, $t \in [0, T]$, is defined as the wealth process $V_t(\phi)$, $t \in [0, T]$, of any admissible trading strategy $\phi$ that replicates $X$, that is, satisfies the equality $V_T(\phi) = X$.
+\end{defn}
+
+If no replicating admissible strategy exists\footnote{This happens only if a claim is not integrable under $\Pm^*$}, the arbitrage price of such a claim is not defined. Conforming to the definition of an arbitrage price, to value a derivative security, we typically first search for its replicating strategy. The risk-neutral valuation approach to the pricing problem is also possible, as the following simple result shows.
+
+\begin{cor}{Risk-Neutral Valuation Formula}{RiskNeutralValuation}
+Let $X$ be an attainable European contingent claim that settles at time $T$. Then the arbitrage price $\pi_t(X)$ at time $t \in [0, T]$ in $\cM_{BS}$ is given by the \textit{risk-neutral valuation formula}
+\begin{equation}
+    \pi_t(X) = B_t \E_{\bb{P}^*}(B_T^{-1} X \mid \cF_t), \quad \forall t \in [0, T].
+\end{equation}
+\end{cor}
+
+
+
+\subsection{Black-Scholes Option Pricing Formula}
+Two alternative justifications of the option valuation formula are provided. The first relies on the fact that the risk-free return can be replicated by holding a continuously adjusted position in the underlying stock and an option. In other words, if an option is not priced in accordance with the Black-Scholes formula, there is a sure profit to be made by some combination of either short or long sales of the option and the underlying asset. The second method of derivation is based on equilibrium arguments, which require, in particular, that the option earns an expected rate of return commensurate with the risk involved in holding the option as an asset. The first approach is usually referred to as the \textit{risk-free portfolio} method, while the second is known as the \textit{equilibrium derivation} of the Black-Scholes formula.
+
+The replication approach presented below is based on the observation that in the Black-Scholes setting the option value can be mimicked by holding a continuously rebalanced position in the underlying stock and risk-free bonds. Recall that we assume throughout that the financial market we are dealing with is perfect (partially, this was already implicit in the definition of a self-financing trading strategy).
+We shall first consider a European call option written on a stock $S$, with expiry date $T$ and strike price $K$. Hence the payoff (and the price) at time $T$ equals $(S_T - K)^+$. Let the function $c : \R_+ \times (0, T] \to \R$ be given by the formula
+\begin{equation}
+    c(s, t) = s \Phi(d_1(s, t)) - K \e^{-rt} \Phi(d_2(s, t)),
+    \label{eq:CallPrice}
+\end{equation}
+where
+\begin{equation}
+    d_1(s, t) = \frac{\ln(s/K) + (r + \frac{1}{2}\sigma^2)t}{\sigma \sqrt{t}},
+    \label{eq:D1Definition}
+\end{equation}
+and $d_2(s, t) = d_1(s, t) - \sigma \sqrt{t}$, or explicitly
+\begin{equation}
+    d_2(s, t) = \frac{\ln(s/K) + (r - \frac{1}{2}\sigma^2)t}{\sigma \sqrt{t}}.
+    \label{eq:D2Definition}
+\end{equation}
+Furthermore, let $\Phi$ stand for the standard Gaussian cumulative distribution function
+\begin{equation*}
+    \Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^x \e^{-z^2/2} \di z, \quad \forall x \in \R.
+\end{equation*}
+We adopt the following notational convention
+\begin{equation*}
+    d_{1,2}(s, t) = \frac{\ln(s/K) + (r \pm \frac{1}{2}\sigma^2)t}{\sigma \sqrt{t}}.
+\end{equation*}
+Let us denote by $C_t$ the arbitrage price at time $t$ of a European call option in the Black-Scholes model.
+
+\begin{thm}{Arbitrage Price of European Call Option}{ArbitragePrice}
+    The arbitrage price at time $t < T$ of the European call option with expiry date $T$ and strike price $K$ in the Black-Scholes model is given by the formula
+    \begin{equation}
+        C_t = c(S_t, T - t), \quad \forall t \in [0, T),
+        \label{eq:BsPrice}
+    \end{equation}
+    where the function $c : \R_+ \times (0, T] \to \R$ is given by \cref{eq:CallPrice}. More explicitly, we have, for any $t < T$
+    \begin{equation*}
+        C_t = S_t \Phi(d_1(S_t, T - t)) - K B(t, T) \Phi(d_2(S_t, T - t)),
+    \end{equation*}
+    where $d_1, d_2$ are given by \cref{eq:D1Definition,eq:D2Definition}. Moreover, the unique admissible replicating strategy $\phi = (\phi^1, \phi^2)$ of the call option satisfies, for every $t \in [0, T]$,
+    \begin{equation*}
+        \phi^1_t = \frac{\partial c}{\partial s}(S_t, T - t) = \Phi(d_1(S_t, T - t))
+    \end{equation*}
+    and
+    \begin{equation*}
+        \phi^2_t = \e^{-rt} (c(S_t, T - t) - \phi^1_t S_t).
+    \end{equation*}
+\end{thm}
+
+
+
+\subsection{Put-Call Parity for Spot Options}
+We shall show that if no arbitrage opportunities exist, puts and calls with the same strike and maturity must at all times during their lives obey the put-call parity relationship. Let us mention, in this regard, that empirical studies of the put-call parity have been reported \citep{gouldTransactionsCostsRelationship1974,klemkoskyPutCallParityMarket1979}.
+
+A point worth stressing is that equality \eqref{eq:PutCallParity} does not rely on specific assumptions imposed on the stock price model. Indeed, it is satisfied in any arbitrage-free, continuous-time model of a security market, provided that the savings account $B$ is given by the formula $B_t = e^{rt}$.
+
+\begin{prop}{Put-Call Parity}{PutCallParity}
+The arbitrage prices of European call and put options with the same expiry date $T$ and strike price $K$ satisfy the \textit{put-call parity relationship}
+\begin{equation} \label{eq:PutCallParity}
+    C_t - P_t = S_t - K e^{-r(T-t)}
+\end{equation}
+for every $t \in [0, T]$.
+\end{prop}
+
+The put-call parity can be used to derive a closed-form expression for the arbitrage price of a European put option. Let us denote by $p : \R_+ \times (0, T] \to \R$ the function
+\begin{equation} \label{eq:PutOptionFunction}
+    p(s,t) = K \e^{-rt} \Phi(-d_2(s,t)) - s \Phi(-d_1(s,t)),
+\end{equation}
+with $d_1(s,t)$ and $d_2(s,t)$ given by \Cref{eq:D1Definition,eq:D2Definition}. The following result is an immediate consequence of \Cref{prop:PutCallParity} combined with \Cref{thm:ArbitragePrice}.
+
+\begin{cor}{Black-Scholes Price of European Put Option}{BlackScholesPutPrice}
+The Black-Scholes price at time $t < T$ of a European put option with strike price $K$ equals $P_t = p(S_t, T - t)$, where the function $p : \R_+ \times [0, T] \to \R$ is given by \cref{eq:PutOptionFunction}. More explicitly, the price at time $t < T$ of a European put option equals
+\begin{equation}
+    P_t = K B(t, T) \Phi(-d_2(S_t, T - t)) - S_t \Phi(-d_1(S_t, T - t)).
+\end{equation}
+\end{cor}
+
+\subsection{Black-Scholes PDE}
+Random payoffs of such a simple form are termed \textit{path-independent} claims, as opposed to \textit{path-dependent} contingent claims
+
+Path-dependent payoffs correspond to the various kinds of OTC options, known under the generic name of \textit{exotic options}.
+
+\begin{lem}{PDE for Brownian Functionals}{PdeForBrownianFunctionals}
+Let $W$ be a one-dimensional Brownian motion defined on a probability space $(\Omega, \cF, \Pm)$. For a Borel-measurable function $h : \R \to \R$, we define the function $u : \R \times [0, T] \to \R$ by setting
+\begin{equation}
+    u(x, t) = \E_{\Pm}(e^{-r(T-t)} h(W_T) \mid W_t = x), \quad \forall (x, t) \in \R \times [0, T].
+\end{equation}
+Suppose that
+\begin{equation}
+    \int_{-\infty}^{+\infty} e^{-ax^2} |h(x)| \, \di x < \infty
+\end{equation}
+for some $a > 0$. Then the function $u$ is defined for $0 < T - t < 1/2a$ and $x \in \R$, and has derivatives of all orders. In particular, it belongs to the class $C^{2,1}(\R \times (0, T))$ and satisfies the following PDE
+\begin{equation}
+    -\frac{\partial u}{\partial t}(x, t) = \frac{1}{2} \frac{\partial^2 u}{\partial x^2}(x, t) - ru(x, t), \quad \forall (x, t) \in \R \times (0, T),
+\end{equation}
+with the terminal condition $u(x, T) = h(x)$ for $x \in \R$.
+\end{lem}

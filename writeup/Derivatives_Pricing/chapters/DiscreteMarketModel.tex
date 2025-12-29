@@ -1,0 +1,462 @@
+%! TeX root = ../main.tex
+\subsection{Discrete Time Compounding}
+We work in a finite-horizon discrete-time model indexed by $\left\{0,1,\dots,N\right\}$
+\begin{center}
+	\begin{tikzpicture}[x=1.5cm, y=1cm]
+		% Continuous horizontal timeline
+		\draw[thick] (0,0) -- (6,0);
+
+		% Ticks and Labels for 0, 1, 2, 3
+		\foreach \x in {0, 1, 2, 3} {
+				\draw[ultra thick] (\x, -0.2) -- (\x, 0.2);
+				\node[below=5pt] at (\x, 0) {$\x$};
+			}
+
+		% Ellipsis label in the gap
+		\node[below=5pt] at (4.5, 0) {$\dots$};
+
+		% Final N tick and label
+		\draw[ultra thick] (6, -0.2) -- (6, 0.2);
+		\node[below=5pt] at (6, 0) {$N$};
+	\end{tikzpicture}
+\end{center}
+We invest a cash flow $C$ each year in an investment plan that carries a constant interest rate $r$. At the end of the $N$-th year, the value of the amount $C$ invested at the beginning of year $k = 1, 2, \dots, N$ has turned into $C(1+r)^{N-k+1}$ and the total value of the plan $V_N$ at the end of the $N$-th year becomes
+\begin{align}
+	V_N & = C \sum_{k=1}^{N} (1+r)^{N-k+1} \nonumber \\
+	    & = C \sum_{k=1}^{N} (1+r)^k \nonumber       \\
+	    & = C(1+r) \frac{(1+r)^N - 1}{r},
+\end{align}
+hence the duration $N$ of the plan satisfies
+\begin{equation}
+	N+1 = \frac{1}{\log(1+r)} \log \left( 1+r + \frac{r V_N}{C} \right).
+\end{equation}
+\noindent At time $t=0$ one borrows an amount $L$ over a period of $N$ years at the constant interest rate $r$ per year.
+
+\begin{prop}{Constant Repayment}{Repayment}
+	Assuming the loan is fully amortized at the beginning of year $N+1$, the constant annual repayment $C$ is uniquely determined by
+	\begin{equation}
+		C = \frac{r(1+r)^N L}{(1+r)^N - 1} = \frac{r}{1 - (1+r)^{-N}} L.
+	\end{equation}
+\end{prop}
+\begin{proof}
+	Let $L_k$ denote the outstanding principal balance at the beginning of year $k$, with $L_1 = L$. The evolution of the debt is governed by the linear recurrence relation
+	\begin{equation}
+		L_{k+1} = (1+r)L_k - C, \quad \forall k \ge 1.
+	\end{equation}
+	Iteratively expanding this relation yields the value of the debt at the start of any arbitrary year $k$
+	\begin{align}
+		L_k & = (1+r)^{k-1}L_1 - C \sum_{j=0}^{k-2} (1+r)^j \nonumber                 \\
+		    & = (1+r)^{k-1}L - C \frac{(1+r)^{k-1} - 1}{r}. \label{eq:BalanceGeneral}
+	\end{align}
+	The amortization condition requires that the debt is extinguished at the horizon $N$, such that $L_{N+1} = 0$. Substituting $k=N+1$ into \cref{eq:BalanceGeneral} implies
+	\[
+		0 = (1+r)^N L - C \frac{(1+r)^N - 1}{r}.
+	\]
+	Rearranging for $C$ yields the result in \ref{prop:Repayment}. Furthermore, substituting this expression for $C$ back into \cref{eq:BalanceGeneral} provides the closed-form outstanding balance
+	\begin{equation}
+		L_k = \frac{C}{r} \left[ 1 - (1+r)^{k-1-N} \right] \equiv \frac{C - (1+r)^{k-1}(C - rL)}{r}.
+	\end{equation}
+\end{proof}
+\noindent Rearranging the result in \ref{prop:Repayment} yields the annuity factor
+\begin{equation}
+	\frac{L}{C} = \frac{1 - (1+r)^{-N}}{r},
+\end{equation}
+and solving for the duration $N$ implies
+\begin{equation}
+	N = \frac{1}{\log(1+r)} \log \left( \frac{C}{C - rL} \right) = - \frac{\log(1 - \frac{rL}{C})}{\log(1+r)}.
+\end{equation}
+\begin{xtip}
+	For $N$ to be finite, we require the condition $C > rL$. This means the annual repayment must exceed the interest accrued on the initial principal; otherwise, the principal balance will never decrease.
+\end{xtip}
+
+\begin{prop}{Repayment Decomposition}{Decomposition}
+	The $k$-th repayment $C$ decomposes into an interest component $rL_k$ and a principal repayment component $C - rL_k$ given by
+	\begin{align}
+		rL_k     & = C \left( 1 - \frac{1}{(1+r)^{N-k+1}} \right) = C r \sum_{l=1}^{N-k+1} (1+r)^{-l} \label{eq:InterestComp} \\
+		C - rL_k & = \frac{C}{(1+r)^{N-k+1}}, \quad k=1, 2, \dots, N. \label{eq:PrincipalComp}
+	\end{align}
+\end{prop}
+
+\begin{proof}
+	Recall from the proof of \ref{prop:Repayment} that the outstanding balance $L_k$ represents the present value of the remaining $N-k+1$ payments. We express $L_k$ as
+	\begin{equation}
+		L_k = \frac{C}{r} \left[ 1 - (1+r)^{-(N-k+1)} \right].
+	\end{equation}
+	Multiplying by $r$ immediately yields the interest component in \cref{eq:InterestComp}. Consequently, the principal repayment is determined by the residual
+	\begin{align}
+		C - rL_k & = C - C \left[ 1 - (1+r)^{-(N-k+1)} \right] \nonumber \\
+		         & = C (1+r)^{-(N-k+1)},
+	\end{align}
+	which corresponds to \cref{eq:PrincipalComp}.
+\end{proof}
+
+\noindent We verify that the sum of discounted payments at rate $r$ recovers the initial loan amount
+\begin{equation}
+	\sum_{l=1}^{N} \frac{C}{(1+r)^l} = C \frac{1 - (1+r)^{-N}}{r} = L.
+\end{equation}
+In particular, the first interest repayment satisfies
+\begin{equation}
+	rL_1 = C r \sum_{l=1}^{N} \frac{1}{(1+r)^l} = C \left( 1 - (1+r)^{-N} \right),
+\end{equation}
+and the first principal repayment is
+\begin{equation}
+	C - rL = \frac{C}{(1+r)^N}.
+\end{equation}
+
+\subsection{The Model}
+\begin{defn}{Numéraire}{Numeraire}
+	A \emph{numéraire} is a price process $(X(t))_{t=0}^T$ (a sequence of random variables), which is strictly positive for all $t \in \{0, 1, \dots, T\}$.
+\end{defn}
+
+For the standard approach the risk-free bank account process is used as numéraire. In some applications, however, it is more convenient to use a security other than the bank account and we therefore just use $S_0$ without loss of generality.
+
+\begin{defn}{Value of the Portfolio}{ValueOfThePortfolio}
+	The value of the portfolio at time $t$ is the scalar product
+	\begin{equation*}
+		V_\varphi(t) = \varphi(t) \cdot S(t) \coloneqq \sum_{i=0}^d \varphi_i(t)S_i(t), \quad (t=1, 2, \dots, T) \text{ and } V_\varphi(0) = \varphi(1) \cdot S(0).
+	\end{equation*}
+	The process $V_\varphi(t, \omega)$ is called the \emph{wealth} or \emph{value process} of the trading strategy $\varphi$.
+\end{defn}
+
+The initial wealth $V_\varphi(0)$ is called the \emph{initial investment} or \emph{endowment} of the investor.
+
+Now $\varphi(t) \cdot S(t-1)$ reflects the market value of the portfolio just after it has been established at time $t-1$, whereas $\varphi(t) \cdot S(t)$ is the value just after time $t$ prices are observed, but before changes are made in the portfolio. Hence
+\begin{equation*}
+	\varphi(t) \cdot (S(t) - S(t-1)) = \varphi(t) \cdot \Delta S(t)
+\end{equation*}
+is the change in the market value due to changes in security prices which occur between time $t-1$ and $t$. This motivates the following definition.
+
+\begin{defn}{Gains Process}{GainsProcess}
+	The \emph{gains process} $G_\varphi$ of a trading strategy $\varphi$ is given by
+	\begin{equation*}
+		G_\varphi(t) \coloneqq \sum_{\tau=1}^t \varphi(\tau) \cdot (S(\tau) - S(\tau-1)) = \sum_{\tau=1}^t \varphi(\tau) \cdot \Delta S(\tau), \quad (t=1, 2, \dots, T).
+	\end{equation*}
+\end{defn}
+
+Define $\tilde{S}(t) = (1, \beta(t)S_1(t), \dots, \beta(t)S_d(t))'$, the vector of discounted prices, and consider the \emph{discounted value process}
+\begin{equation*}
+	\tilde{V}_\varphi(t) = \beta(t)(\varphi(t) \cdot S(t)) = \varphi(t) \cdot \tilde{S}(t), \quad (t=1, 2, \dots, T)
+\end{equation*}
+and the \emph{discounted gains process}
+\begin{equation*}
+	\tilde{G}_\varphi(t) \coloneqq \sum_{\tau=1}^t \varphi(\tau) \cdot (\tilde{S}(\tau) - \tilde{S}(\tau-1)) = \sum_{\tau=1}^t \varphi(\tau) \cdot \Delta \tilde{S}(\tau), \quad (t=1, 2, \dots, T).
+\end{equation*}
+
+Observe that the discounted gains process reflects the gains from trading with assets $1$ to $d$ only, which in case of the standard model (a bank account and $d$ stocks) are the risky assets. We will only consider special classes of trading strategies.
+
+\begin{defn}{Self-Financing Strategy}{SelfFinancingStrategy}
+	The strategy $\varphi$ is \emph{self-financing}, $\varphi \in \Phi$, if
+	\begin{equation}
+		\varphi(t) \cdot S(t) = \varphi(t+1) \cdot S(t) \quad (t=1, 2, \dots, T-1).
+		\label{eq:SelfFinancingCondition}
+	\end{equation}
+\end{defn}
+
+\begin{xtip}
+	When new prices $S(t)$ are quoted at time $t$, the investor adjusts his portfolio from $\varphi(t)$ to $\varphi(t+1)$, without bringing in or consuming any wealth. The following result (which is trivial in our current setting, but requires a little argument in continuous time) shows that renormalising security prices (i.e. changing the numéraire) has essentially no economic effects.
+\end{xtip}
+
+\begin{prop}{Numéraire Invariance}{NumeraireInvariance}
+	Let $X(t)$ be a numéraire. A trading strategy $\varphi$ is self-financing with respect to $S(t)$ if and only if $\varphi$ is self-financing with respect to $X(t)^{-1}S(t)$.
+\end{prop}
+
+\begin{proof}
+	Since $X(t) > 0$ for all $t$, scalar multiplication by $X(t)^{-1}$ preserves the equality. For $t=1, \dots, T-1$:
+	\begin{align*}
+		\varphi(t) \cdot S(t)                       & = \varphi(t+1) \cdot S(t)             \\
+		\iff \quad \varphi(t) \cdot (X(t)^{-1}S(t)) & = \varphi(t+1) \cdot (X(t)^{-1}S(t)).
+	\end{align*}
+\end{proof}
+
+\begin{cor}{Self-Financing Equivalence}{SelfFinancingEquivalence}
+	A trading strategy $\varphi$ is self-financing with respect to $S(t)$ if and only if $\varphi$ is self-financing with respect to $\tilde{S}(t)$.
+\end{cor}
+
+We now give a characterisation of self-financing strategies in terms of the discounted processes.
+
+\begin{prop}{Characterisation of Self-Financing Strategies}{CharSelfFinancing}
+	A trading strategy $\bphi$ belongs to $\Phi$ if and only if
+	\begin{equation} \label{eq:SelfFinancingEquivalence}
+		\tilde{V}_{\bphi}(t) = V_{\bphi}(0) + \tilde{G}_{\bphi}(t), \quad t = 0, 1, \dots, T.
+	\end{equation}
+\end{prop}
+
+\begin{proof}
+	Assume $\bphi \in \Phi$. Then, using the defining relation of the gains process, the num\'{e}raire invariance theorem, and the fact that $\tilde{S}_0^{(0)} = 1$:
+	\begin{align*}
+		V_{\bphi}(0) + \tilde{G}_{\bphi}(t) & = \bphi_1 \cdot \bS_0 + \sum_{\tau=1}^t \bphi_\tau \cdot (\tilde{\bS}_\tau - \tilde{\bS}_{\tau-1})                                                                   \\
+		                                    & = \bphi_1 \cdot \tilde{\bS}_0 + \bphi_t \cdot \tilde{\bS}_t - \sum_{\tau=1}^{t-1} (\bphi_{\tau+1} - \bphi_\tau) \cdot \tilde{\bS}_\tau - \bphi_1 \cdot \tilde{\bS}_0 \\
+		                                    & = \bphi_t \cdot \tilde{\bS}_t                                                                                                                                        \\
+		                                    & = \tilde{V}_{\bphi}(t).
+	\end{align*}
+	Note that the summation term vanishes because the strategy is self-financing (i.e., $\bphi_{\tau+1} \cdot \tilde{\bS}_\tau = \bphi_\tau \cdot \tilde{\bS}_\tau$).
+
+	Conversely, assume that \cref{eq:SelfFinancingEquivalence} holds true. By the num\'{e}raire invariance theorem, it is sufficient to show the discounted version of the self-financing relation for each $t = 1, 2, \dots, T-1$. Summing up to $t=2$, \cref{eq:SelfFinancingEquivalence} yields:
+	\begin{equation*}
+		\bphi_2 \cdot \tilde{\bS}_2 = \bphi_1 \cdot \tilde{\bS}_0 + \bphi_1 \cdot (\tilde{\bS}_1 - \tilde{\bS}_0) + \bphi_2 \cdot (\tilde{\bS}_2 - \tilde{\bS}_1).
+	\end{equation*}
+	Subtracting $\bphi_2 \cdot \tilde{\bS}_2$ from both sides simplifies to:
+	\begin{equation*}
+		0 = \bphi_1 \cdot \tilde{\bS}_1 - \bphi_2 \cdot \tilde{\bS}_1 \implies \bphi_2 \cdot \tilde{\bS}_1 = \bphi_1 \cdot \tilde{\bS}_1.
+	\end{equation*}
+	Proceeding similarly---or by induction---we can demonstrate that $\bphi_t \cdot \tilde{\bS}_t = \bphi_{t+1} \cdot \tilde{\bS}_t$ for $t = 2, \dots, T-1$, as required.
+\end{proof}
+
+We are allowed to borrow (so $\phi_t^{(0)}$ may be negative) and sell short (so $\phi_t^{(i)}$ may be negative for $i = 1, \dots, d$). Consequently, if we decide on the allocation of the risky assets, the num\'{e}raire component adjusts automatically to satisfy the budget constraint.
+
+\begin{prop}{Predictability of the Num\'{e}raire Component}{PredictabilityNumeraire}
+	If $(\phi_1(t), \dots, \phi_d(t))'$ is predictable and $V_0$ is $\cF_0$-measurable, there is a unique predictable process $(\phi_0(t))_{t=1}^T$ such that $\bphi = (\phi_0, \phi_1, \dots, \phi_d)'$ is self-financing with initial value of the corresponding portfolio $V_{\bphi}(0) = V_0$.
+\end{prop}
+
+\begin{proof}
+	If $\bphi$ is self-financing, then by \cref{prop:CharSelfFinancing},
+	\begin{equation*}
+		\tilde{V}_{\bphi}(t) = V_0 + \tilde{G}_{\bphi}(t) = V_0 + \sum_{\tau=1}^t \left( \phi_1(\tau) \Delta \tilde{S}_1(\tau) + \dots + \phi_d(\tau) \Delta \tilde{S}_d(\tau) \right).
+	\end{equation*}
+	On the other hand,
+	\begin{equation*}
+		\tilde{V}_{\bphi}(t) = \bphi(t) \cdot \tilde{\bS}(t) = \phi_0(t) + \phi_1(t) \tilde{S}_1(t) + \dots + \phi_d(t) \tilde{S}_d(t).
+	\end{equation*}
+	Equate these:
+	\begin{align*}
+		\phi_0(t) & = V_0 + \sum_{\tau=1}^t \left( \phi_1(\tau) \Delta \tilde{S}_1(\tau) + \dots + \phi_d(\tau) \Delta \tilde{S}_d(\tau) \right) \\
+		          & \quad - \left( \phi_1(t) \tilde{S}_1(t) + \dots + \phi_d(t) \tilde{S}_d(t) \right),
+	\end{align*}
+	which defines $\phi_0(t)$ uniquely. The terms in $\tilde{S}_i(t)$ are
+	\begin{equation*}
+		\phi_i(t) \Delta \tilde{S}_i(t) - \phi_i(t) \tilde{S}_i(t) = -\phi_i(t) \tilde{S}_i(t-1),
+	\end{equation*}
+	which is $\cF_{t-1}$-measurable. So
+	\begin{align*}
+		\phi_0(t) & = V_0 + \sum_{\tau=1}^{t-1} \left( \phi_1(\tau) \Delta \tilde{S}_1(\tau) + \dots + \phi_d(\tau) \Delta \tilde{S}_d(\tau) \right) \\
+		          & \quad - \left( \phi_1(t) \tilde{S}_1(t-1) + \dots + \phi_d(t) \tilde{S}_d(t-1) \right),
+	\end{align*}
+	where as $\phi_1, \dots, \phi_d$ are predictable, all terms on the right-hand side are $\cF_{t-1}$-measurable, so $\phi_0$ is predictable.
+\end{proof}
+
+\subsection{Existence of Equivalent Martingale Measures}
+
+\begin{defn}{Arbitrage Opportunity}{ArbitrageOpportunity}
+	Let $\tilde{\Phi}\subset\Phi$ be a set of self-financing strategies. A strategy $\varphi\in\tilde{\Phi}$ is called an \textit{arbitrage opportunity} or \textit{arbitrage strategy} with respect to $\tilde{\Phi}$ if $\Pm\{V_{\varphi}(0)=0\}=1$, and the terminal wealth of $\varphi$ satisfies
+	\[
+		\Pm\{V_{\varphi}(T)\ge 0\}=1\quad\text{and}\quad\Pm\{V_{\varphi}(T)>0\}>0.
+	\]
+\end{defn}
+
+An arbitrage opportunity is a self-financing strategy with zero initial value, which produces a non-negative final value with probability one and has a positive probability of yielding a positive final value. Note that arbitrage opportunities are always defined in relation to a specific class of trading strategies.
+
+\begin{defn}{Arbitrage-Free Market}{ArbitrageFreeMarket}
+	We say that a security market $\cM$ is arbitrage-free if there are no arbitrage opportunities in the class $\Phi$ of trading strategies. We will allow ourselves to use ‘no-arbitrage’ in place of ‘arbitrage-free’ when convenient.
+\end{defn}
+
+\begin{lem}{Global Implies Local No-Arbitrage}{GlobalImpliesLocalNoArbitrage}
+	If the market model contains no arbitrage opportunities, then for all $t\in\{0,1,\dots,T-1\}$, for all self-financing trading strategies $\varphi\in\Phi$ and for any $A\in\mathcal{P}_t$, we have
+	\begin{enumerate}[(i)]
+		\item $\Pm(\tilde{V}_{\varphi}(t+1)-\tilde{V}_{\varphi}(t)\ge 0\mid A)=1\Rightarrow \Pm(\tilde{V}_{\varphi}(t+1)-\tilde{V}_{\varphi}(t)=0\mid A)=1$,
+		\item $\Pm(\tilde{V}_{\varphi}(t+1)-\tilde{V}_{\varphi}(t)\le 0\mid A)=1\Rightarrow \Pm(\tilde{V}_{\varphi}(t+1)-\tilde{V}_{\varphi}(t)=0\mid A)=1$.
+	\end{enumerate}
+\end{lem}
+
+The economic meaning: no arbitrage ‘globally’ implies no arbitrage ‘locally’. Any local trading strategy can be embedded in a global strategy to which the global no-arbitrage condition applies.
+
+\begin{proof}
+	We only prove (i) ((ii) is similar). Fix $t\in\{0,\dots,T-1\}$ and $\varphi\in\Phi$. Suppose $\Pm(\tilde{V}_{\varphi}(t+1)-\tilde{V}_{\varphi}(t)\ge 0\mid A)=1$ for some $A\in\mathcal{P}_t$ and define a new trading strategy $\psi$ for all times $u=1,\dots,T$ as follows: For $u\le t$: $\psi(u)=0$ (‘do nothing before time $t$’). For $u=t+1$: $\psi(t+1)=0$ if $\omega\notin A$, and
+	\[
+		\psi_k(t+1,\omega)=\begin{cases}
+			\varphi_k(t+1,\omega)                               & \text{if }\omega\in A\text{ and }k\in\{1,\dots,d\}, \\
+			\varphi_0(t+1,\omega)-\tilde{V}_{\varphi}(t,\omega) & \text{if }\omega\in A\text{ and }k=0.
+		\end{cases}
+	\]
+	(If $\omega\in A$ at time $t$, follow $\varphi$ in risky assets, but adjust the num\'eraire to offset doing nothing when $\omega\notin A$.) For $u>t+1$: $\psi_k(u)=0$ for $k\in\{1,\dots,d\}$ and
+	\[
+		\psi_0(u,\omega)=\begin{cases}
+			\tilde{V}_{\psi}(t+1,\omega) & \text{if }\omega\in A,    \\
+			0                            & \text{if }\omega\notin A.
+		\end{cases}
+	\]
+	(Invest $\tilde{V}_{\psi}(t+1)$ in the num\'eraire if $\omega\in A$, otherwise do nothing.)
+
+	We show $\psi$ is self-financing. By construction, $\psi$ is predictable. For $\omega\notin A$, $\psi\equiv 0$, so consider $\omega\in A$. The relevant time is $t+1$. Since $\psi(t)=0$, $\psi(t)\cdot\tilde{S}(t)=0$. Now
+	\[
+		\begin{aligned}
+			\psi(t+1)\cdot\tilde{S}(t) & =(\varphi_0(t+1)-\tilde{V}_{\varphi}(t))\tilde{S}_0(t)+\sum_{k=1}^d \varphi_k(t+1)\tilde{S}_k(t)            \\
+			                           & =\sum_{k=0}^d \varphi_k(t+1)\tilde{S}_k(t)-\tilde{V}_{\varphi}(t)                                           \\
+			                           & =\varphi(t+1)\cdot\tilde{S}(t)-\tilde{V}_{\varphi}(t)=\varphi(t)\cdot\tilde{S}(t)-\tilde{V}_{\varphi}(t)=0,
+		\end{aligned}
+	\]
+	since $\varphi$ is self-financing. For $u\le t$, $\psi(u)\cdot\tilde{S}(u)=0$, hence $\psi(u+1)\cdot\tilde{S}(u)=\psi(u)\cdot\tilde{S}(u)$ for all $u\le t$. When $u>t+1$ and $\omega\in A$ we only hold the num\'eraire (discounted value $=1$), so
+	\[
+		\psi(u+1)\cdot\tilde{S}(u)=\tilde{V}_{\psi}(t+1)=\psi(u)\cdot\tilde{S}(u).
+	\]
+	Therefore, $\psi$ is self-financing.
+
+	We now analyze the value process of $\psi$. Using $\Pm(\tilde{V}_{\varphi}(t+1)-\tilde{V}_{\varphi}(t)\ge 0\mid A)=1$, for all $u\ge t+1$ and $\omega\in A$,
+	\[
+		\begin{aligned}
+			\tilde{V}_{\psi}(u) & =\psi(u)\cdot\tilde{S}(u)=\psi(t+1)\cdot\tilde{S}(t+1)                                                                    \\
+			                    & =(\varphi_0(t+1)-\tilde{V}_{\varphi}(t))\tilde{S}_0(t+1)+\sum_{k=1}^d \varphi_k(t+1)\tilde{S}_k(t+1)                      \\
+			                    & =\sum_{k=0}^d \varphi_k(t+1)\tilde{S}_k(t+1)-\tilde{V}_{\varphi}(t)=\tilde{V}_{\varphi}(t+1)-\tilde{V}_{\varphi}(t)\ge 0.
+		\end{aligned}
+	\]
+	Since $\tilde{V}_{\psi}(T)=0$ on $A^c$, $\psi$ is self-financing with $\tilde{V}_{\psi}(0)=0$ and $\tilde{V}_{\psi}(T)\ge 0$. Arbitrage-free implies $\tilde{V}_{\psi}(T)=0$, hence
+	\[
+		\begin{aligned}
+			0 & =\Pm(\tilde{V}_{\psi}(T)>0)=\Pm(\{\tilde{V}_{\psi}(T)>0\}\cap A) \\
+			  & =\Pm(\tilde{V}_{\psi}(t+1)-\tilde{V}_{\psi}(t)>0\mid A)\,\Pm(A).
+		\end{aligned}
+	\]
+	Therefore $\Pm(\tilde{V}_{\psi}(t+1)-\tilde{V}_{\psi}(t)=0\mid A)=1$.
+\end{proof}
+
+\begin{defn}{Martingale Measure}{MartingaleMeasure}
+	A probability measure $\Pm^*$ on $(\Omega, \cF_T)$ equivalent to $\Pm$ is called a \textit{martingale measure} for $\tilde{S}$ if the process $\tilde{S}$ follows a $\Pm^*$-martingale with respect to the filtration $\F$. We denote by $\mathcal{P}(\tilde{S})$ the class of equivalent martingale measures.
+\end{defn}
+
+\begin{prop}{Wealth Process Martingale}{WealthProcessMartingale}
+	Let $\Pm^*$ be an equivalent martingale measure ($\Pm^* \in \mathcal{P}(\tilde{S})$) and $\varphi \in \Phi$ any self-financing strategy. Then the wealth process $\tilde{V}_{\varphi}(t)$ is a $\Pm^*$-martingale with respect to the filtration $\F$.
+\end{prop}
+
+\begin{proof}
+	By the self-financing property of $\varphi$ (compare \Cref{prop:CharSelfFinancing,eq:SelfFinancingEquivalence}) and, we have
+	\[
+		\tilde{V}_{\varphi}(t) = V_{\varphi}(0) + \tilde{G}_{\varphi}(t) \quad (t = 0, 1, \dots, T).
+	\]
+	So
+	\[
+		\tilde{V}_{\varphi}(t+1) - \tilde{V}_{\varphi}(t) = \tilde{G}_{\varphi}(t+1) - \tilde{G}_{\varphi}(t) = \varphi(t+1) \cdot (\tilde{S}(t+1) - \tilde{S}(t)).
+	\]
+	So for $\varphi \in \Phi$, $\tilde{V}_t(\varphi)$ is the martingale transform of the $\Pm^*$ martingale $\tilde{S}$ by $\varphi$ and hence a $\Pm^*$ martingale itself.
+\end{proof}
+
+The next result is the key to further development.
+
+\begin{prop}{Equivalent Martingale Measure Implies Arbitrage-Free}{EmmImpliesArbFree}
+	If an equivalent martingale measure exists - that is, if $\mathcal{P}(\tilde{S}) \neq \emptyset$ - then the market $\cM$ is arbitrage-free.
+\end{prop}
+
+\begin{proof}
+	Assume such a $\Pm^*$ exists. For any self-financing strategy $\varphi$, we have as before
+	\[
+		\tilde{V}_{\varphi}(t) = V_{\varphi}(0) + \sum_{\tau=1}^t \varphi(\tau) \cdot \Delta\tilde{S}(\tau).
+	\]
+	By \Cref{prop:CharSelfFinancing}, $\tilde{S}(t)$ a (vector) $\Pm^*$-martingale implies $\tilde{V}_{\varphi}(t)$ is a $\Pm^*$-martingale. So the initial and final $\Pm^*$-expectations are the same,
+	\[
+		\E^*(\tilde{V}_{\varphi}(T)) = \E^*(\tilde{V}_{\varphi}(0)).
+	\]
+	If the strategy is an arbitrage opportunity, its initial value - the right-hand side above - is zero. Therefore the left-hand side $\E^*(\tilde{V}_{\varphi}(T))$ is zero, but $\tilde{V}_{\varphi}(T) \geq 0$ (by definition). Also each $\Pm^*(\{ \omega \}) > 0$ (by assumption, each $\Pm(\{ \omega \}) > 0$, so by equivalence each $\Pm^*(\{ \omega \}) > 0$). This and $\tilde{V}_{\varphi}(T) \geq 0$ force $\tilde{V}_{\varphi}(T) = 0$. So no arbitrage is possible.
+\end{proof}
+
+\begin{prop}{Arbitrage-Free Implies Existence of EMM}{ArbFreeImpliesEmm}
+	If the market $\cM$ is arbitrage-free, then the class $\mathcal{P}(\tilde{S})$ of equivalent martingale measures is non-empty.
+\end{prop}
+
+Because of the fundamental nature of this result, we will provide two proofs. The first proof is based on our previous observation that the `global' no-arbitrage condition implies also no-arbitrage `locally'. We therefore can combine single-period results to prove the multi-period claim. The second proof uses functional-analytic techniques, i.e. a variant of the \textit{Hahn-Banach theorem}.
+
+\begin{thm}{No-Arbitrage Theorem}{NoArbitrage}
+	The market $\cM$ is arbitrage-free if and only if there exists a probability measure $\Pm^*$ equivalent to $\Pm$ under which the discounted $d$-dimensional asset price process $\tilde{S}$ is a $\Pm^*$-martingale.
+\end{thm}
+
+\subsection{Pricing}
+We now turn to the main underlying question of this text, namely the pricing of contingent claims (i.e. financial derivatives). First, we have to model these financial instruments in our current framework. This is done in the following fashion.
+
+\begin{defn}{Contingent Claim}{ContingentClaim}
+	A contingent claim $X$ with maturity date $T$ is an arbitrary non-negative $\cF_T$-measurable random variable (which is, by the finiteness of the probability space, bounded). We denote the class of all contingent claims by $\mathcal{X}^+$.
+\end{defn}
+
+A typical example of a contingent claim $X$ is an option on some underlying asset $S$, then (e.g. for the case of a European call option with maturity date $T$ and strike $K$) we have a functional relation $X = f(S)$ with some function $f$ (e.g. $X = (S(T) - K)^+$). The general definition allows for more complicated relationships, which are captured by the $\cF_T$-measurability of $X$ (recall that $\cF_T$ is typically generated by the process $S$).
+
+We say that the claim is \textit{attainable} if there exists a \textit{replicating strategy} $\varphi \in \Phi$ such that
+\[
+	V_{\varphi}(T) = X.
+\]
+
+Therefore, the replicating strategy generates the same cash flow at time $T$ as does $X$. In a highly efficient security market, we expect the law of one price to hold; that is, for a specified cash flow, there exists only one price at any given instant. Otherwise, arbitrageurs would use the opportunity to cash in a riskless profit. So the no-arbitrage condition implies that for an attainable contingent claim, its time $t$ price must be given by the value of any replicating strategy (we say the claim is uniquely replicated in that case). This is the basic idea of the arbitrage pricing theory. Clearly, the equivalence of the no-arbitrage condition and the existence of risk-neutral probability measures implies that risk-neutral measures can be used for pricing purposes.
+
+\begin{prop}{Unique Replication}{UniqueReplication}
+	Suppose the market $\cM$ is arbitrage-free. Then any attainable contingent claim $X$ is uniquely replicated in $\cM$.
+\end{prop}
+
+\begin{proof}
+	Suppose there is an attainable contingent claim $X$ and strategies $\varphi$ and $\psi$ such that
+	\[
+		V_{\varphi}(T) = V_{\psi}(T) = X,
+	\]
+	but there exists a $\tau < T$ such that
+	\[
+		V_{\varphi}(u) = V_{\psi}(u) \text{ for every } u < \tau \text{ and } V_{\varphi}(\tau) \neq V_{\psi}(\tau).
+	\]
+	Define $A \coloneqq \{ \omega \in \Omega : V_{\varphi}(\tau, \omega) > V_{\psi}(\tau, \omega) \}$, then $A \in \cF_{\tau}$ and $\Pm(A) > 0$ (otherwise just rename the strategies). Define the $\cF_{\tau}$-measurable random variable $Y \coloneqq V_{\varphi}(\tau) - V_{\psi}(\tau)$ and consider the trading strategy $\xi$ defined by
+	\[
+		\xi(u) = \begin{cases}
+			\varphi(u) - \psi(u),                                             & u \leq \tau      \\
+			\I_{A^c}(\varphi(u) - \psi(u)) + \I_A(Y\beta(\tau), 0, \dots, 0), & \tau < u \leq T.
+		\end{cases}
+	\]
+	Then $\xi$ is predictable, and the self-financing condition \Cref{eq:SelfFinancingCondition} is clearly true for $t \neq \tau$, and for $t = \tau$ we have using that $\varphi, \psi \in \Phi$
+	\begin{align*}
+		\xi(\tau) \cdot S(\tau)     & = (\varphi(\tau) - \psi(\tau)) \cdot S(\tau) = V_{\varphi}(\tau) - V_{\psi}(\tau),                                            \\
+		\xi(\tau + 1) \cdot S(\tau) & = \I_{A^c}(\varphi(\tau + 1) - \psi(\tau + 1)) \cdot S(\tau) + \I_A Y \beta(\tau) S_0(\tau)                                   \\
+		                            & = \I_{A^c}(\varphi(\tau) - \psi(\tau)) \cdot S(\tau) + \I_A (V_{\varphi}(\tau) - V_{\psi}(\tau)) \beta(\tau) \beta^{-1}(\tau) \\
+		                            & = V_{\varphi}(\tau) - V_{\psi}(\tau).
+	\end{align*}
+	Hence $\xi$ is a self-financing strategy with initial value equal to zero. Furthermore
+	\[
+		\begin{aligned}
+			V_{\xi}(T) & = \I_{A^c}(\varphi(T) - \psi(T)) \cdot S(T) + \I_A (Y \beta(\tau), 0, \dots, 0) \cdot S(T) \\
+			           & = \I_A Y \beta(\tau) S_0(T) \geq 0
+		\end{aligned}
+	\]
+	and
+	\[
+		\Pm\{V_{\xi}(T) > 0\} = \Pm\{A\} > 0.
+	\]
+	Hence, the market $\cM$ contains an arbitrage opportunity with respect to the class $\Phi$ of self-financing strategies. But this contradicts the assumption that the market $\cM$ is arbitrage-free.
+\end{proof}
+This uniqueness property allows us now to define the important concept of an arbitrage price process.
+
+\begin{defn}{Arbitrage Price Process}{ArbitragePriceProcess}
+	Suppose the market $\cM$ is arbitrage-free. Let $X$ be any attainable contingent claim with time $T$ maturity. Then the \textit{arbitrage price process} $\pi_X(t)$, $0 \leq t \leq T$ or simply \textit{arbitrage price} of $X$ in $\cM$ is given by the value process of any replicating strategy $\varphi$ for $X$.
+\end{defn}
+
+The synthesis of hedging strategies that replicate the outcome of a contingent claim constitutes a fundamental objective in both theoretical and applied finance. Classical valuation frameworks postulate that an option is perfectly replicated by a dynamic self-financing portfolio of the underlying market assets \citep{black_pricing_1973, merton_pricing_1974}. This mechanism enables the construction of a riskless hedge that neutralises stochastic exposure and informs the delta-hedging strategies employed by market participants.
+
+The resulting pricing functional depends strictly on the assumption of non-satiation to preclude arbitrage opportunities and remains invariant to specific investor utility functions. Consequently, the value derived in an actual market must coincide with that of a hypothetical economy populated entirely by risk-neutral agents \citep{cox_valuation_1976}. This principle enables the valuation of derivatives as the expected discounted payoff under a specific probability measure, where discounted asset prices form martingales \citep{harrison_martingales_1981}.
+
+\begin{prop}{Risk-Neutral Valuation Formula}{RiskNeutralValuation}
+	The arbitrage price process of any attainable contingent claim $X$ is given by the \textit{risk-neutral valuation formula}
+	\begin{equation}
+		\pi_X(t) = \beta(t)^{-1} \E^* (X \beta(T) \mid \cF_t) \quad \forall t = 0, 1, \dots, T,
+		\label{eq:risk_neutral_formula}
+	\end{equation}
+	where $\E^*$ is the expectation operator with respect to an equivalent martingale measure $\Pm^*$.
+\end{prop}
+
+\begin{proof}
+	Since we assume the market is arbitrage-free there exists (at least) an equivalent martingale measure $\Pm^*$. By \Cref{prop:WealthProcessMartingale} the discounted value process $\tilde{V}_\varphi$ of any self-financing strategy $\varphi$ is a $\Pm^*$-martingale. So for any contingent claim $X$ with maturity $T$ and any replicating trading strategy $\varphi \in \Phi$ we have for each $t = 0, 1, \dots, T$
+	\begin{equation}
+		\begin{aligned}
+			\pi_X(t) & = V_\varphi(t) = \beta(t)^{-1} \tilde{V}_\varphi(t)                                                                                 \\
+			         & = \beta(t)^{-1} \E^*(\tilde{V}_\varphi(T) \mid \cF_t)  &  & (\text{as } \tilde{V}_\varphi(t) \text{ is a } \Pm^*\text{-martingale}) \\
+			         & = \beta(t)^{-1} \E^*(\beta(T) V_\varphi(T) \mid \cF_t) &  & (\text{undoing the discounting})                                        \\
+			         & = \beta(t)^{-1} \E^*(\beta(T)X \mid \cF_t)             &  & (\text{as } \varphi \text{ is a replicating strategy for } X).
+		\end{aligned}
+	\end{equation}
+\end{proof}
+
+\subsection{Market Completeness and Uniqueness of Equivalent Martingale Measures}
+
+The last section made clear that attainable contingent claims can be priced using an equivalent martingale measure. In this section we will discuss the question of the circumstances under which all contingent claims are attainable. This would be a very desirable property of the market $\cM$, because we would then have solved the pricing question (at least for contingent claims) completely. Since contingent claims are merely non-negative $\cF_T$-measurable random variables in our setting, it should be no surprise that we can give a criterion in terms of probability measures. We start with:
+
+\begin{defn}{Market Completeness}{MarketCompleteness}
+	A market $\cM$ is complete if every contingent claim is attainable, i.e. for every non-negative $\cF_T$-measurable random variable $X \in \matX^+$ there exists a replicating self-financing strategy $\varphi \in \Phi$ such that $V_\varphi(T) = X$.
+\end{defn}
+
+In the case of an arbitrage-free market $\cM$ one can even insist on replicating contingent claims by an admissible strategy $\varphi \in \Phi_a$. Indeed, if $\varphi$ is self-financing and $\Pm^*$ is an equivalent martingale measure under which discounted prices $\tilde{S}$ are $\Pm^*$-martingales (such $\Pm^*$ exist since $\cM$ is arbitrage-free and we can hence use the no-arbitrage theorem, \Cref{thm:NoArbitrage} $\tilde{V}_\varphi(t)$ is also a $\Pm^*$-martingale, being the martingale transform of the martingale $\tilde{S}$ by $\varphi$ (see \Cref{prop:WealthProcessMartingale}). So
+\begin{equation}
+	\tilde{V}_\varphi(t) = \E^ *(\tilde{V}_\varphi(T)|\cF_t) \quad (t=0,1,\dots,T).
+\end{equation}
+If $\varphi$ replicates $X$, $V_\varphi(T) = X \ge 0$, so discounting, $\tilde{V}_\varphi(T) \ge 0$, so the above equation gives $\tilde{V}_\varphi(t) \ge 0$ for each $t$. Thus all the values at each time $t$ are non-negative, not just the final value at time $T$, so $\varphi$ is admissible.
+
+\begin{thm}{Completeness Theorem}{CompletenessTheorem}
+	An arbitrage-free market $\cM$ is complete if and only if there exists a unique probability measure $\Pm^*$ equivalent to $\Pm$ under which discounted asset prices are martingales.
+\end{thm}

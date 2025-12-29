@@ -1,0 +1,41 @@
+An \emph{Asian option} (or \emph{average option}) defines a class of options, whether European or American style, whose terminal payoff depends on the average asset value over a specific period within the option's life. Due to this averaging feature, Asian options are particularly suitable for thinly traded assets or commodities. Unlike standard options, they are typically less expensive and offer greater robustness against price manipulation near the expiry date.
+
+Asian options were first traded in Tokyo in 1987, and have become particularly popular in commodities trading.
+
+Let $T$ denote the exercise date, and let $0 \le T_0 < T$ represent the commencement of the averaging period. The payoff at expiry for an Asian call option is defined as
+\begin{equation} \label{eq:AsianCallPayoff}
+    C_T^A \idef (A_S(T_0, T) - K)^+,
+\end{equation}
+where
+\begin{equation} \label{eq:ArithmeticAverage}
+    A_S(T_0, T) = \frac{1}{T - T_0} \int_{T_0}^T S_u \, \di u
+\end{equation}
+represents the arithmetic average of the asset price over the time interval $[T_0, T]$. Here, $K$ denotes the fixed strike price, and the asset price $S$ is assumed to follow a geometric Brownian motion.
+
+The main difficulty in pricing and hedging Asian options is due to the fact that the random variable $A(T_0, T)$ does not have a lognormal distribution. This feature makes the task of finding an explicit formula for the price of an Asian option surprisingly involved.
+
+For this reason, early studies of Asian options were based either on approximations or on the direct application of the Monte Carlo method. The numerical approach to the valuation of Asian options, is based on the approximation of the arithmetic average using the geometric average. Note first that it is natural to substitute for the continuous-time average $A(T_0, T)$ its discrete-time counterpart
+\begin{equation} \label{eq:DiscreteTimeCounterpart}
+    A_S^n(T_0, T) = \frac{1}{n} \sum_{i=0}^{n-1} S_{T_i},
+\end{equation}
+where $T_i = T_0 + i(T - T_0)/n$. Furthermore, the arithmetic average $A_S^n(T_0, T)$ can be replaced with the geometric average, denoted by $G_S^n(T_0, T)$, in what follows. Recall that the random variables $S_{T_i}, i = 1, \dots, n$ are given explicitly by the expression
+\begin{equation} \label{eq:ExplicitStockPrice}
+    S_{T_i} = S_{T_0} \exp \left(\sigma (W^*_{T_i} - W^*_{T_0}) + \left(r - \frac{1}{2}\sigma^2\right)(T_i - T_0)\right),
+\end{equation}
+where $W^*$ is a standard Brownian motion under the martingale measure $\Pm^*$. Hence the geometric average admits the following representation
+\begin{equation} \label{eq:GeometricAverageRepresentation}
+    G_S^n(T_0, T) = \left(\prod_{i=0}^{n-1} S_{T_i}\right)^{1/n} = c S_{T_0} \exp \left(\frac{\sigma}{n} \sum_{i=0}^{n-1} (n - i - 1)(W^*_{T_{i+1}} - W^*_{T_i})\right)
+\end{equation}
+for a strictly positive constant $c$. In view of the independence of increments of the Brownian motion, the last formula makes clear that the geometric average $G_S^n(T_0, T)$ has a lognormal distribution under $\Pm^*$. The approximate Black-Scholes-like formula for the price of an Asian call option can thus be easily found by the direct evaluation of the conditional expectation
+\begin{equation} \label{eq:AsianCallConditionalExpectation}
+    \tilde{C}_{T_0}^n = e^{-r(T-T_0)} \E_{\Pm^*} \left((G_S^n(T_0, T) - K)^+ \mid \cF_{T_0}\right).
+\end{equation}
+
+It appears, however, that such an approach significantly underprices Asian call options. To overcome this deficiency, one may directly approximate the true distribution of the arithmetic average using an approximate distribution, typically a lognormal distribution with the appropriate parameters
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/movingAverage.pgf}
+    \caption{Brownian motion $B_t$ and its moving average $X_t$}
+    \label{fig:movingAverage}
+\end{figure}
