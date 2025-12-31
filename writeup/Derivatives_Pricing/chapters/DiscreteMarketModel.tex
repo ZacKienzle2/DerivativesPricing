@@ -514,8 +514,6 @@ If $\varphi$ replicates $X$, $V_\varphi(T) = X \ge 0$, so discounting, $\tilde{V
 	which is zero as $Z$ is orthogonal to $\tilde{V}$ and $\sum_{t=1}^T \varphi(t) \cdot \Delta \tilde{S}(t) \in \tilde{V}$. By the martingale transform lemma (Lemma 3.4.1), $\tilde{S}(t)$ is a $\Prob^{**}$-martingale since $\varphi$ is an arbitrary predictable process. Thus $\Prob^{**}$ is a second equivalent martingale measure, different from $\Prob^*$. So incompleteness implies non-uniqueness of equivalent martingale measures, as required.
 \end{proof}
 
-
-
 \subsection{Fundamental Theorem of Asset Pricing}
 
 We call a measure $\Prob^*$ under which discounted prices $\tilde{S}(t)$ are $\Prob^*$-martingales a \textit{martingale measure}. Such a $\Prob^*$ equivalent to the actual probability measure $P$ is called an \textit{equivalent martingale measure}.
@@ -523,3 +521,81 @@ We call a measure $\Prob^*$ under which discounted prices $\tilde{S}(t)$ are $\P
 \begin{thm}{Fundamental Theorem of Asset Pricing}{FundamentalTheoremAssetPricing}
 	In an arbitrage-free complete market, there exists a unique martingale measure $\Prob^*$.
 \end{thm}
+
+\subsection{The Cox-Ross-Rubinstein Model}
+We now turn to the pricing of derivative assets in the Cox-Ross-Rubinstein market model. To do so we first have to discuss whether the Cox-Ross-Rubinstein model is arbitrage-free and complete.
+
+Our first task is to find an equivalent martingale measure of the same class as $\Prob$, i.e.\ a probability measure $\bQ$ defined as a product measure via a measure $\tilde{\bQ}$ on $(\tilde{\Omega}, \tilde{\F})$ such that $\tilde{\bQ}(\set{u}) = q$ and $\tilde{\bQ}(\set{d}) = 1-q$. We call the set of all measures of that type $\scP$. We have:
+
+\begin{prop}{Martingale Measure Existence}{MartingaleMeasureExistence}
+    \begin{enumerate}[(i)]
+        \item A martingale measure $\bQ \in \scP$ for the discounted stock price $\tilde{S}$ exists if and only if
+        \begin{equation}
+            d < 1+r < u.
+            \label{eq:CRRNoArb}
+        \end{equation}
+        \item If \Cref{eq:CRRNoArb} holds true, then there is a unique such measure in $\scP$ characterised by
+        \begin{equation}
+            q = \frac{1+r-d}{u-d}.
+        \end{equation}
+    \end{enumerate}
+\end{prop}
+
+\begin{proof}
+    Since $S(t) = \tilde{S}(t)B(t) = \tilde{S}(t)(1+r)^t$, we have $Z(t+1) = S(t+1)/S(t) = (\tilde{S}(t+1)/\tilde{S}(t))(1+r)$. So, the discounted price $(\tilde{S}(t))$ is a $\bQ$-martingale if and only if for $t = 0, 1, \dots, T-1$
+    \[
+        \E^{\bQ}[\tilde{S}(t+1) \gvn \cF_t] = \tilde{S}(t) \iff \E^{\bQ}[(\tilde{S}(t+1)/\tilde{S}(t)) \gvn \cF_t] = 1 \iff \E^{\bQ}[Z(t+1) \gvn \cF_t] = 1+r.
+    \]
+    But $Z(1), \dots, Z(T)$ are mutually independent and hence $Z(t+1)$ is independent of $\cF_t = \sigma(Z(1), \dots, Z(t))$. So
+    \[
+        1+r = \E^{\bQ}(Z(t+1) \gvn \cF_t) = \E^{\bQ}(Z(t+1)) = uq + d(1-q)
+    \]
+    is a weighted average of $u$ and $d$; this can be $1+r$ if and only if $1+r \in [d, u]$. As $\bQ$ is to be \textit{equivalent} to $\Prob$ and $\Prob$ has no non-empty null sets, $r=d-1, u-1$ are excluded and \Cref{eq:CRRNoArb} is proved.
+
+    To prove uniqueness and to find the value of $q$ we simply observe that under \Cref{eq:CRRNoArb}
+    \[
+        u \cdot q + d \cdot (1-q) = 1+r
+    \]
+    has a unique solution. Solving it for $q$ leads to the above formula.
+\end{proof}
+
+\begin{cor}{Arbitrage-Free Model}{arb_free}
+    The Cox-Ross-Rubinstein model is arbitrage-free.
+\end{cor}
+
+\begin{proof}
+    By \Cref{prop:MartingaleMeasureExistence} there exists an equivalent martingale measure and this is by the no-arbitrage theorem, \Cref{thm:NoArbitrage} enough to guarantee that the Cox-Ross-Rubinstein model is free of arbitrage.
+\end{proof}
+
+To answer the question of market completeness we have to examine the structure of equivalent martingale measures. We already know that there is a unique martingale measure in the class $\scP$, but can we find other equivalent martingale measures outside $\scP$? Examining the structure of the underlying measure space (product space) again we can show that every probability measure is a product measure, and hence all probability measures are of class $\scP$. Using this result we conclude the following:
+
+\begin{prop}{CRR Model Completeness}{crr_complete}
+    The Cox-Ross-Rubinstein model is complete.
+\end{prop}
+
+\begin{proof}
+    Since by \Cref{prop:MartingaleMeasureExistence} the equivalent martingale measure is unique, the claim follows from the completeness theorem (\Cref{thm:CompletenessTheorem}).
+\end{proof}
+
+We translate the above measure-theoretic argument to economic language. Since every probability measure is a product measure uniqueness of the equivalent martingale measure on the product space is equivalent to uniqueness of the individual martingale measures on the component space. (Observe that this is true for general product space situations, it merely says that for independent random variables, the individual distributions determine the joint distribution.) We thus have the following result.
+
+\begin{cor}{Multi-Period Completeness}{Multi-PeriodCompleteness}
+    The multi-period model is complete if and only if every underlying single-period model is complete.
+\end{cor}
+
+We can now use the risk-neutral valuation formula to price every contingent claim in the Cox-Ross-Rubinstein model.
+
+\begin{prop}{Arbitrage Price Process}{ArbitragePriceProcess}
+    The arbitrage price process of a contingent claim $X$ in the Cox-Ross-Rubinstein model is given by
+    \[
+        \pi_X(t) = B(t)\E^* (X/B(T) \mid \F_t) \quad \forall t = 0, 1, \dots, T,
+    \]
+    where $\E^*$ is the expectation operator with respect to the unique equivalent martingale measure $\Prob^*$ characterised by $p^* = (1+r-d)/(u-d)$.
+\end{prop}
+
+\begin{cor}{European Call Valuation}{EuropeanCallValuation}
+    Consider a European call option with expiry $T$ and strike price $K$ written on (one share of) the stock $S$. The arbitrage price process $C(t), t=0,1,\dots,T$ of the option is given by (set $\tau = T-t$)
+    \begin{equation}
+        C(t) = (1+r)^{-\tau} \sum_{j=0}^{\tau} \bincof{\tau}{j} p^{*j}(1-p^*)^{\tau-j}(S(t)u^j d^{\tau-j} - K)^+.
+    \end{equation}
+\end{cor}
