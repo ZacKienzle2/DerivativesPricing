@@ -1,6 +1,5 @@
- \documentclass[12pt, a4paper, twoside]{article} %, draft , twoside
+%&preamble
 
-\input{preamble.tex}
 \addbibresource{references.bib}
 
 \hypersetup{
@@ -194,23 +193,22 @@ Reproducing,
 %\input{chapters/Martingales}
 
 \section{Wiener and Brownian Motion Processes}
-%\input{chapters/BrownianMotionProcesses}
+\input{chapters/BrownianMotionProcesses}
 
 \section{\Ito{} Calculus}
-%\input{chapters/ItoCalculus}
+\input{chapters/ItoCalculus}
 
 
 
 \part{Jump Processes}
 \section{Levy Processes}
-%\input{chapters/LevyProcesses}
+\input{chapters/LevyProcesses}
 
 
 \part{Stochastic Volatility}
-%\input{chapters/StochasticVolatility}
+\input{chapters/StochasticVolatility}
 
 \part{Risk-Neutral Valuation}
-
 
 
 \section{Assets, Portfolios and Arbitrage}\label{sec:AssetsPortfoliosArbitrage}
@@ -320,7 +318,7 @@ Reproducing,
 \section{Delta Hedging}
 
 \clearpage
-\printbibliography
+\printbibliography{}
 
 \appendix
 
@@ -344,5 +342,4 @@ Reproducing,
 \section{Python Primer}
 %\input{chapters/PythonPrimer}
 
-\printbibliography{}
 \end{document}
