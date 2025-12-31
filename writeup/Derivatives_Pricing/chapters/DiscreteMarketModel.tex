@@ -392,7 +392,7 @@ Therefore, the replicating strategy generates the same cash flow at time $T$ as 
 			\I_{A^c}(\varphi(u) - \psi(u)) + \I_A(Y\beta(\tau), 0, \dots, 0), & \tau < u \leq T.
 		\end{cases}
 	\]
-	Then $\xi$ is predictable, and the self-financing condition \Cref{eq:SelfFinancingCondition} is clearly true for $t \neq \tau$, and for $t = \tau$ we have using that $\varphi, \psi \in \Phi$
+	Then \(\xi\) is predictable, and the self-financing condition \Cref{eq:SelfFinancingCondition} is clearly true for \(t \neq \tau\), and for \(t = \tau\) we have using that \(\varphi, \psi \in \Phi\)
 	\begin{align*}
 		\xi(\tau) \cdot S(\tau)     & = (\varphi(\tau) - \psi(\tau)) \cdot S(\tau) = V_{\varphi}(\tau) - V_{\psi}(\tau),                                            \\
 		\xi(\tau + 1) \cdot S(\tau) & = \I_{A^c}(\varphi(\tau + 1) - \psi(\tau + 1)) \cdot S(\tau) + \I_A Y \beta(\tau) S_0(\tau)                                   \\
@@ -443,7 +443,7 @@ The resulting pricing functional depends strictly on the assumption of non-satia
 	\end{equation}
 \end{proof}
 
-\subsection{Market Completeness and Uniqueness of Equivalent Martingale Measures}
+\subsection{Market Completeness and EMMs}
 
 The last section made clear that attainable contingent claims can be priced using an equivalent martingale measure. In this section we will discuss the question of the circumstances under which all contingent claims are attainable. This would be a very desirable property of the market $\cM$, because we would then have solved the pricing question (at least for contingent claims) completely. Since contingent claims are merely non-negative $\cF_T$-measurable random variables in our setting, it should be no surprise that we can give a criterion in terms of probability measures. We start with:
 
@@ -459,4 +459,67 @@ If $\varphi$ replicates $X$, $V_\varphi(T) = X \ge 0$, so discounting, $\tilde{V
 
 \begin{thm}{Completeness Theorem}{CompletenessTheorem}
 	An arbitrage-free market $\cM$ is complete if and only if there exists a unique probability measure $\Pm^*$ equivalent to $\Pm$ under which discounted asset prices are martingales.
+\end{thm}
+
+\begin{proof}
+	'$\Rightarrow$': Assume that the arbitrage-free market $\cM$ is complete. Then for any $\cF_T$-measurable random variable $X \geq 0$ ( contingent claim), there exists an admissible (so self-financing) strategy $\varphi$ replicating $X$: $X = V_{\varphi}(T)$. As $\varphi$ is self-financing, by \Cref{prop:WealthProcessMartingale},
+	\begin{equation}
+		\beta(T)X = \tilde{V}_{\varphi}(T) = V_{\varphi}(0) + \sum_{\tau=1}^{T} \varphi(\tau) \cdot \Delta \tilde{S}(\tau).
+	\end{equation}
+	We know by the no-arbitrage theorem (see \Cref{thm:NoArbitrage}) that an equivalent martingale measure $\bb{P}^*$ exists; we have to prove uniqueness. So, let $\bb{P}_1, \bb{P}_2$ be two such equivalent martingale measures. For $i = 1, 2$, $(\tilde{V}_{\varphi}(t))_{t=0}^T$ is a $\bb{P}_i$-martingale. So,
+	\begin{equation}
+		\E_i(\tilde{V}_{\varphi}(T)) = \E_i(\tilde{V}_{\varphi}(0)) = V_{\varphi}(0),
+	\end{equation}
+	since the value at time zero is non-random ($\cF_0 = \{\emptyset, \Omega\}$) and $\beta(0) = 1$. So
+	\begin{equation}
+		\E_1(\beta(T)X) = \E_2(\beta(T)X).
+	\end{equation}
+	Since $X$ is arbitrary, $\E_1, \E_2$ have to agree on integrating all non-negative integrands. Taking negatives and using linearity: they have to agree on non-positive integrands also. Splitting an arbitrary integrand into its positive and negative parts: they have to agree on all integrands. Now $\E_i$ is expectation (i.e. integration) with respect to the measure $\bb{P}_i$, and measures that agree on integrating all integrands must coincide. So $\bb{P}_1 = \bb{P}_2$, giving uniqueness as required.
+
+	'$\Leftarrow$': Assume that the arbitrage-free market $\cM$ is incomplete: then there exists a non-attainable $\cF_T$-measurable random variable $X \geq 0$ (a contingent claim). We may confine attention to self-financing strategies $\varphi$ (which will in the replicating case be automatically admissible). By \Cref{prop:PredictabilityNumeraire}, we may confine attention to the risk assets $S_1, \dots, S_d$, as these suffice to tell us how to handle the num\'eraire $S_0$.
+
+	Consider the following set of random variables
+	\[
+		\tilde{V} \idef \set[\bigg]{Y \in \matX : Y = Y_0 + \sum_{t=1}^T \varphi(t) \cdot \Delta \tilde{S}(t), \ Y_0 \in \R, \ \varphi \text{ predictable}}.
+	\]
+	(Recall that $Y_0$ is $\cF_0$-measurable and set $\varphi = ((\varphi_1(t), \dots, \varphi_d(t)))_{t=1}^T$ with predictable components.) Then by the above reasoning, the discounted value $\beta(T)X$ does not belong to $\tilde{V}$, so $\tilde{V}$ is a \textit{proper} subset of the set $\matX$ of all random variables on $\Omega$ (which may be identified with $\R^{\abs{\Omega}}$). Let $\Prob^*$ be a probability measure equivalent to $\Prob$ under which discounted prices are martingales (such $\Prob^*$ exist by the no-arbitrage theorem, \Cref{thm:NoArbitrage}. Define the scalar product
+	\[
+		(Z, Y) \to \E^*(ZY)
+	\]
+	on random variables on $\Omega$. Since $\tilde{V}$ is a proper subset, there exists a non-zero random variable $Z$ orthogonal to $\tilde{V}$ (since $\Omega$ is finite, $\R^{\abs{\Omega}}$ is Euclidean: this is just Euclidean geometry). That is,
+	\[
+		\E^*(ZY) = 0, \quad \forall \ Y \in \tilde{V}.
+	\]
+	Choosing the special $Y = 1 \in \tilde{V}$ given by $\varphi_i(t) = 0, t = 1, 2, \dots, T; \ i = 1, \dots, d$ and $Y_0 = 1$ we find
+	\[
+		\E^*(Z) = 0.
+	\]
+	Write $\norm{X}_\infty \idef \sup\set{\abs{X(\omega)} : \omega \in \Omega}$, and define $\Prob^{**}$ by
+	\[
+		\Prob^{**}(\set{\omega}) = \left( 1 + \frac{Z(\omega)}{2\norm{Z}_\infty} \right) \Prob^*(\set{\omega}).
+	\]
+	By construction, $\Prob^{**}$ is equivalent to $\Prob^*$ (same null sets - actually, as $\Prob^* \sim \Prob$ and $\Prob$ has no non-empty null sets, neither do $\Prob^*, \Prob^{**}$). As $Z$ is non-zero, $\Prob^{**}$ and $\Prob^*$ are \textit{different}. Now
+	\begin{align*}
+		\E^{**} \left( \sum_{t=1}^T \varphi(t) \cdot \Delta \tilde{S}(t) \right) & = \sum_{\omega \in \Omega} \Prob^{**}(\omega) \left( \sum_{t=1}^T \varphi(t, \omega) \cdot \Delta \tilde{S}(t, \omega) \right)                                                     \\
+		                                                                         & = \sum_{\omega \in \Omega} \left( 1 + \frac{Z(\omega)}{2\norm{Z}_\infty} \right) \Prob^*(\omega) \left( \sum_{t=1}^T \varphi(t, \omega) \cdot \Delta \tilde{S}(t, \omega) \right).
+	\end{align*}
+	The `1' term on the right gives
+	\[
+		\E^* \left( \sum_{t=1}^T \varphi(t) \cdot \Delta \tilde{S}(t) \right),
+	\]
+	which is zero since this is a martingale transform of the $\Prob^*$-martingale $\tilde{S}(t)$ (recall martingale transforms are by definition null at zero). The `$Z$' term gives a multiple of the inner product
+	\[
+		\left(Z, \sum_{t=1}^T \varphi(t) \cdot \Delta \tilde{S}(t)\right),
+	\]
+	which is zero as $Z$ is orthogonal to $\tilde{V}$ and $\sum_{t=1}^T \varphi(t) \cdot \Delta \tilde{S}(t) \in \tilde{V}$. By the martingale transform lemma (Lemma 3.4.1), $\tilde{S}(t)$ is a $\Prob^{**}$-martingale since $\varphi$ is an arbitrary predictable process. Thus $\Prob^{**}$ is a second equivalent martingale measure, different from $\Prob^*$. So incompleteness implies non-uniqueness of equivalent martingale measures, as required.
+\end{proof}
+
+
+
+\subsection{Fundamental Theorem of Asset Pricing}
+
+We call a measure $\Prob^*$ under which discounted prices $\tilde{S}(t)$ are $\Prob^*$-martingales a \textit{martingale measure}. Such a $\Prob^*$ equivalent to the actual probability measure $P$ is called an \textit{equivalent martingale measure}.
+
+\begin{thm}{Fundamental Theorem of Asset Pricing}{FundamentalTheoremAssetPricing}
+	In an arbitrage-free complete market, there exists a unique martingale measure $\Prob^*$.
 \end{thm}

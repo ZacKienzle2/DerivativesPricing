@@ -5,10 +5,10 @@ Probability theory is about modelling and analysing \textit{random experiments}:
 The \textit{sample space} \(\Omega\) of a random experiment is the set of all possible outcomes of the random experiment. Sample spaces can be countable, such as \(\N\), or uncountable, such as \(\R^n\) or \(\{0, 1\}^\infty\). The sets in the \(\sigma\)-algebra \(\cH\) are called \textit{events}. These are the subsets to which we wish to assign a probability. We can view \(\cH\) as the family of events. An event \(A\) \textit{occurs} if the outcome of the experiment is one of the elements in \(A\). The properties of \(\cH\) are natural in the context of random experiments and events:
 
 \begin{itemize}
-    \item If \(A\) and \(B\) are events, the set \(A \cup B\) is also an event, namely the event that \(A\) \textit{or} \(B\) or both occur. For a sequence \(A_1, A_2, \dots\) of events, their union is the event that \textit{at least one} of the events occurs.
-    \item If \(A\) and \(B\) are events, the set \(A \cap B\) is also an event, namely the event that \(A\) \textit{and} \(B\) both occur. For a sequence \(A_1, A_2, \dots\) of events, their intersection is the event that \textit{all} of the events occur.
-    \item If \(A\) is an event, its complement \(A^c\) is also an event, namely the event that \(A\) \textit{does not occur}.
-    \item The set \(\Omega\) itself is an event, namely the \textit{certain event} (it always occurs). Similarly, \(\emptyset\) is an event, namely the \textit{impossible event} (it never occurs).
+	\item If \(A\) and \(B\) are events, the set \(A \cup B\) is also an event, namely the event that \(A\) \textit{or} \(B\) or both occur. For a sequence \(A_1, A_2, \dots\) of events, their union is the event that \textit{at least one} of the events occurs.
+	\item If \(A\) and \(B\) are events, the set \(A \cap B\) is also an event, namely the event that \(A\) \textit{and} \(B\) both occur. For a sequence \(A_1, A_2, \dots\) of events, their intersection is the event that \textit{all} of the events occur.
+	\item If \(A\) is an event, its complement \(A^c\) is also an event, namely the event that \(A\) \textit{does not occur}.
+	\item The set \(\Omega\) itself is an event, namely the \textit{certain event} (it always occurs). Similarly, \(\emptyset\) is an event, namely the \textit{impossible event} (it never occurs).
 \end{itemize}
 
 When the sample space \(\Omega\) is \(\R\), the natural \(\sigma\)-algebra \(\cH\) is the \textit{Borel \(\sigma\)-algebra} \(\cB\). Recall that this is the smallest \(\sigma\)-algebra on \(\R\) that contains all the intervals of the form \((-\infty, x]\) for \(x \in \R\). This \(\sigma\)-algebra of sets is big enough to contain all important sets and small enough to allow us to assign a probability to all events \citep{williamsProbabilityMartingales2018}.
@@ -16,366 +16,366 @@ When the sample space \(\Omega\) is \(\R\), the natural \(\sigma\)-algebra \(\cH
 The third ingredient in the model for a random experiment is the specification of the probability of the events. In fact, this is the crucial part of the model. Mathematically, we are looking for a \textit{measure} \(\Pm\) that assigns to each event \(A\) a number \(\Pm(A)\) in \([0, 1]\) describing how likely or probable that event is.
 
 \begin{defn}{Probability Measure}{}
-A \textit{probability measure} is a measure on $(\Omega, \cH)$ with $\Prob(\Omega) = 1$. Thus, $\Prob$ is a mapping from $\cH$ to $[0, 1]$ with the following properties:
-\begin{enumerate}
-    \item $\Prob(\emptyset) = 0$ and $\Prob(\Omega) = 1$.
-    \item For any sequence $A_1, A_2, \dots$ of disjoint events,
-    \begin{equation}
-        \Prob(\cup_n A_n) = \sum_n \Prob(A_n).
-        \label{eq:ProbabilityMeasureDef}
-    \end{equation}
-\end{enumerate}
+	A \textit{probability measure} is a measure on $(\Omega, \cH)$ with $\Prob(\Omega) = 1$. Thus, $\Prob$ is a mapping from $\cH$ to $[0, 1]$ with the following properties:
+	\begin{enumerate}
+		\item $\Prob(\emptyset) = 0$ and $\Prob(\Omega) = 1$.
+		\item For any sequence $A_1, A_2, \dots$ of disjoint events,
+		      \begin{equation}
+			      \Prob(\cup_n A_n) = \sum_n \Prob(A_n).
+			      \label{eq:ProbabilityMeasureDef}
+		      \end{equation}
+	\end{enumerate}
 \end{defn}
 
 \begin{thm}{Properties of a Probability Measure}{}
-Let $\Prob$ be a probability measure on a measurable space $(\Omega, \cH)$, and let $A, B$ and $A_1, A_2, \dots$ be events. Then, the following hold:
-\begin{enumerate}
-    \item (\textit{Monotonicity}): $A \subseteq B \implies \Prob(A) \le \Prob(B)$.
-    \item (\textit{Continuity from below}): If $A_1, A_2, \dots$ is an increasing sequence of events, i.e., $A_1 \subseteq A_2 \subseteq \cdots$, then
-    \begin{equation}
-        \lim \Prob(A_n) = \Prob(\cup_n A_n).
-        \label{eq:ContinuityFromBelow}
-    \end{equation}
-    \item (\textit{Countable subadditivity}): $\Prob(\cup_n A_n) \le \sum_n \Prob(A_n)$.
-\end{enumerate}
+	Let $\Prob$ be a probability measure on a measurable space $(\Omega, \cH)$, and let $A, B$ and $A_1, A_2, \dots$ be events. Then, the following hold:
+	\begin{enumerate}
+		\item (\textit{Monotonicity}): $A \subseteq B \implies \Prob(A) \le \Prob(B)$.
+		\item (\textit{Continuity from below}): If $A_1, A_2, \dots$ is an increasing sequence of events, i.e., $A_1 \subseteq A_2 \subseteq \cdots$, then
+		      \begin{equation}
+			      \lim \Prob(A_n) = \Prob(\cup_n A_n).
+			      \label{eq:ContinuityFromBelow}
+		      \end{equation}
+		\item (\textit{Countable subadditivity}): $\Prob(\cup_n A_n) \le \sum_n \Prob(A_n)$.
+	\end{enumerate}
 \end{thm}
 
 \begin{thm}{Additional Properties of a Probability Measure}{}
-Let $\Prob$ be a probability measure on a measurable space $(\Omega, \cH)$, and let $A, B$ and $A_1, A_2, \dots$ be events. Then, the following hold:
-\begin{enumerate}
-    \item (\textit{Complement}): $\Prob(A^c) = 1 - \Prob(A)$.
-    \item (\textit{Union}): $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$.
-    \item (\textit{Continuity from above}): If $A_1, A_2, \dots$ is a decreasing sequence of events, i.e., $A_1 \supseteq A_2 \supseteq \cdots$, then
-    \begin{equation}
-        \lim \Prob(A_n) = \Prob(\cap_n A_n).
-        \label{eq:ContinuityFromAbove}
-    \end{equation}
-\end{enumerate}
+	Let $\Prob$ be a probability measure on a measurable space $(\Omega, \cH)$, and let $A, B$ and $A_1, A_2, \dots$ be events. Then, the following hold:
+	\begin{enumerate}
+		\item (\textit{Complement}): $\Prob(A^c) = 1 - \Prob(A)$.
+		\item (\textit{Union}): $\Prob(A \cup B) = \Prob(A) + \Prob(B) - \Prob(A \cap B)$.
+		\item (\textit{Continuity from above}): If $A_1, A_2, \dots$ is a decreasing sequence of events, i.e., $A_1 \supseteq A_2 \supseteq \cdots$, then
+		      \begin{equation}
+			      \lim \Prob(A_n) = \Prob(\cap_n A_n).
+			      \label{eq:ContinuityFromAbove}
+		      \end{equation}
+	\end{enumerate}
 \end{thm}
 
 \subsection{Random Variables}
 Usually, the most convenient way to describe quantities of interest connected with random experiments is by using random variables.
 
 \begin{defn}{Random Variable}{}
-Let $(\Omega, \cH, \Prob)$ be a probability space and $(E, \cE)$ a measurable space. A \textit{random variable} $X$ taking values in $E$ is an $\cH/\cE$-measurable function; that is, a mapping $X : \Omega \to E$ that satisfies
-\begin{equation}
-    X^{-1}A = \{X \in A\} = \{\omega \in \Omega : X(\omega) \in A\} \in \cH \quad \text{for all } A \in \cE.
-    \label{eq:RandomVariableDef}
-\end{equation}
+	Let $(\Omega, \cH, \Prob)$ be a probability space and $(E, \cE)$ a measurable space. A \textit{random variable} $X$ taking values in $E$ is an $\cH/\cE$-measurable function; that is, a mapping $X : \Omega \to E$ that satisfies
+	\begin{equation}
+		X^{-1}A = \{X \in A\} = \{\omega \in \Omega : X(\omega) \in A\} \in \cH \quad \text{for all } A \in \cE.
+		\label{eq:RandomVariableDef}
+	\end{equation}
 \end{defn}
 
 \begin{defn}{Stochastic Process}{}
-A collection of random variables $X \coloneqq \{X_t, t \in \mathbb{T}\}$, where $\mathbb{T}$ is any index set, is called a \textit{stochastic process}. When $\mathbb{T}$ is finite, $X$ is called a \textit{random vector}.
+	A collection of random variables $X \coloneqq \{X_t, t \in \mathbb{T}\}$, where $\mathbb{T}$ is any index set, is called a \textit{stochastic process}. When $\mathbb{T}$ is finite, $X$ is called a \textit{random vector}.
 \end{defn}
 
 \begin{thm}{Stochastic Process}{}
-$X \coloneqq \{X_t, t \in \mathbb{T}\}$ is a stochastic process taking values in $\times_{t \in \mathbb{T}} E_t$ with $\sigma$-algebra $\otimes_{t \in \mathbb{T}} \mathcal{E}_t$ if and only if each $X_t$ is a random variable taking values in $E_t$ with $\sigma$-algebra $\mathcal{E}_t$.
+	$X \coloneqq \{X_t, t \in \mathbb{T}\}$ is a stochastic process taking values in $\times_{t \in \mathbb{T}} E_t$ with $\sigma$-algebra $\otimes_{t \in \mathbb{T}} \mathcal{E}_t$ if and only if each $X_t$ is a random variable taking values in $E_t$ with $\sigma$-algebra $\mathcal{E}_t$.
 \end{thm}
 
 \subsection{Probability Distributions}
 
 \begin{defn}{Probability Distribution}{}
-Let $(\Omega, \mathcal{H}, \mathbb{P})$ be a probability space and let $X$ be a random variable taking values in $(E, \mathcal{E})$. The (\textit{probability}) \textit{distribution} of $X$ is the image measure $\mu$ of $\mathbb{P}$ under $X$. That is,
-\begin{equation}
-    \mu(B) \coloneqq \mathbb{P}(X \in B), \quad B \in \mathcal{E}.
-    \label{eq:ProbabilityDistributionDef}
-\end{equation}
+	Let $(\Omega, \mathcal{H}, \mathbb{P})$ be a probability space and let $X$ be a random variable taking values in $(E, \mathcal{E})$. The (\textit{probability}) \textit{distribution} of $X$ is the image measure $\mu$ of $\mathbb{P}$ under $X$. That is,
+	\begin{equation}
+		\mu(B) \coloneqq \mathbb{P}(X \in B), \quad B \in \mathcal{E}.
+		\label{eq:ProbabilityDistributionDef}
+	\end{equation}
 \end{defn}
 
 \begin{defn}{Cumulative Distribution Function}{}
-The (\textit{cumulative}) \textit{distribution function} of a numerical random variable $X$ is the function $F : \R \to [0, 1]$ defined by
-\begin{equation}
-    F(x) \coloneqq \mathbb{P}(X \le x), \quad x \in \R.
-    \label{eq:CumulativeDistributionFunctionDef}
-\end{equation}
+	The (\textit{cumulative}) \textit{distribution function} of a numerical random variable $X$ is the function $F : \R \to [0, 1]$ defined by
+	\begin{equation}
+		F(x) \coloneqq \mathbb{P}(X \le x), \quad x \in \R.
+		\label{eq:CumulativeDistributionFunctionDef}
+	\end{equation}
 \end{defn}
 
 \begin{prop}{Properties of a Cumulative Distribution Function}{}
-\begin{enumerate}
-    \item (\textit{Bounded}): $0 \le F(x) \le 1$.
-    \item (\textit{Increasing}): $x \le y \implies F(x) \le F(y)$.
-    \item (\textit{Right-continuous}): $\lim_{h \downarrow 0} F(x + h) = F(x)$.
-\end{enumerate}
+	\begin{enumerate}
+		\item (\textit{Bounded}): $0 \le F(x) \le 1$.
+		\item (\textit{Increasing}): $x \le y \implies F(x) \le F(y)$.
+		\item (\textit{Right-continuous}): $\lim_{h \downarrow 0} F(x + h) = F(x)$.
+	\end{enumerate}
 \end{prop}
 
 \begin{defn}{Discrete Distribution}{}
-We say that $X$ has a \textit{discrete distribution} $\mu$ on $(E, \cE)$ if $\mu$ is a discrete measure; that is, it is of the form
-\begin{equation*}
-    \mu = \sum_{x \in D} f(x) \delta_x
-\end{equation*}
-for some countable set $D$ and positive masses $\{f(x), x \in D\}$.
+	We say that $X$ has a \textit{discrete distribution} $\mu$ on $(E, \cE)$ if $\mu$ is a discrete measure; that is, it is of the form
+	\begin{equation*}
+		\mu = \sum_{x \in D} f(x) \delta_x
+	\end{equation*}
+	for some countable set $D$ and positive masses $\{f(x), x \in D\}$.
 \end{defn}
 
 \begin{defn}{Distribution with a Density}{}
-We say that $X$ has an \textit{absolutely continuous} distribution $\mu$ on $(E, \cE)$ with respect to a measure $\lambda$ on $(E, \cE)$ if there exists a positive $\cE$-measurable function $f$ such that $\mu = f \lambda$; that is,
-\begin{equation*}
-    \mu(B) = \Prob(X \in B) = \int_B \lambda(\di x) f(x), \quad B \in \cE.
-\end{equation*}
+	We say that $X$ has an \textit{absolutely continuous} distribution $\mu$ on $(E, \cE)$ with respect to a measure $\lambda$ on $(E, \cE)$ if there exists a positive $\cE$-measurable function $f$ such that $\mu = f \lambda$; that is,
+	\begin{equation*}
+		\mu(B) = \Prob(X \in B) = \int_B \lambda(\di x) f(x), \quad B \in \cE.
+	\end{equation*}
 \end{defn}
 
 \begin{defn}{Independent Random Variables}{}
-Let $X$ and $Y$ be random variables taking values in $(E, \cE)$ and $(F, \cF)$, respectively. They are said to be \textit{independent} if for any $A \in \cE$ and $B \in \cF$ it holds that
-\begin{equation}
-    \Prob(X \in A, Y \in B) = \Prob(X \in A) \Prob(Y \in B).
-    \label{eq:IndependentRandomVariablesDef}
-\end{equation}
+	Let $X$ and $Y$ be random variables taking values in $(E, \cE)$ and $(F, \cF)$, respectively. They are said to be \textit{independent} if for any $A \in \cE$ and $B \in \cF$ it holds that
+	\begin{equation}
+		\Prob(X \in A, Y \in B) = \Prob(X \in A) \Prob(Y \in B).
+		\label{eq:IndependentRandomVariablesDef}
+	\end{equation}
 \end{defn}
 
 \begin{defn}{Independency}{}
-We say that a collection of random variables $\{X_t, t \in \mathbb{T}\}$, with each $X_t$ taking values in $(E_t, \mathcal{E}_t)$, is an \textit{independency} if for any finite choice of indexes $t_1, \dots, t_n \in \mathbb{T}$ and sets $A_{t_1} \in \mathcal{E}_{t_1}, \dots, A_{t_n} \in \mathcal{E}_{t_n}$ it holds that
-\begin{equation*}
-    \Prob(X_{t_1} \in A_{t_1}, \dots, X_{t_n} \in A_{t_n}) = \Prob(X_{t_1} \in A_{t_1}) \cdots \Prob(X_{t_n} \in A_{t_n}).
-\end{equation*}
+	We say that a collection of random variables $\{X_t, t \in \mathbb{T}\}$, with each $X_t$ taking values in $(E_t, \mathcal{E}_t)$, is an \textit{independency} if for any finite choice of indexes $t_1, \dots, t_n \in \mathbb{T}$ and sets $A_{t_1} \in \mathcal{E}_{t_1}, \dots, A_{t_n} \in \mathcal{E}_{t_n}$ it holds that
+	\begin{equation*}
+		\Prob(X_{t_1} \in A_{t_1}, \dots, X_{t_n} \in A_{t_n}) = \Prob(X_{t_1} \in A_{t_1}) \cdots \Prob(X_{t_n} \in A_{t_n}).
+	\end{equation*}
 \end{defn}
 
 \subsection{Expectation}
 The expectation of a (numerical) random variable is a weighted average of all the values that the random variable can take.
 
 \begin{defn}{Expectation}{}
-Let $(\Omega, \mathcal{H}, \Prob)$ be a probability space and $X$ a numerical random variable. The \textit{expectation} of $X$ is defined as the integral
-\begin{equation*}
-    \E X \coloneqq \Prob X = \int X \di \Prob.
-\end{equation*}
+	Let $(\Omega, \mathcal{H}, \Prob)$ be a probability space and $X$ a numerical random variable. The \textit{expectation} of $X$ is defined as the integral
+	\begin{equation*}
+		\E X \coloneqq \Prob X = \int X \di \Prob.
+	\end{equation*}
 \end{defn}
 
 \begin{thm}{Properties of an Expectation}{}
-Let $a, b \in \R$ and let $X, Y$, and $(X_n)$ be numerical random variables for which the expectations below are well-defined. Then, the following hold:
-\begin{enumerate}
-    \item (\textit{Monotonicity}): If $X \le Y$, then $\E X \le \E Y$.
-    \item (\textit{Linearity}): $\E(aX + bY) = a \E X + b \E Y$.
-    \item (\textit{Monotone convergence}): If $X_n \uparrow X$, then $\E X_n \uparrow \E X$.
-\end{enumerate}
+	Let $a, b \in \R$ and let $X, Y$, and $(X_n)$ be numerical random variables for which the expectations below are well-defined. Then, the following hold:
+	\begin{enumerate}
+		\item (\textit{Monotonicity}): If $X \le Y$, then $\E X \le \E Y$.
+		\item (\textit{Linearity}): $\E(aX + bY) = a \E X + b \E Y$.
+		\item (\textit{Monotone convergence}): If $X_n \uparrow X$, then $\E X_n \uparrow \E X$.
+	\end{enumerate}
 \end{thm}
 
 \begin{lem}{Fatou}{}
-For any sequence $(X_n)$ of positive numerical random variables,
-\begin{equation*}
-    \E \liminf X_n \le \liminf \E X_n.
-\end{equation*}
+	For any sequence $(X_n)$ of positive numerical random variables,
+	\begin{equation*}
+		\E \liminf X_n \le \liminf \E X_n.
+	\end{equation*}
 \end{lem}
 
 \begin{thm}{Dominated and Bounded Convergence}{}
-Let $(X_n)$ be a sequence of numerical random variables for which $\lim X_n = X$ exists. Then, the following hold:
-\begin{enumerate}
-    \item (\textit{Dominated convergence}): If, for each $n$, $|X_n| \le Y$ for some random variable $Y$ with $\E Y < \infty$, then $\E X_n \to \E X < \infty$.
-    \item (\textit{Bounded convergence}): If $|X_n| \le c$ for all $n$ for some $c \in \R$, then $\E X_n \to \E X < \infty$.
-\end{enumerate}
+	Let $(X_n)$ be a sequence of numerical random variables for which $\lim X_n = X$ exists. Then, the following hold:
+	\begin{enumerate}
+		\item (\textit{Dominated convergence}): If, for each $n$, $|X_n| \le Y$ for some random variable $Y$ with $\E Y < \infty$, then $\E X_n \to \E X < \infty$.
+		\item (\textit{Bounded convergence}): If $|X_n| \le c$ for all $n$ for some $c \in \R$, then $\E X_n \to \E X < \infty$.
+	\end{enumerate}
 \end{thm}
 
 \begin{thm}{Expectation and Image Measure}{}
-Let $X$ be a random variable taking values in $(E, \cE)$ with distribution $\mu$ and let $h$ be an $\cE$-measurable function. Then, provided the integral exists:
-\begin{equation*}
-    \E h(X) = \int h(X) \di \Prob = \int_{\R} \mu(\di x) h(x) = \mu h.
-\end{equation*}
+	Let $X$ be a random variable taking values in $(E, \cE)$ with distribution $\mu$ and let $h$ be an $\cE$-measurable function. Then, provided the integral exists:
+	\begin{equation*}
+		\E h(X) = \int h(X) \di \Prob = \int_{\R} \mu(\di x) h(x) = \mu h.
+	\end{equation*}
 \end{thm}
 
 \begin{thm}{Transformation Rule}{}
-Let $X$ be a random vector with density $f_X$ with respect to the Lebesgue measure on $(\R^n, \mathcal{B}^n)$. Let $Z \coloneqq g(\v{X})$, where $g: \R^n \to \R^n$ is invertible with inverse $g^{-1}$ and Jacobian $|\frac{\partial \v{z}}{\partial \v{x}}|$. Then, at $\v{z} = g(\v{x})$ the random vector $Z$ has the following density with respect to the Lebesgue measure on $(\R^n, \mathcal{B}^n)$:
-\begin{equation}
-    f_Z(\v{z}) \coloneqq \frac{f_X(\v{x})}{|\frac{\partial \v{z}}{\partial \v{x}}|} = f_X(g^{-1}(\v{z})) \left|\frac{\partial \v{x}}{\partial \v{z}}\right|, \quad \v{z} \in \R^n.
-    \label{eq:TransformationRuleDensity}
-\end{equation}
+	Let $X$ be a random vector with density $f_X$ with respect to the Lebesgue measure on $(\R^n, \mathcal{B}^n)$. Let $Z \coloneqq g(\vecb{X})$, where $g: \R^n \to \R^n$ is invertible with inverse $g^{-1}$ and Jacobian $|\frac{\partial \vecb{z}}{\partial \vecb{x}}|$. Then, at $\vecb{z} = g(\vecb{x})$ the random vector $Z$ has the following density with respect to the Lebesgue measure on $(\R^n, \mathcal{B}^n)$:
+	\begin{equation}
+		f_Z(\vecb{z}) \coloneqq \frac{f_X(\vecb{x})}{|\frac{\partial \vecb{z}}{\partial \vecb{x}}|} = f_X(g^{-1}(\vecb{z})) \left|\frac{\partial \vecb{x}}{\partial \vecb{z}}\right|, \quad \vecb{z} \in \R^n.
+		\label{eq:TransformationRuleDensity}
+	\end{equation}
 \end{thm}
 
 \begin{prop}{Expectation of a Quadratic Form}{}
-Let $\v{A}$ be an $n \times n$ matrix and $\v{X}$ an $n$-dimensional random vector with expectation vector $\v{\mu}$ and covariance matrix $\v{\Sigma}$. The random variable $Y \coloneqq \v{X}^{\T} \v{A} \v{X}$ has expectation $\tr(\v{\Sigma} \v{A}) + \v{\mu}^{\T} \v{A} \v{\mu}$.
+	Let $\vecb{A}$ be an $n \times n$ matrix and $\vecb{X}$ an $n$-dimensional random vector with expectation vector $\vecb{\mu}$ and covariance matrix $\vecb{\Sigma}$. The random variable $Y \coloneqq \vecb{X}^{\T} \vecb{A} \vecb{X}$ has expectation $\tr(\vecb{\Sigma} \vecb{A}) + \vecb{\mu}^{\T} \vecb{A} \vecb{\mu}$.
 \end{prop}
 
 \subsection{$L^p$ Spaces}
 Let $X$ be a numerical random variable on
 
 \begin{defn}{$L^p$ Space}{}
-For each $p \in [1, \infty]$ the space $L^p$ is comprised of all numerical random variables $X$ for which $\|X\|_p < \infty$.
+	For each $p \in [1, \infty]$ the space $L^p$ is comprised of all numerical random variables $X$ for which $\|X\|_p < \infty$.
 \end{defn}
 
 \begin{lem}{Jensen's Inequality}{}
-Let $h : \mathcal{X} \to \R$ be a convex function and let $X$ be a random variable taking values in $\mathcal{X}$, with expectation vector $\E X$. Then,
-\begin{equation*}
-    \E h(X) \ge h(\E X).
-\end{equation*}
+	Let $h : \mathcal{X} \to \R$ be a convex function and let $X$ be a random variable taking values in $\mathcal{X}$, with expectation vector $\E X$. Then,
+	\begin{equation*}
+		\E h(X) \ge h(\E X).
+	\end{equation*}
 \end{lem}
 
 \begin{thm}{Properties of the $L^p$ Norm}{}
-Let $X$ and $Y$ be numerical random variables on $(\Omega, \cH, \Prob)$. Then, the following hold:
-\begin{enumerate}
-    \item (\textit{Positivity}): $\|X\|_p \ge 0$, and $\|X\|_p = 0 \iff X = 0$ almost surely.
-    \item (\textit{Multiplication by a constant}): $\|c X\|_p = |c| \|X\|_p$.
-    \item (\textit{Minkowski's (triangle) inequality}):
-    \begin{equation*}
-        |\|X\|_p - \|Y\|_p| \le \|X + Y\|_p \le \|X\|_p + \|Y\|_p.
-    \end{equation*}
-    \item (\textit{Hölder's inequality}): For $p, q, r \in [1, \infty]$ with $\frac{1}{p} + \frac{1}{q} = \frac{1}{r}$,
-    \begin{equation}
-        \|XY\|_r \le \|X\|_p \|Y\|_q.
-        \label{eq:HoldersInequality}
-    \end{equation}
-    \item (\textit{Monotonicity}): If $1 \le p < q \le \infty$, then $\|X\|_p \le \|X\|_q$.
-\end{enumerate}
+	Let $X$ and $Y$ be numerical random variables on $(\Omega, \cH, \Prob)$. Then, the following hold:
+	\begin{enumerate}
+		\item (\textit{Positivity}): $\|X\|_p \ge 0$, and $\|X\|_p = 0 \iff X = 0$ almost surely.
+		\item (\textit{Multiplication by a constant}): $\|c X\|_p = |c| \|X\|_p$.
+		\item (\textit{Minkowski's (triangle) inequality}):
+		      \begin{equation*}
+			      |\|X\|_p - \|Y\|_p| \le \|X + Y\|_p \le \|X\|_p + \|Y\|_p.
+		      \end{equation*}
+		\item (\textit{Hölder's inequality}): For $p, q, r \in [1, \infty]$ with $\frac{1}{p} + \frac{1}{q} = \frac{1}{r}$,
+		      \begin{equation}
+			      \|XY\|_r \le \|X\|_p \|Y\|_q.
+			      \label{eq:HoldersInequality}
+		      \end{equation}
+		\item (\textit{Monotonicity}): If $1 \le p < q \le \infty$, then $\|X\|_p \le \|X\|_q$.
+	\end{enumerate}
 \end{thm}
 
 \subsection{Integral Transforms}
 Expectations are used in many probabilistic analyses.
 
 \begin{defn}{Moment Generating Function}{}
-The \textit{moment generating function (MGF)} of a numerical random variable $X$ with distribution $\mu$ is the function $M : \R \to [0, \infty]$, given by
-\begin{equation*}
-    M(s) \coloneqq \E \e^{sX} = \int_{-\infty}^{\infty} \mu(\di x) \e^{sx}, \quad s \in \R.
-\end{equation*}
+	The \textit{moment generating function (MGF)} of a numerical random variable $X$ with distribution $\mu$ is the function $M : \R \to [0, \infty]$, given by
+	\begin{equation*}
+		M(s) \coloneqq \E \e^{sX} = \int_{-\infty}^{\infty} \mu(\di x) \e^{sx}, \quad s \in \R.
+	\end{equation*}
 \end{defn}
 
 \begin{thm}{Uniqueness of the MGF}{}
-A measure $\mu$ is determined by its MGF $M$ if the latter is finite in a neighborhood of $0$.
+	A measure $\mu$ is determined by its MGF $M$ if the latter is finite in a neighborhood of $0$.
 \end{thm}
 
 \begin{thm}{Taylor's Theorem for MGFs}{}
-Suppose $M(s) \coloneqq \E \e^{sX}$ is finite in the neighborhood $(-s_0, s_0)$ of $0$. Then, $M$ has the Taylor expansion
-\begin{equation*}
-    M(s) = \sum_{k=0}^{\infty} \frac{s^k}{k!} \E X^k, \quad |s| < s_0.
-\end{equation*}
-In particular, all moments $\E X^k, k \in \N$ are finite.
+	Suppose $M(s) \coloneqq \E \e^{sX}$ is finite in the neighborhood $(-s_0, s_0)$ of $0$. Then, $M$ has the Taylor expansion
+	\begin{equation*}
+		M(s) = \sum_{k=0}^{\infty} \frac{s^k}{k!} \E X^k, \quad |s| < s_0.
+	\end{equation*}
+	In particular, all moments $\E X^k, k \in \N$ are finite.
 \end{thm}
 
 \begin{thm}{Product of MGFs}{}
-If $X$ and $Y$ are independent, then $M_{X+Y}(s) = M_X(s) M_Y(s)$.
+	If $X$ and $Y$ are independent, then $M_{X+Y}(s) = M_X(s) M_Y(s)$.
 \end{thm}
 
 \begin{defn}{Characteristic Function}{}
-The \textit{characteristic function} of a numerical random variable $X$ with distribution $\mu$ is the function $\psi : \R \to \C$, defined by
-\begin{equation*}
-    \psi(r) \coloneqq \E \e^{\ii r X} = \E \cos(r X) + \ii \E \sin(r X) = \int_{-\infty}^{\infty} \mu(\di x) \e^{\ii r x}, \quad r \in \R.
-\end{equation*}
+	The \textit{characteristic function} of a numerical random variable $X$ with distribution $\mu$ is the function $\psi : \R \to \C$, defined by
+	\begin{equation*}
+		\psi(r) \coloneqq \E \e^{\ii r X} = \E \cos(r X) + \ii \E \sin(r X) = \int_{-\infty}^{\infty} \mu(\di x) \e^{\ii r x}, \quad r \in \R.
+	\end{equation*}
 \end{defn}
 
 \begin{thm}{Inversion and Uniqueness of the Characteristic Function}{}
-If the probability measure $\mu$ has characteristic function $\psi$, and if $\mu\{a\} = \mu\{b\} = 0$, then
-\begin{equation}
-    \mu(a, b] = \lim_{t \to \infty} \frac{1}{2\pi} \int_{\R} \di r \, \I_{[-t, t]}(r) \frac{\e^{-\ii r a} - \e^{-\ii r b}}{\ii r} \psi(r) \coloneqq \lim_{t \to \infty} I_t.
-    \label{eq:CharacteristicFunctionInversion}
-\end{equation}
-In particular, the characteristic function determines $\mu$ uniquely. If, in addition, $\int_{\R} \di r \, |\psi(r)| < \infty$, then $\mu$ has a density $f$ with respect to the Lebesgue measure, given by
-\begin{equation}
-    f(x) \coloneqq \frac{1}{2\pi} \int_{-\infty}^{\infty} \di r \, \e^{-\ii r x} \psi(r).
-    \label{eq:CharacteristicFunctionDensity}
-\end{equation}
+	If the probability measure $\mu$ has characteristic function $\psi$, and if $\mu\{a\} = \mu\{b\} = 0$, then
+	\begin{equation}
+		\mu(a, b] = \lim_{t \to \infty} \frac{1}{2\pi} \int_{\R} \di r \, \I_{[-t, t]}(r) \frac{\e^{-\ii r a} - \e^{-\ii r b}}{\ii r} \psi(r) \coloneqq \lim_{t \to \infty} I_t.
+		\label{eq:CharacteristicFunctionInversion}
+	\end{equation}
+	In particular, the characteristic function determines $\mu$ uniquely. If, in addition, $\int_{\R} \di r \, |\psi(r)| < \infty$, then $\mu$ has a density $f$ with respect to the Lebesgue measure, given by
+	\begin{equation}
+		f(x) \coloneqq \frac{1}{2\pi} \int_{-\infty}^{\infty} \di r \, \e^{-\ii r x} \psi(r).
+		\label{eq:CharacteristicFunctionDensity}
+	\end{equation}
 \end{thm}
 
 \begin{prop}{Properties of the Characteristic Function}{}
-\begin{enumerate}
-    \item (\textit{Symmetry}): The random variables $X$ and $-X$ are identically distributed if and only if the characteristic function of $X$ is real-valued.
-    \item (\textit{Convolution}): If $X$ and $Y$ are independent, then $\psi_{X+Y} = \psi_X \psi_Y$.
-    \item (\textit{Affine transformation}): If $a$ and $b$ are real numbers, then
-    \begin{equation*}
-        \psi_{aX+b}(r) = \e^{\ii r b} \psi_X(a r), \quad r \in \R.
-    \end{equation*}
-    \item (\textit{Taylor's theorem}): If $\E |X^n| < \infty$, then
-    \begin{equation*}
-        \psi(r) = \sum_{k=0}^n \frac{\E X^k}{k!} (\ii r)^k + \bigO(r^n), \quad r \in \R.
-    \end{equation*}
-\end{enumerate}
+	\begin{enumerate}
+		\item (\textit{Symmetry}): The random variables $X$ and $-X$ are identically distributed if and only if the characteristic function of $X$ is real-valued.
+		\item (\textit{Convolution}): If $X$ and $Y$ are independent, then $\psi_{X+Y} = \psi_X \psi_Y$.
+		\item (\textit{Affine transformation}): If $a$ and $b$ are real numbers, then
+		      \begin{equation*}
+			      \psi_{aX+b}(r) = \e^{\ii r b} \psi_X(a r), \quad r \in \R.
+		      \end{equation*}
+		\item (\textit{Taylor's theorem}): If $\E |X^n| < \infty$, then
+		      \begin{equation*}
+			      \psi(r) = \sum_{k=0}^n \frac{\E X^k}{k!} (\ii r)^k + \bigO(r^n), \quad r \in \R.
+		      \end{equation*}
+	\end{enumerate}
 \end{prop}
 
 \subsection{Information and Indepedence}
 In this section, we have another look at the role of $\sigma$-algebras and independence in random experiments.
 
 \begin{defn}{$\sigma$-Algebra Generated by a Random Variable}{}
-Let $X$ be a random variable taking values in $(E, \cE)$. The sets $\{X \in A\}, A \in \cE$ form a $\sigma$-algebra, called the \textit{$\sigma$-algebra generated by $X$}, and we write $\sigma X$.
+	Let $X$ be a random variable taking values in $(E, \cE)$. The sets $\{X \in A\}, A \in \cE$ form a $\sigma$-algebra, called the \textit{$\sigma$-algebra generated by $X$}, and we write $\sigma X$.
 \end{defn}
 
 \begin{thm}{$\sigma$-Algebra Generated by a Stochastic Process}{}
-For the stochastic process $X \coloneqq \{X_t, t \in \mathbb{T}\}$, the $\sigma$-algebra generated by $X$ is the smallest $\sigma$-algebra on $\Omega$ that is generated by the union of the $\sigma$-algebras $\sigma X_t, t \in \mathbb{T}$. We write $\bigvee_{t \in \mathbb{T}} \sigma X_t$ or $\sigma \{X_t, t \in \mathbb{T}\}$.
+	For the stochastic process $X \coloneqq \{X_t, t \in \mathbb{T}\}$, the $\sigma$-algebra generated by $X$ is the smallest $\sigma$-algebra on $\Omega$ that is generated by the union of the $\sigma$-algebras $\sigma X_t, t \in \mathbb{T}$. We write $\bigvee_{t \in \mathbb{T}} \sigma X_t$ or $\sigma \{X_t, t \in \mathbb{T}\}$.
 \end{thm}
 
 \begin{thm}{$\sigma X$-Numerical Random Variables}{}
-Let $X$ be a random variable taking values in a measurable space $(E, \cE)$. A mapping $V : \Omega \to \Rbar$ belongs to $\sigma X$ if and only if $V = h \circ X$ for some $h \in \cE$.
+	Let $X$ be a random variable taking values in a measurable space $(E, \cE)$. A mapping $V : \Omega \to \Rbar$ belongs to $\sigma X$ if and only if $V = h \circ X$ for some $h \in \cE$.
 \end{thm}
 
 \begin{defn}{Filtration}{}
-Let $\mathbb{T}$ be a subset of $\R$. A \textit{filtration} is an increasing collection $\{\cF_t : t \in \mathbb{T}\}$ of sub-$\sigma$-algebras of $\cH$; that is, $\cF_s \subseteq \cF_t$ whenever $s < t$.
+	Let $\mathbb{T}$ be a subset of $\R$. A \textit{filtration} is an increasing collection $\{\cF_t : t \in \mathbb{T}\}$ of sub-$\sigma$-algebras of $\cH$; that is, $\cF_s \subseteq \cF_t$ whenever $s < t$.
 \end{defn}
 
 \begin{thm}{Stochastic Process with Arbitrary Index Set}{}
-For each $t$ in an arbitrary set $\mathbb{T}$, let $X_t$ be a random variable taking values in a measurable set $(E_t, \mathcal{E}_t)$. Then, the mapping $V : \Omega \to \Rbar$ belongs to $\sigma\{X_t, t \in \mathbb{T}\}$ if and only if there exists a sequence $(t_n)$ in $\mathbb{T}$ and a function $h$ in $\bigotimes_{n} \mathcal{E}_{t_n}$ such that
-\begin{equation*}
-    V = h(X_{t_1}, X_{t_2}, \dots).
-\end{equation*}
+	For each $t$ in an arbitrary set $\mathbb{T}$, let $X_t$ be a random variable taking values in a measurable set $(E_t, \mathcal{E}_t)$. Then, the mapping $V : \Omega \to \Rbar$ belongs to $\sigma\{X_t, t \in \mathbb{T}\}$ if and only if there exists a sequence $(t_n)$ in $\mathbb{T}$ and a function $h$ in $\bigotimes_{n} \mathcal{E}_{t_n}$ such that
+	\begin{equation*}
+		V = h(X_{t_1}, X_{t_2}, \dots).
+	\end{equation*}
 \end{thm}
 
 \begin{defn}{Independence for $\sigma$-Algebras}{}
-Let $\{\cF_i, i = 1, \dots, n\}$ be a collection of sub-$\sigma$-algebras of $\cH$. The $\{\cF_i\}$ are said to be (\textit{mutually}) \textit{independent} or form an \textit{independency} if
-\begin{equation}
-    \E V_1 \cdots V_n = \E V_1 \cdots \E V_n
-    \label{eq:SigmaAlgebraIndependenceDef}
-\end{equation}
-for all positive random variables $V_i \in \cF_i, i = 1, \dots, n$.
+	Let $\{\cF_i, i = 1, \dots, n\}$ be a collection of sub-$\sigma$-algebras of $\cH$. The $\{\cF_i\}$ are said to be (\textit{mutually}) \textit{independent} or form an \textit{independency} if
+	\begin{equation}
+		\E V_1 \cdots V_n = \E V_1 \cdots \E V_n
+		\label{eq:SigmaAlgebraIndependenceDef}
+	\end{equation}
+	for all positive random variables $V_i \in \cF_i, i = 1, \dots, n$.
 \end{defn}
 
 \begin{thm}{Independence of $\sigma$-Algebras}{}
-Sub-$\sigma$-algebras $\cF_1, \dots, \cF_n$ of $\cH$ generated by p-systems $\mathcal{C}_1, \dots, \mathcal{C}_n$ are independent if and only if for all $H_i \in \mathcal{C}_i \cup \{\Omega\}, i = 1, \dots, n$, it holds that:
-\begin{equation}
-    \Prob(H_1 \cap \dots \cap H_n) = \Prob(H_1) \cdots \Prob(H_n).
-    \label{eq:ProductMeasureOnPiSystem}
-\end{equation}
+	Sub-$\sigma$-algebras $\cF_1, \dots, \cF_n$ of $\cH$ generated by p-systems $\mathcal{C}_1, \dots, \mathcal{C}_n$ are independent if and only if for all $H_i \in \mathcal{C}_i \cup \{\Omega\}, i = 1, \dots, n$, it holds that:
+	\begin{equation}
+		\Prob(H_1 \cap \dots \cap H_n) = \Prob(H_1) \cdots \Prob(H_n).
+		\label{eq:ProductMeasureOnPiSystem}
+	\end{equation}
 \end{thm}
 
 \begin{thm}{Independence of Random Variables}{}
-Random variables $X$ and $Y$ taking values in $(E, \cE)$ and $(F, \cF)$ are independent if and only if
-\begin{equation}
-    \E g(X) h(Y) = \E g(X) \E h(Y), \quad g \in \cE_+, h \in \cF_+.
-    \label{eq:IndependenceViaExpectation}
-\end{equation}
+	Random variables $X$ and $Y$ taking values in $(E, \cE)$ and $(F, \cF)$ are independent if and only if
+	\begin{equation}
+		\E g(X) h(Y) = \E g(X) \E h(Y), \quad g \in \cE_+, h \in \cF_+.
+		\label{eq:IndependenceViaExpectation}
+	\end{equation}
 \end{thm}
 
 \subsection{Important Stochastic Processes}
 We conclude by highlighting some key classes of stochastic processes, including Gaussian processes, Poisson random measures, and \Levy{} processes.
 
 \begin{defn}{Gaussian Process}{}
-A real-valued stochastic process $\{X_t, t \in \mathbb{T}\}$ is said to be \textit{Gaussian} if all its finite-dimensional distributions are Gaussian (normal); that is, if the vector $[X_{t_1}, \dots, X_{t_n}]^{\T}$ is multivariate normal for any choice of $n$ and $t_1, \dots, t_n \in \mathbb{T}$.
+	A real-valued stochastic process $\{X_t, t \in \mathbb{T}\}$ is said to be \textit{Gaussian} if all its finite-dimensional distributions are Gaussian (normal); that is, if the vector $[X_{t_1}, \dots, X_{t_n}]^{\T}$ is multivariate normal for any choice of $n$ and $t_1, \dots, t_n \in \mathbb{T}$.
 \end{defn}
 
 \begin{defn}{Poisson Random Measure}{}
-A random measure $N$ on $(E, \cE)$ is said to be a \textit{Poisson random measure} with mean measure $\mu$ if the following properties hold:
-\begin{enumerate}
-    \item $N(A) \sim \Poi(\mu(A))$ for any set $A \in \cE$.
-    \item For any selection of disjoint sets $A_1, \dots, A_n \in \cE$, the random variables $N(A_1), \dots, N(A_n)$ are independent.
-\end{enumerate}
+	A random measure $N$ on $(E, \cE)$ is said to be a \textit{Poisson random measure} with mean measure $\mu$ if the following properties hold:
+	\begin{enumerate}
+		\item $N(A) \sim \Poi(\mu(A))$ for any set $A \in \cE$.
+		\item For any selection of disjoint sets $A_1, \dots, A_n \in \cE$, the random variables $N(A_1), \dots, N(A_n)$ are independent.
+	\end{enumerate}
 \end{defn}
 
 \begin{prop}{Poisson Random Measure on a Product Space}{}
-Let $X \coloneqq \{X_i, i \in I\}$ be the atoms of a Poisson random measure $N$ on $(E, \cE)$ with mean measure $\mu$, and let $\{Y_i, i \in \mathbb{N}\}$ be $\iid$ random variables on $(F, \cF)$ with distribution $\pi$, independent of $X$. Then, $\{(X_i, Y_i), i \in I\}$ form the atoms of a Poisson random measure $M$ on $(E \times F, \cE \otimes \cF)$ with mean measure $\mu \otimes \pi$.
+	Let $X \coloneqq \{X_i, i \in I\}$ be the atoms of a Poisson random measure $N$ on $(E, \cE)$ with mean measure $\mu$, and let $\{Y_i, i \in \mathbb{N}\}$ be $\iid$ random variables on $(F, \cF)$ with distribution $\pi$, independent of $X$. Then, $\{(X_i, Y_i), i \in I\}$ form the atoms of a Poisson random measure $M$ on $(E \times F, \cE \otimes \cF)$ with mean measure $\mu \otimes \pi$.
 \end{prop}
 
 \begin{thm}{Conditioning on the Total Number of Points}{}
-Let $N$ be a Poisson random measure on $(E, \cE)$ with mean measure $\mu$ satisfying $\mu(E) \coloneqq c < \infty$. Then, conditional on $N(E) = k$, the $k$ atoms of $N$ are $\iid$ with probability distribution $\mu/c$.
+	Let $N$ be a Poisson random measure on $(E, \cE)$ with mean measure $\mu$ satisfying $\mu(E) \coloneqq c < \infty$. Then, conditional on $N(E) = k$, the $k$ atoms of $N$ are $\iid$ with probability distribution $\mu/c$.
 \end{thm}
 
 \begin{defn}{Compound Poisson Process}{}
-The process $(X_t, t \ge 0)$ defined by
-\begin{equation*}
-    X_t \coloneqq \int_{[0, t] \times \R^d} N(\di s, \di \v{x}) \v{x}, \quad t \ge 0,
-\end{equation*}
-is the \textit{compound Poisson process} corresponding to the measure $\nu$.
+	The process $(X_t, t \ge 0)$ defined by
+	\begin{equation*}
+		X_t \coloneqq \int_{[0, t] \times \R^d} N(\di s, \di \vecb{x}) \vecb{x}, \quad t \ge 0,
+	\end{equation*}
+	is the \textit{compound Poisson process} corresponding to the measure $\nu$.
 \end{defn}
 
 \begin{defn}{\Levy \; Process}{}
-The process $X$ is said to be a \textit{Lévy process} if
-\begin{enumerate}
-    \item the paths of $X$ are almost surely right-continuous and left-limited, with $X_0 = 0$, and
-    \item for every $t_1 < t_2 < t_3 < t_4$, the increments $X_{t_2} - X_{t_1}$ and $X_{t_4} - X_{t_3}$ are independent, and for every $t, u \in \R_+$, the increment $X_{t+u} - X_t$ has the same distribution as $X_u$.
-\end{enumerate}
+	The process $X$ is said to be a \textit{Lévy process} if
+	\begin{enumerate}
+		\item the paths of $X$ are almost surely right-continuous and left-limited, with $X_0 = 0$, and
+		\item for every $t_1 < t_2 < t_3 < t_4$, the increments $X_{t_2} - X_{t_1}$ and $X_{t_4} - X_{t_3}$ are independent, and for every $t, u \in \R_+$, the increment $X_{t+u} - X_t$ has the same distribution as $X_u$.
+	\end{enumerate}
 \end{defn}
 
 \begin{thm}{$\Levy-\Ito$ Decomposition}{}
-The process $\v{X} \coloneqq (\v{X}_t, t \ge 0)$ is a Lévy process if and only if there exists a $d$-dimensional Brownian motion process $\v{B} \coloneqq (\v{B}_t, t \ge 0)$ starting at $\v{0}$ and a Poisson random measure $N$ on $\R_+ \times \R^d$ that is independent of $\v{B}$ and has mean measure $\text{Leb} \otimes \nu$, with $\nu$ satisfying
-\begin{equation}
-    \int_{\R^d} \nu(\di \v{x}) (|\v{x}|^2 \wedge 1) < \infty,
-    \label{eq:LevyMeasureCondition}
-\end{equation}
-such that $\v{X} = \v{B} + \v{U} + \v{Z}$, where the summands are independent, $\v{U} \coloneqq (\v{U}_t, t \ge 0)$ is the compound Poisson process
-\begin{equation*}
-    \v{U}_t \coloneqq \int_0^t \int_{||\v{x}|| > 1} N(\di s, \di \v{x}) \v{x}, \quad t \ge 0,
-\end{equation*}
-and $\v{Z} \coloneqq (\v{Z}_t, t \ge 0)$ is the limit of compensated compound Poisson processes:
-\begin{equation*}
-    \v{Z} \coloneqq \lim_{\delta \downarrow 0} \v{Z}^{\delta} \quad \text{with} \quad \v{Z}^{\delta}_t \coloneqq \int_0^t \int_{\delta \le ||\v{x}|| \le 1} [\v{x} N(\di s, \di \v{x}) - \di s \, \v{x} \nu(\di \v{x})], \quad t \ge 0.
-\end{equation*}
+	The process $\vecb{X} \coloneqq (\vecb{X}_t, t \ge 0)$ is a Lévy process if and only if there exists a $d$-dimensional Brownian motion process $\vecb{B} \coloneqq (\vecb{B}_t, t \ge 0)$ starting at $\vecb{0}$ and a Poisson random measure $N$ on $\R_+ \times \R^d$ that is independent of $\vecb{B}$ and has mean measure $\text{Leb} \otimes \nu$, with $\nu$ satisfying
+	\begin{equation}
+		\int_{\R^d} \nu(\di \vecb{x}) (|\vecb{x}|^2 \wedge 1) < \infty,
+		\label{eq:LevyMeasureCondition}
+	\end{equation}
+	such that $\vecb{X} = \vecb{B} + \vecb{U} + \vecb{Z}$, where the summands are independent, $\vecb{U} \coloneqq (\vecb{U}_t, t \ge 0)$ is the compound Poisson process
+	\begin{equation*}
+		\vecb{U}_t \coloneqq \int_0^t \int_{||\vecb{x}|| > 1} N(\di s, \di \vecb{x}) \vecb{x}, \quad t \ge 0,
+	\end{equation*}
+	and $\vecb{Z} \coloneqq (\vecb{Z}_t, t \ge 0)$ is the limit of compensated compound Poisson processes:
+	\begin{equation*}
+		\vecb{Z} \coloneqq \lim_{\delta \downarrow 0} \vecb{Z}^{\delta} \quad \text{with} \quad \vecb{Z}^{\delta}_t \coloneqq \int_0^t \int_{\delta \le ||\vecb{x}|| \le 1} [\vecb{x} N(\di s, \di \vecb{x}) - \di s \, \vecb{x} \nu(\di \vecb{x})], \quad t \ge 0.
+	\end{equation*}
 \end{thm}

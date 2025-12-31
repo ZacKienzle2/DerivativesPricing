@@ -7,3 +7,7 @@ __pycache__/
 *.fdb_latexmk
 *.synctex.gz
 .venv/
+*.pdf
+*.fmt
+*.listing
+.vscode/
