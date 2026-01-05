@@ -1,6 +1,3 @@
-% !TeX root = main.tex
-\documentclass[12pt, a4paper]{article}
-
 % math packages (load before fonts)
 \usepackage{amsmath}
 \usepackage{mathtools}
@@ -52,6 +49,13 @@
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{matrix,calc,positioning,arrows.meta,intersections,chains,shapes.geometric,patterns,fpu}
+% \usetikzlibrary{external}
+% \tikzexternalize[
+% 	prefix=figures/,
+% 	system call={
+% 			pdflatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname "\image" "\texsource"
+% 		}
+% ]
 
 % layout and utilities
 \usepackage[margin=1in,bindingoffset=0.5cm,headheight=15pt,twoside,marginparwidth=0.8in,marginparsep=0.1in]{geometry}
@@ -91,6 +95,7 @@
 % algorithms
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\numberwithin{equation}{section}
 \makeatletter
 \@addtoreset{algorithm}{section}
 \makeatother
@@ -151,12 +156,13 @@
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
-% missing definitions
 \newcommand{\ii}{\mathrm{i}}
 \newcommand{\la}{\leftarrow}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\blambda}{\boldsymbol{\lambda}}
 \DeclareMathOperator{\Span}{span}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\scH}{\mathcal{H}}
 
 % general macros
 \newcommand{\xbar}[1]{\overline{#1}}
@@ -374,4 +380,18 @@
 \crefname{tcb@cnt@prop}{Proposition}{Propositions}
 \crefname{tcb@cnt@defn}{Definition}{Definitions}
 
-\newcommand{\preambleloaded}{true}
+\addbibresource{references.bib}
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=darkblue,
+	citecolor=darkblue,
+	filecolor=darkblue,
+	urlcolor=darkblue,
+	breaklinks=true,
+	pdfborder={0 0 0}
+}
+\setlist[itemize]{leftmargin=*, nosep, noitemsep}
+\setlist[enumerate]{leftmargin=*, nosep, noitemsep, label=(\arabic*)}
+
+\doublespacing{}

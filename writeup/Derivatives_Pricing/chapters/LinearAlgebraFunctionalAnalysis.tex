@@ -23,7 +23,7 @@ Using a basis $\mathcal{B}$ of $\mathcal{V}$, we can thus represent each vector 
 	\end{bmatrix}.
 	\label{eq:VectorRep}
 \end{equation}
-Typically, vectors in $\R^n$ are represented via the \textit{standard basis}, consisting of unit vectors (points) $\vecb{e}_1 = (1, 0, \dots, 0), \dots, \vecb{e}_n = (0, 0, \dots, 0, 1)$. As a consequence, any point $(x_1, \dots, x_n) \in \R^n$ can be represented, using the standard basis, as a row or column vector of the form \cref{eq:VectorRep} above, with $\alpha_i = x_i, i = 1, \dots, n$. We will also write $[x_1, x_2, \dots, x_n]^\T$, for the corresponding column vector, where ${}^\T$ denotes the \textit{transpose}.
+Typically, vectors in $\R^n$ are represented via the \textit{standard basis}, consisting of unit vectors (points) $\vecb{e}_1 = (1, 0, \dots, 0), \dots, \vecb{e}_n = (0, 0, \dots, 0, 1)$. As a consequence, any point $(x_1, \dots, x_n) \in \R^n$ can be represented, using the standard basis, as a row or column vector of the form \Cref{eq:VectorRep} above, with $\alpha_i = x_i, i = 1, \dots, n$. We will also write $[x_1, x_2, \dots, x_n]^\T$, for the corresponding column vector, where ${}^\T$ denotes the \textit{transpose}.
 
 \begin{xattention}
 	To avoid confusion, we will use the convention from now on that a generic vector $\vecb{x}$ is always represented via the standard basis as a column vector. The corresponding row vector is denoted by $\vecb{x}^\T$.
@@ -70,7 +70,7 @@ By applying these rules repeatedly, one can reduce any matrix to a diagonal matr
 	\end{enumerate}
 \end{thm}
 
-\ref{thm:UsefulMatrixRules} summarises a number of useful matrix rules for the concepts that we have discussed so far.
+\Cref{thm:UsefulMatrixRules} summarises a number of useful matrix rules for the concepts that we have discussed so far.
 
 Next, consider an $n \times p$ matrix $\vecb{A}$ for which the matrix inverse fails to exist. That is, $\vecb{A}$ is either non-square ($n \neq p$) or its determinant is 0. Instead of the inverse, we can use its so-called pseudo-inverse, which always exists.
 
@@ -199,7 +199,7 @@ Namely, since $\vecb{PU} = \vecb{U}$, the matrix $\vecb{P}$ projects any vector 
 \end{thm}
 
 \begin{proof}
-	By Property 1 of \ref{defn:MoorePenrosePseudoInverse} we have $\vecb{PU} = \vecb{U U}^+ \vecb{U} = \vecb{U}$, so that $\vecb{P}$ projects any vector in $\mathcal{V}$ onto itself. Moreover, $\vecb{P}$ projects any vector in $\mathcal{V}^\perp$ onto the zero vector.
+	By Property 1 of \Cref{defn:MoorePenrosePseudoInverse} we have $\vecb{PU} = \vecb{U U}^+ \vecb{U} = \vecb{U}$, so that $\vecb{P}$ projects any vector in $\mathcal{V}$ onto itself. Moreover, $\vecb{P}$ projects any vector in $\mathcal{V}^\perp$ onto the zero vector.
 \end{proof}
 
 Note that in the special case where $\vecb{u}_1, \dots, \vecb{u}_k$ above form an orthonormal basis of $\mathcal{V}$, then the projection onto $\mathcal{V}$ is very simple to describe, namely we have
@@ -223,7 +223,7 @@ For any point $\vecb{x} \in \R^n$, the point in $\mathcal{V}$ that is closest to
 	\begin{equation*}
 		\|\vecb{y} - \vecb{x}\|^2 = \left\langle \vecb{x} - \sum_{i=1}^k \alpha_i \vecb{u}_i, \vecb{x} - \sum_{i=1}^k \alpha_i \vecb{u}_i \right\rangle = \|\vecb{x}\|^2 - 2 \sum_{i=1}^k \alpha_i \langle \vecb{x}, \vecb{u}_i \rangle + \sum_{i=1}^k \alpha_i^2.
 	\end{equation*}
-	Minimizing this with respect to the $\{\alpha_i\}$ gives $\alpha_i = \langle \vecb{x}, \vecb{u}_i \rangle, i = 1, \dots, k$. In view of \cref{eq:OrthonormalProjectionSum}, the optimal $\vecb{y}$ is thus $\vecb{Px}$.
+	Minimizing this with respect to the $\{\alpha_i\}$ gives $\alpha_i = \langle \vecb{x}, \vecb{u}_i \rangle, i = 1, \dots, k$. In view of \Cref{eq:OrthonormalProjectionSum}, the optimal $\vecb{y}$ is thus $\vecb{Px}$.
 \end{proof}
 
 \subsection{Eigenvalues and Eigenvectors}
@@ -253,7 +253,7 @@ Every invertible matrix $\vecb{A}$ can be written as the product of three matric
 \begin{equation}
 	\vecb{A} = \vecb{PLU}, \label{eq:PLUDecomposition}
 \end{equation}
-where $\vecb{L}$ is a lower triangular matrix, $\vecb{U}$ an upper triangular matrix, and $\vecb{P}$ a \textit{permutation matrix}. A permutation matrix is a square matrix with a single 1 in each row and column, and zeros otherwise. The matrix product $\vecb{PB}$ simply permutes the rows of a matrix $\vecb{B}$ and, likewise, $\vecb{BP}$ permutes its columns. A decomposition of the form \cref{eq:PLUDecomposition} is called a \textit{PLU decomposition}. As a permutation matrix is orthogonal, its transpose is equal to its inverse, and so we can write \cref{eq:PLUDecomposition} as
+where $\vecb{L}$ is a lower triangular matrix, $\vecb{U}$ an upper triangular matrix, and $\vecb{P}$ a \textit{permutation matrix}. A permutation matrix is a square matrix with a single 1 in each row and column, and zeros otherwise. The matrix product $\vecb{PB}$ simply permutes the rows of a matrix $\vecb{B}$ and, likewise, $\vecb{BP}$ permutes its columns. A decomposition of the form \Cref{eq:PLUDecomposition} is called a \textit{PLU decomposition}. As a permutation matrix is orthogonal, its transpose is equal to its inverse, and so we can write \Cref{eq:PLUDecomposition} as
 \begin{equation*}
 	\vecb{P}^\T \vecb{A} = \vecb{LU}.
 \end{equation*}
@@ -415,11 +415,11 @@ which, after a similar calculation as the one above, yields
 		\vecb{O}_{k \times n} & \vecb{I}_k
 	\end{bmatrix}.
 \end{equation}
-The upper-left block of $\Sigma^{-1}$ from \cref{eq:BlockInverseUL} must be the same as the upper-left block of $\Sigma^{-1}$ from \cref{eq:BlockInverseIntermed}, leading to the \textit{Woodbury identity}:
+The upper-left block of $\Sigma^{-1}$ from \Cref{eq:BlockInverseUL} must be the same as the upper-left block of $\Sigma^{-1}$ from \Cref{eq:BlockInverseIntermed}, leading to the \textit{Woodbury identity}:
 \begin{equation} \label{eq:WoodburyIdentity}
 	(\vecb{A} - \vecb{B} \vecb{D}^{-1} \vecb{C})^{-1} = \vecb{A}^{-1} + \vecb{A}^{-1} \vecb{B} (\vecb{D} - \vecb{C} \vecb{A}^{-1} \vecb{B})^{-1} \vecb{C} \vecb{A}^{-1}.
 \end{equation}
-From \cref{eq:BlockLU} and the fact that the determinant of a product is the product of the determinants, we see that $\det(\Sigma) = \det(\vecb{A}) \det(\vecb{D} - \vecb{C} \vecb{A}^{-1} \vecb{B})$. Similarly, from \cref{eq:BlockUL} we have $\det(\Sigma) = \det(\vecb{A} - \vecb{B} \vecb{D}^{-1} \vecb{C}) \det(\vecb{D})$, leading to the identity
+From \Cref{eq:BlockLU} and the fact that the determinant of a product is the product of the determinants, we see that $\det(\Sigma) = \det(\vecb{A}) \det(\vecb{D} - \vecb{C} \vecb{A}^{-1} \vecb{B})$. Similarly, from \Cref{eq:BlockUL} we have $\det(\Sigma) = \det(\vecb{A} - \vecb{B} \vecb{D}^{-1} \vecb{C}) \det(\vecb{D})$, leading to the identity
 \begin{equation} \label{eq:DeterminantIdentity}
 	\det(\vecb{A} - \vecb{B} \vecb{D}^{-1} \vecb{C}) \det(\vecb{D}) = \det(\vecb{A}) \det(\vecb{D} - \vecb{C} \vecb{A}^{-1} \vecb{B}).
 \end{equation}

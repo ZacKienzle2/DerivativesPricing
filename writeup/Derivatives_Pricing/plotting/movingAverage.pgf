@@ -27,7 +27,7 @@
 %%     \renewcommand{\normalsize}{\fontsize{10.000000}{12.000000}\selectfont}
 %%     \normalsize
 %%   }
-%%   
+%%
 %%   \makeatletter\@ifpackageloaded{underscore}{}{\usepackage[strings]{underscore}}\makeatother
 %%
 \begingroup%
