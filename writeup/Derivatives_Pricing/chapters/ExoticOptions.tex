@@ -1,4 +1,37 @@
-The generic term "barrier options" refers to a class of options whose payoff depends on whether the underlying price hits a prespecified barrier during the option’s lifetime.
+\subsection{Introduction}
+The European calls and puts considered thus far are sometimes called \textit{vanilla} or even \textit{plain vanilla} options. Their payoffs depend only on the final value of the underlying asset. Options whose payoffs depend on the path of the underlying asset are called \textit{path-dependent} or \textit{exotic}.
+
+We present three types of exotic options on a geometric Brownian motion asset and work out a detailed analysis for one option of each type. The types considered are \textit{barrier options}, \textit{lookback options}, and \textit{Asian options}. We work out the standard partial differential equations governing the option price. The first two options have explicit pricing formulas, which are based on the reflection principle for Brownian motion. Such a formula for Asian options is not known. However, for the Asian option there is a change-of-num\'{e}raire argument that reduces the pricing partial differential equation to a simple form that can easily be solved numerically.
+
+\subsection{Maximum of Brownian Motion with Drift}
+\Cref{fig:runningMax} represents the running maximum process
+\begin{equation}
+	M_0^t \coloneqq \max_{s \in [0,t]} W_s, \quad t \geq 0, \nonumber
+\end{equation}
+of Brownian motion $(W_t)_{t\in\mathbb{R}_{+}}$.
+\begin{figure}[H]
+	\centering
+	\input{plotting/runningMax.pgf}
+	\caption{A Wiener process path $B_t$ and its running maximum $M_0^t$.}
+	\label{fig:runningMax}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/brownianMaxDensity.pgf}
+	\caption{Probability density of the maximum $X_0^1$ of Brownian motion over $[0,1]$}
+	\label{fig:brownianMaxDensity}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/lognormalMaximumDensity.pgf}
+	\caption{Density of the maximum $M_0^T = \mathrm{Max}_{t\in[0,T]} S_t$ of geometric Brownian motion with $S_0 = 1$.}
+	\label{fig:lognormalMaximumDensity}
+\end{figure}
+
+\subsection{Barrier Options}
+The generic term "barrier options" refers to a class of options whose payoff depends on whether the underlying price hits a prespecified barrier during the option's lifetime.
 
 \subsection{Knock-out Barrier}
 \subsubsection{Up-and-out barrier call option}
@@ -202,3 +235,78 @@ For this option to have non-zero value, we typically require $S_0 > B$. Since it
 
 \clearpage
 \subsection{Knock-in Barrier}
+
+\subsubsection{Up-and-Out Call}
+
+\subsection{Lookback Options}
+Lookback call (resp.\ $\mathrm{put}$) options are financial derivatives that allow their holders to exercise the option by setting the strike price at the minimum (resp.\ maximum) of the underlying asset price process $(S_t)_{t \in [0,T]}$ over the time interval $[0,T]$. Lookback options can be priced by $\mathrm{PDE}$ arguments or by computing the discounted expected values of their claim payoff $C$, namely $C = S_T - \min_{0 \le t \le T} S_t$ in the case of call options, and $C = \max_{0 \le t \le T} S_t - S_T$ in the case of put options.
+
+\subsection{The Lookback Put Option}
+The standard lookback put option gives its holder the right to sell the underlying asset at its historically highest price. In this case, the floating strike price is $M_0^T$ and the payoff is given by the terminal value
+\begin{equation}
+	C = M_0^T - S_T
+\end{equation}
+of the drawdown process $(M_0^T - S_t)_{t\in[0,T]}$. The following pricing formula for lookback put options is a direct consequence of Proposition 10.9.
+
+\begin{prop}{The Price Of The Lookback Put Option}{LookbackPutPrice}
+	The price at time $t \in [0,T]$ of the lookback put option with payoff $M_0^T - S_T$ is given by
+	\begin{align} \label{eq:LookbackPutPrice}
+		P_{LB}(t) & = \mathrm{e}^{-r\tau} \mathbb{E}^\ast \left[ M_0^T - S_T \mid \mathcal{F}_t \right] \nonumber                                                             \\
+		          & = M_0^t \mathrm{e}^{-r\tau} \Phi \left( -d_2\left(S_t, M_0^t\right) \right) \nonumber                                                                     \\
+		          & \quad + S_t \left( 1 + \frac{\sigma^2}{2r} \right) \Phi \left( d_1\left(S_t, M_0^t\right) \right) \nonumber                                               \\
+		          & \quad - S_t \mathrm{e}^{-r\tau} \frac{\sigma^2}{2r} \left( \frac{M_0^t}{S_t} \right)^{2r/\sigma^2} \Phi \left( -d_2\left(M_0^t, S_t\right) \right) - S_t,
+	\end{align}
+	where $\tau = T-t$, and $d_{1,2}(\cdot, \cdot)$ correspond to the definitions in \cref{eq:D1TermDefinition,eq:ExplicitD2TermDefinition} with the fixed strike $K$ replaced by the running maximum $M_0^t$ (or $S_t$ where arguments are inverted).
+\end{prop}
+
+\subsection{Floating Strike Lookback Option}
+
+We begin with a geometric brownian motion asset price, which may be written as in
+
+
+
+\subsubsection{Floating Strike Lookback Option}
+
+\subsection{Asian Options}
+An \emph{Asian option} (or \emph{average option}) defines a class of options, whether European or American style, whose terminal payoff depends on the average asset value over a specific period within the option's life. Due to this averaging feature, Asian options are particularly suitable for thinly traded assets or commodities. Unlike standard options, they are typically less expensive and offer greater robustness against price manipulation near the expiry date.
+
+Asian options were first traded in Tokyo in 1987, and have become particularly popular in commodities trading.
+
+Let $T$ denote the exercise date, and let $0 \le T_0 < T$ represent the commencement of the averaging period. The payoff at expiry for an Asian call option is defined as
+\begin{equation} \label{eq:AsianCallPayoff}
+	C_T^A \idef (A_S(T_0, T) - K)^+,
+\end{equation}
+where
+\begin{equation} \label{eq:ArithmeticAverage}
+	A_S(T_0, T) = \frac{1}{T - T_0} \int_{T_0}^T S_u \, \di u
+\end{equation}
+represents the arithmetic average of the asset price over the time interval $[T_0, T]$. Here, $K$ denotes the fixed strike price, and the asset price $S$ is assumed to follow a geometric Brownian motion.
+
+The main difficulty in pricing and hedging Asian options is due to the fact that the random variable $A(T_0, T)$ does not have a lognormal distribution. This feature makes the task of finding an explicit formula for the price of an Asian option surprisingly involved.
+
+For this reason, early studies of Asian options were based either on approximations or on the direct application of the Monte Carlo method. The numerical approach to the valuation of Asian options, is based on the approximation of the arithmetic average using the geometric average. Note first that it is natural to substitute for the continuous-time average $A(T_0, T)$ its discrete-time counterpart
+\begin{equation} \label{eq:DiscreteTimeCounterpart}
+	A_S^n(T_0, T) = \frac{1}{n} \sum_{i=0}^{n-1} S_{T_i},
+\end{equation}
+where $T_i = T_0 + i(T - T_0)/n$. Furthermore, the arithmetic average $A_S^n(T_0, T)$ can be replaced with the geometric average, denoted by $G_S^n(T_0, T)$, in what follows. Recall that the random variables $S_{T_i}, i = 1, \dots, n$ are given explicitly by the expression
+\begin{equation} \label{eq:ExplicitStockPrice}
+	S_{T_i} = S_{T_0} \exp \left(\sigma (W^*_{T_i} - W^*_{T_0}) + \left(r - \frac{1}{2}\sigma^2\right)(T_i - T_0)\right),
+\end{equation}
+where $W^*$ is a standard Brownian motion under the martingale measure $\Pm^*$. Hence the geometric average admits the following representation
+\begin{equation} \label{eq:GeometricAverageRepresentation}
+	G_S^n(T_0, T) = \left(\prod_{i=0}^{n-1} S_{T_i}\right)^{1/n} = c S_{T_0} \exp \left(\frac{\sigma}{n} \sum_{i=0}^{n-1} (n - i - 1)(W^*_{T_{i+1}} - W^*_{T_i})\right)
+\end{equation}
+for a strictly positive constant $c$. In view of the independence of increments of the Brownian motion, the last formula makes clear that the geometric average $G_S^n(T_0, T)$ has a lognormal distribution under $\Pm^*$. The approximate Black-Scholes-like formula for the price of an Asian call option can thus be easily found by the direct evaluation of the conditional expectation
+\begin{equation} \label{eq:AsianCallConditionalExpectation}
+	\tilde{C}_{T_0}^n = e^{-r(T-T_0)} \E_{\Pm^*} \left((G_S^n(T_0, T) - K)^+ \mid \cF_{T_0}\right).
+\end{equation}
+
+It appears, however, that such an approach significantly underprices Asian call options. To overcome this deficiency, one may directly approximate the true distribution of the arithmetic average using an approximate distribution, typically a lognormal distribution with the appropriate parameters
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/movingAverage.pgf}
+	\caption{Brownian motion $B_t$ and its moving average $X_t$}
+	\label{fig:movingAverage}
+\end{figure}
+

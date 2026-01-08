@@ -1,4 +1,4 @@
-% math packages (load before fonts)
+% math packages
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{amsthm}
@@ -12,6 +12,7 @@
 \usepackage{textcomp}
 
 % encoding, fonts and microtype
+\usepackage{bbm}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{libertine}
@@ -198,6 +199,10 @@
 \newcommand{\cM}{\mathcal{M}}
 \newcommand{\matX}{\mathcal{X}}
 \newcommand{\idef}{\coloneqq}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\Rbar}{\overline{\mathbb{R}}}
+\newcommand{\cD}{\mathcal{D}}
 
 % comprehensive bold math block
 \newcommand{\ba}{\boldsymbol{a}}
@@ -228,6 +233,10 @@
 \newcommand{\scF}{\mathcal{F}}
 \newcommand{\scL}{\mathcal{L}}
 \newcommand{\iid}{\text{i.i.d.}}
+\newcommand{\bc}{\boldsymbol{c}}
+\newcommand{\bu}{\boldsymbol{u}}
+\newcommand{\bw}{\boldsymbol{w}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
 
 % operators
 \DeclareMathOperator{\Var}{Var}
@@ -267,6 +276,9 @@
 \newcommand{\Mnom}{\mathsf{Mnom}} \let\mnom\Mnom
 \newcommand{\Unif}{\EuScript{U}} \let\U\Unif
 \newcommand{\Fdist}{\mathsf{F}}
+\newcommand{\invgam}{\mathsf{InvGamma}}
+\newcommand{\Ex}{\mathsf{Exp}}
+
 
 % helpers
 \newcommand{\code}[1]{{\normalfont\ttfamily\hyphenchar\font=-1 #1}}
@@ -314,18 +326,33 @@
 \newtcbtheorem[auto counter,number within=section]{defn}{Definition}{academicbox,colback=defncolor,colframe=airforceblue,colbacktitle=airforceblue,fontupper=\upshape}{defn}
 
 % alert boxes
-\newtcolorbox{xattention}{
-	enhanced,breakable,colback=warncolor,colframe=black!35!black,
-	drop shadow,arc=5mm,sharp corners=uphill,
-	boxed title style={empty},
+\newtcbtheorem[auto counter,number within=section]{xattention}{Attention}{
+	enhanced,
+	breakable,
+	colback=warncolor,
+	colframe=black!35!black,
+	colbacktitle=black!35!black,
+	coltitle=white,
+	fonttitle=\bfseries,
+	drop shadow,
+	arc=5mm,
+	sharp corners=uphill,
 	overlay={\node[anchor=west,xshift=-10mm] at (frame.west) {\Huge\ding{43}};}
-}
-\newtcolorbox{xtip}{
-	enhanced,breakable,colback=tipcolor,colframe=black!35!black,
-	drop shadow,arc=5mm,sharp corners=uphill,
-	boxed title style={empty},
+}{xattention}
+
+\newtcbtheorem[auto counter,number within=section]{xtip}{Tip}{
+	enhanced,
+	breakable,
+	colback=tipcolor,
+	colframe=black!35!black,
+	colbacktitle=black!35!black,
+	coltitle=white,
+	fonttitle=\bfseries,
+	drop shadow,
+	arc=5mm,
+	sharp corners=uphill,
 	overlay={\node[anchor=west,xshift=-10mm] at (frame.west) {\Huge\ding{45}};}
-}
+}{xtip}
 
 % listing environments
 \newtcblisting{Pcode}[1]{
@@ -373,12 +400,19 @@
 	}
 }{}
 
-% cleveref aliases
-\crefname{tcb@cnt@thm}{Theorem}{Theorems}
-\crefname{tcb@cnt@cor}{Corollary}{Corollaries}
-\crefname{tcb@cnt@lem}{Lemma}{Lemmas}
-\crefname{tcb@cnt@prop}{Proposition}{Propositions}
-\crefname{tcb@cnt@defn}{Definition}{Definitions}
+\newcommand{\tcbcrefname}[3]{\crefname{tcb@cnt@#1}{#2}{#3}}
+
+\tcbcrefname{thm}{Theorem}{Theorems}
+\tcbcrefname{cor}{Corollary}{Corollaries}
+\tcbcrefname{lem}{Lemma}{Lemmas}
+\tcbcrefname{prop}{Proposition}{Propositions}
+\tcbcrefname{defn}{Definition}{Definitions}
+\tcbcrefname{xattention}{Attention}{Attentions}
+\tcbcrefname{xtip}{Tip}{Tips}
+
+\crefname{section}{section}{sections}
+\crefname{subsection}{subsection}{subsections}
+\crefname{subsubsection}{subsection}{subsections}
 
 \addbibresource{references.bib}
 

@@ -1,77 +1,115 @@
+\section{Definitions and Properties}
+
+\Levy{} processes serve as the fundamental building blocks of continuous-time stochastic modelling, representing the continuous analogue of random walks through their defining property of stationary and independent increments \parencite{sato_levy_2013, schilling_introduction_2016}.
+
+Analytically, their distributional structure is isomorphic to the class of infinitely divisible distributions via the \Levy{}-Khintchine formula, which characterizes the characteristic exponent through a unique triplet comprising a deterministic drift, a Gaussian variance, and a \Levy{} measure governing jump intensity \parencite{applebaum_levy_2013}.
+
+From a pathwise perspective, the \Levy{}-\Ito{} decomposition explicitly resolves the trajectory into the superposition of a deterministic trend, a continuous Gaussian martingale, and a discontinuous jump component driven by a Poisson random measure \parencite{kyprianou_fluctuations_2014}.
+
+Within derivatives pricing, this framework generalizes geometric Brownian motion to endogenously capture the leptokurtosis and skewness inherent in asset returns, thereby rectifying the distributional inadequacies of diffusion-only models \parencite{cont_financial_2004}.
+
+\subsection{From Random Walks to \Levy{} Processes}
+
+\begin{defn}{\Levy{} process}{LevyProcess}
+	A cadlag\footnotemark{} stochastic process $(X_t)_{t \ge 0}$ on $(\Omega, \cF, \Prob)$ with values in $\R^d$ such that $X_0 = 0$ is called a \Levy{} process if it possesses the following properties:
+	\begin{enumerate}[label=\arabic*.]
+		\item \emph{Independent increments}: for every increasing sequence of times $t_0 \dots t_n$, the random variables $X_{t_0}, X_{t_1} - X_{t_0}, \dots, X_{t_n} - X_{t_{n-1}}$ are independent.
+		\item \emph{Stationary increments}: the law of $X_{t+h} - X_t$ does not depend on $t$.
+		\item \emph{Stochastic continuity}: $\forall \varepsilon > 0, \lim_{h \to 0} \Prob(\abs{X_{t+h} - X_t} \ge \varepsilon) = 0$.
+	\end{enumerate}
+\end{defn}
+
+\footnotetext{Some authors do not impose the cadlag (right-continuity and left limits) property in the definition of a \Levy{} process, but it can be shown that every \Levy{} process (defined without the cadlag property) has a unique modification that is cadlag; therefore, the cadlag property can be assumed without loss of generality.}
+
+\begin{defn}{Infinite Divisibility}{InfiniteDivisibility}
+	A probability distribution $F$ on $\R^d$ is said to be \textit{infinitely divisible} if for any integer $n \ge 2$, there exist $n$ $\iid$ random variables $Y_1, \dots, Y_n$ such that $Y_1 + \dots + Y_n$ has distribution $F$.
+\end{defn}
+
+\begin{prop}{Infinite Divisibility and \Levy{} Processes}{InfiniteDivisibilityAndLevyProcesses}
+	Let $X \coloneqq (X_t)_{t \ge 0}$ be a  \Levy{} process. Then for every $t$, $X_t$ has an infinitely divisible distribution. Conversely, if $F$ is an infinitely divisible distribution, there exists a $\Levy$ process $X$ such that the distribution of $X_1$ is given by $F$.
+\end{prop}
+
+\begin{prop}{Characteristic function of a \Levy{} process}{CharacteristicFunctionLevy}
+	Let $(X_t)_{t\geq 0}$ be a \Levy{} process on $\R^d$. There exists a continuous function $\psi : \R^d \mapsto \R$ called the characteristic exponent of $X$, such that:
+	\begin{equation}\label{eq:CharacteristicFunction}
+		E\left[e^{iz \cdot X_t}\right] = e^{t\psi(z)}, \quad z \in \R^d.
+	\end{equation}
+\end{prop}
+
+
+
+\section{Building Levy Processes}
+
+\subsection{Model building with \Levy{} Processes}
+Let us start by some general considerations on \Levy{} processes, their use as models for price dynamics and different ways to specify such models.
+\section{Simulating Levy Processes}
+
+
+
+\section{Stochastic Calculus for Jump Processes}
+
 Consider now a jump-diffusion process
-\begin{equation} \label{JumpDiffusionProcess}
+\begin{equation} \label{eq:JumpDiffusionProcess}
 	X_t = \sigma W_t + \mu t + J_t = X^c(t) + J_t,
 \end{equation}
 where $J$ is a compound Poisson process and $X^c$ is the continuous part of $X$:
-\begin{equation} \label{ComponentDefinitions}
+\begin{equation} \label{eq:ComponentDefinitions}
 	J_t = \sum_{i=1}^{N_t} \Delta X_i, \qquad\qquad X^c_t = \mu t + \sigma W_t.
 \end{equation}
-Define $Y_t = f(X_t)$ where $f \in C^2(\mathbb{R})$ and denote by $T_i, i = 1 \dots N_T$ the jump times of $X$. On $]T_i, T_{i+1}[$, $X$ evolves according to
-\begin{equation} \label{EvolutionBetweenJumps}
+Define $Y_t = f(X_t)$ where $f \in C^2(\mathbb{R})$ and denote by $T_i, i = 1 \dots N_T$ the jump times of $X$. On $[T_i, T_{i+1}]$, $X$ evolves according to
+\begin{equation} \label{eq:EvolutionBetweenJumps}
 	dX_t = dX^c_t = \sigma dW_t + \mu dt,
 \end{equation}
 so by applying the \Ito{} formula in the Brownian case we obtain
-\begin{align} \label{ItoIntegration}
-    Y_{T_{i+1}-} - Y_{T_i} &= \int_{T_i}^{T_{i+1}-} \frac{\sigma^2}{2} f''(X_t) \di t + \int_{T_i}^{T_{i+1}-} f'(X_t) \di X_t \nonumber \\
-    &= \int_{T_i}^{T_{i+1}-} \left\{ \frac{\sigma^2}{2} f''(X_t) \di t + f'(X_t) \di X^c_t \right\}
+\begin{align} \label{eq:ItoIntegration}
+	Y_{T_{i+1}-} - Y_{T_i} & = \int_{T_i}^{T_{i+1}-} \frac{\sigma^2}{2} f''(X_t) \di t + \int_{T_i}^{T_{i+1}-} f'(X_t) \di X_t \nonumber \\
+	                       & = \int_{T_i}^{T_{i+1}-} \left\{ \frac{\sigma^2}{2} f''(X_t) \di t + f'(X_t) \di X^c_t \right\}
 \end{align}
 since $dX_t = dX^c(t)$ on this interval. If a jump of size $\Delta X_t$ occurs then the resulting change in $Y_t$ is given by $f(X_{t-} + \Delta X_t) - f(X_{t-})$. The total change in $Y_t$ can therefore be written as the sum of these two contributions:
-\begin{equation} \label{FinalItoFormula}
+\begin{equation} \label{eq:FinalItoFormula}
 	\begin{split}
-		f(X_t) - f(X_0) &= \int_0^t f'(X_s) dX^c_s + \int_0^t \frac{\sigma^2}{2} f''(X_s) ds \\
-		&\quad + \sum_{0 \le s \le t, \Delta X_s \neq 0} [f(X_{s-} + \Delta X_s) - f(X_{s-})].
+		f(X_t) - f(X_0) & = \int_0^t f'(X_s) dX^c_s + \int_0^t \frac{\sigma^2}{2} f''(X_s) ds                   \\
+		                & \quad + \sum_{0 \le s \le t, \Delta X_s \neq 0} [f(X_{s-} + \Delta X_s) - f(X_{s-})].
 	\end{split}
 \end{equation}
 
 \begin{xattention}{}
-Replacing $\di X_s^c$ by $\di X_s - \Delta X_s$ one obtains an equivalent expression:
-\begin{equation} \label{EquivalentItoExpression}
-	\begin{split}
-		f(X_t) - f(X_0) &= \int_0^t f'(X_{s-}) \di X_s + \int_0^t \frac{\sigma^2}{2} f''(X_s) \di s \\
-		&\quad + \sum_{0 \le s \le t, \Delta X_s \neq 0} [f(X_{s-} + \Delta X_s) - f(X_{s-}) - \Delta X_s f'(X_{s-})].
-	\end{split}
-\end{equation}
-When the number of jumps is finite, this form is equivalent to \cref{FinalItoFormula}. However, as we will see below, the form \cref{EquivalentItoExpression} is more general, wherein both the stochastic integral and the sum over the jumps in \cref{EquivalentItoExpression} are well-defined for any semi-martingale, even if the number of jumps is infinite, while the sum in \cref{FinalItoFormula} may not converge if jumps have infinite variation.
+	Replacing $\di X_s^c$ by $\di X_s - \Delta X_s$ one obtains an equivalent expression:
+	\begin{equation} \label{eq:EquivalentItoExpression}
+		\begin{split}
+			f(X_t) - f(X_0) & = \int_0^t f'(X_{s-}) \di X_s + \int_0^t \frac{\sigma^2}{2} f''(X_s) \di s                                    \\
+			                & \quad + \sum_{0 \le s \le t, \Delta X_s \neq 0} [f(X_{s-} + \Delta X_s) - f(X_{s-}) - \Delta X_s f'(X_{s-})].
+		\end{split}
+	\end{equation}
+	When the number of jumps is finite, this form is equivalent to \cref{eq:FinalItoFormula}. However, as we will see below, the form \cref{EquivalentItoExpression} is more general, wherein both the stochastic integral and the sum over the jumps in \cref{eq:EquivalentItoExpression} are well-defined for any semi-martingale, even if the number of jumps is infinite, while the sum in \cref{eq:FinalItoFormula} may not converge if jumps have infinite variation.
 
-Here we have only used the \Ito{} formula for diffusions, which is of course still valid if $\sigma$ is replaced by a process $(\sigma_t)_{t \in [0,T]}$ belonging to the class $\mathcal{P}_T$.
+	Here we have only used the \Ito{} formula for diffusions, which is of course still valid if $\sigma$ is replaced by a process $(\sigma_t)_{t \in [0,T]}$ belonging to the class $\mathcal{P}_T$.
 \end{xattention}
 
 \begin{prop}{\Ito{} Formula for Jump-Diffusion Processes}{ItoJumpDiffusion}
-Let $X$ be a diffusion process with jumps, defined as the sum of a drift term, a Brownian stochastic integral and a compound Poisson process:
-\begin{equation*}
-	X_t = X_0 + \int_0^t b_s \di s + \int_0^t \sigma_s \di W_s + \sum_{i=1}^{N_t} \Delta X_i,
-\end{equation*}
-where $b_t$ and $\sigma_t$ are continuous adapted processes with
-\begin{equation*}
-	\E\left[ \int_0^T \sigma_t^2 \di t \right] < \infty.
-\end{equation*}
-Then, for any $C^{1,2}$ function $f : [0,T] \times \R \to \R$, the process $Y_t = f(t, X_t)$ can be represented as
-\begin{align*}
-	f(t, X_t) - f(0, X_0) &= \int_0^t \left[ \frac{\partial f}{\partial s}(s, X_s) + \frac{\partial f}{\partial x}(s, X_s)b_s \right] \di s \\
-	&\quad + \frac{1}{2} \int_0^t \sigma_s^2 \frac{\partial^2 f}{\partial x^2}(s, X_s)\di s + \int_0^t \frac{\partial f}{\partial x}(s, X_s)\sigma_s \di W_s \\
-	&\quad + \sum_{\{i \ge 1, T_i \le t\}} [f(X_{T_i-} + \Delta X_i) - f(X_{T_i-})].
-\end{align*}
-Expressed in differential notation
-\begin{align*}
-	\di Y_t &= \frac{\partial f}{\partial t}(t, X_t) \di t + b_t \frac{\partial f}{\partial x}(t, X_t) \di t + \frac{\sigma_t^2}{2} \frac{\partial^2 f}{\partial x^2}(t, X_t) \di t \\
-	&\quad + \frac{\partial f}{\partial x}(t, X_t) \sigma_t \di W_t + [f(X_{t-} + \Delta X_t) - f(X_{t-})].
-\end{align*}
+	Let $X$ be a diffusion process with jumps, defined as the sum of a drift term, a Brownian stochastic integral and a compound Poisson process:
+	\begin{equation*}
+		X_t = X_0 + \int_0^t b_s \di s + \int_0^t \sigma_s \di W_s + \sum_{i=1}^{N_t} \Delta X_i,
+	\end{equation*}
+	where $b_t$ and $\sigma_t$ are continuous adapted processes with
+	\begin{equation*}
+		\E\left[ \int_0^T \sigma_t^2 \di t \right] < \infty.
+	\end{equation*}
+	Then, for any $C^{1,2}$ function $f : [0,T] \times \R \to \R$, the process $Y_t = f(t, X_t)$ can be represented as
+	\begin{align*}
+		f(t, X_t) - f(0, X_0) & = \int_0^t \left[ \frac{\partial f}{\partial s}(s, X_s) + \frac{\partial f}{\partial x}(s, X_s)b_s \right] \di s                                        \\
+		                      & \quad + \frac{1}{2} \int_0^t \sigma_s^2 \frac{\partial^2 f}{\partial x^2}(s, X_s)\di s + \int_0^t \frac{\partial f}{\partial x}(s, X_s)\sigma_s \di W_s \\
+		                      & \quad + \sum_{\{i \ge 1, T_i \le t\}} [f(X_{T_i-} + \Delta X_i) - f(X_{T_i-})].
+	\end{align*}
+	Expressed in differential notation
+	\begin{align*}
+		\di Y_t & = \frac{\partial f}{\partial t}(t, X_t) \di t + b_t \frac{\partial f}{\partial x}(t, X_t) \di t + \frac{\sigma_t^2}{2} \frac{\partial^2 f}{\partial x^2}(t, X_t) \di t \\
+		        & \quad + \frac{\partial f}{\partial x}(t, X_t) \sigma_t \di W_t + [f(X_{t-} + \Delta X_t) - f(X_{t-})].
+	\end{align*}
 \end{prop}
 
-\begin{defn}{Infinite Divisibility}{InfiniteDivisibility}
-    A probability distribution $F$ on $\R^d$ is said to be \textit{infinitely divisible} if for any integer $n \ge 2$, there exist $n$ $\iid$ random variables $Y_1, \dots, Y_n$ such that $Y_1 + \dots + Y_n$ has distribution $F$.
-\end{defn}
-
-\begin{prop}{Infinite Divisibility and \Levy{} Processes}{InfiniteDivisibilityAndLevyProcesses}
-    Let $X \coloneqq (X_t)_{t \ge 0}$ be a  \Levy{} process. Then for every $t$, $X_t$ has an infinitely divisible distribution. Conversely, if $F$ is an infinitely divisible distribution, there exists a $\Levy$ process $X$ such that the distribution of $X_1$ is given by $F$.
-\end{prop}
-
-\begin{prop}{Characteristic function of a \Levy{} process}{CharacteristicFunctionLevy}
-Let $(X_t)_{t\geq 0}$ be a \Levy{} process on $\R^d$. There exists a continuous function $\psi : \R^d \mapsto \R$ called the characteristic exponent of $X$, such that:
-\begin{equation}\label{eq:CharacteristicFunction}
-    E\left[e^{iz \cdot X_t}\right] = e^{t\psi(z)}, \quad z \in \R^d.
-\end{equation}
-\end{prop}
+\subsection{Risk-neutral modelling with exponential \Levy{} Processes}
 
 \section{Integro-differential equations and numerical methods}
 \epigraph{An approximate answer to the right problem is worth a good deal more than an exact answer to an approximate problem.}{John Tukey}
+
