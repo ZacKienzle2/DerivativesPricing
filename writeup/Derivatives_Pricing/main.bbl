@@ -16,5 +16,862 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global/global}
+    \entry{applebaum_levy_2013}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=135a357db000615e56fe27cdf0a7d1be}{%
+           family={Applebaum},
+           familyi={A\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{135a357db000615e56fe27cdf0a7d1be}
+      \strng{fullhash}{135a357db000615e56fe27cdf0a7d1be}
+      \strng{fullhashraw}{135a357db000615e56fe27cdf0a7d1be}
+      \strng{bibnamehash}{135a357db000615e56fe27cdf0a7d1be}
+      \strng{authorbibnamehash}{135a357db000615e56fe27cdf0a7d1be}
+      \strng{authornamehash}{135a357db000615e56fe27cdf0a7d1be}
+      \strng{authorfullhash}{135a357db000615e56fe27cdf0a7d1be}
+      \strng{authorfullhashraw}{135a357db000615e56fe27cdf0a7d1be}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Second edition, reprinted 2013 with corrections}
+      \field{isbn}{978-0-521-73865-1}
+      \field{number}{116}
+      \field{pagetotal}{460}
+      \field{series}{Cambridge studies in advanced mathematics}
+      \field{title}{Lévy processes and stochastic calculus}
+      \field{year}{2013}
+      \field{dateera}{ce}
+    \endentry
+    \entry{bensoussan_stochastic_1994}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=4a36e88b37487daae13c8e601165eace}{%
+           family={Bensoussan},
+           familyi={B\bibinitperiod},
+           given={Alain},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ace0b760bee25d2906870987ec19c59a}{%
+           family={Crouhy},
+           familyi={C\bibinitperiod},
+           given={Michel},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e674710b0c94355e193b78d98dde47a4}{%
+           family={Galai},
+           familyi={G\bibinitperiod},
+           given={Dan},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c79214d4972f2537e422e86cf3537938}
+      \strng{fullhash}{c79214d4972f2537e422e86cf3537938}
+      \strng{fullhashraw}{c79214d4972f2537e422e86cf3537938}
+      \strng{bibnamehash}{c79214d4972f2537e422e86cf3537938}
+      \strng{authorbibnamehash}{c79214d4972f2537e422e86cf3537938}
+      \strng{authornamehash}{c79214d4972f2537e422e86cf3537938}
+      \strng{authorfullhash}{c79214d4972f2537e422e86cf3537938}
+      \strng{authorfullhashraw}{c79214d4972f2537e422e86cf3537938}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{We propose a general framework to model equity volatility for a firm financed by equity and additional non-equity sources of funds. The stochastic nature of equity volatility is endogenous, and comes from the impact of a change in the value of the firm's assets on the financial leverage. We first present the basic model, which is an extension of the Black-Scholes model, to value corporate securities. Second, we show for the first time in the option literature, that instantaneous equity volatility is a solution of a partial differential equation similar to Black-Scholes', although it is non-linear and in general does not have any analytical solution. However, analytical approximations for equity volatility are proposed for different capital structures: (1) equity and debt, (2) equity and warrants, and (3) equity, debt and warrants. They are shown to be very accurate.}
+      \field{day}{1}
+      \field{issn}{1350-486X}
+      \field{journaltitle}{Applied Mathematical Finance}
+      \field{month}{9}
+      \field{note}{Publisher: Routledge \_eprint: https://doi.org/10.1080/13504869400000004}
+      \field{number}{1}
+      \field{shorttitle}{Stochastic equity volatility related to the leverage effect}
+      \field{title}{Stochastic equity volatility related to the leverage effect: I equity volatility behaviour}
+      \field{urlday}{27}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{1}
+      \field{year}{1994}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{63\bibrangedash 85}
+      \range{pages}{23}
+      \verb{doi}
+      \verb 10.1080/13504869400000004
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1080/13504869400000004
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1080/13504869400000004
+      \endverb
+      \keyw{option pricing,volatility,corporate finance,financial structure,leverage effect,numerical methods,security valuation,stochastic,warrants}
+    \endentry
+    \entry{bielecki_hedging_2004}{incollection}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=f816eed5f8d03a5f6f51cc36d1cb97a5}{%
+           family={Bielecki},
+           familyi={B\bibinitperiod},
+           given={Tomasz\bibnamedelima R.},
+           giveni={T\bibinitperiod\bibinitdelim R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=81c311fd7be5c5d55f6e1b570558b69c}{%
+           family={Jeanblanc},
+           familyi={J\bibinitperiod},
+           given={Monique},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=37f06b5147219060bf49598dad098883}{%
+           family={Rutkowski},
+           familyi={R\bibinitperiod},
+           given={Marek},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{12}{}{%
+        {{hash=f816eed5f8d03a5f6f51cc36d1cb97a5}{%
+           family={Bielecki},
+           familyi={B\bibinitperiod},
+           given={Tomasz\bibnamedelima R.},
+           giveni={T\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=d5d277f4ab9e48882e00b7491800991f}{%
+           family={Björk},
+           familyi={B\bibinitperiod},
+           given={Tomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=81c311fd7be5c5d55f6e1b570558b69c}{%
+           family={Jeanblanc},
+           familyi={J\bibinitperiod},
+           given={Monique},
+           giveni={M\bibinitperiod}}}%
+        {{hash=37f06b5147219060bf49598dad098883}{%
+           family={Rutkowski},
+           familyi={R\bibinitperiod},
+           given={Marek},
+           giveni={M\bibinitperiod}}}%
+        {{hash=aa5a7436458bd026ea9a5b786e99d080}{%
+           family={Scheinkman},
+           familyi={S\bibinitperiod},
+           given={José\bibnamedelima A.},
+           giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=a5a94e36625701b04b0f82e1d472fd69}{%
+           family={Xiong},
+           familyi={X\bibinitperiod},
+           given={Wei},
+           giveni={W\bibinitperiod}}}%
+        {{hash=5e4299e4e8ef0544e2b37a576d6e2a5c}{%
+           family={Carmona},
+           familyi={C\bibinitperiod},
+           given={René\bibnamedelima A.},
+           giveni={R\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=552750769923d481c7b524d9a577151e}{%
+           family={Çinlar},
+           familyi={Ç\bibinitperiod},
+           given={Erhan},
+           giveni={E\bibinitperiod}}}%
+        {{hash=57a643663fd0035bfeabeb50160435eb}{%
+           family={Ekeland},
+           familyi={E\bibinitperiod},
+           given={Ivar},
+           giveni={I\bibinitperiod}}}%
+        {{hash=36466a1e86b83e35617e7680d04d536e}{%
+           family={Jouini},
+           familyi={J\bibinitperiod},
+           given={Elyes},
+           giveni={E\bibinitperiod}}}%
+        {{hash=aa5a7436458bd026ea9a5b786e99d080}{%
+           family={Scheinkman},
+           familyi={S\bibinitperiod},
+           given={José\bibnamedelima A.},
+           giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=701a2d95e8b3a75c89608e9b91902077}{%
+           family={Touzi},
+           familyi={T\bibinitperiod},
+           given={Nizar},
+           giveni={N\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Berlin, Heidelberg}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{fullhash}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{fullhashraw}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{bibnamehash}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{authorbibnamehash}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{authornamehash}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{authorfullhash}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{authorfullhashraw}{9b0165678b7dfce2adb9ddf24763495d}
+      \strng{editorbibnamehash}{89a95ba14cfef4406ac413a84cf155ba}
+      \strng{editornamehash}{89a95ba14cfef4406ac413a84cf155ba}
+      \strng{editorfullhash}{62e8f36e866c4456c29d78ab3e8d9e12}
+      \strng{editorfullhashraw}{62e8f36e866c4456c29d78ab3e8d9e12}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The goal of this chapter is to present a survey of recent developments in the practically important and challenging area of hedging credit risk. In a companion work, Bielecki et al. (2004a), we presented techniques and results related to the valuation of defaultable claims. It should be emphasized that in most existing papers on credit risk, the risk-neutral valuation of defaultable claims is not supported by any other argument than the desire to produce an arbitrage-free model of default-free and defaultable assets. Here, we focus on the possibility of a perfect replication of defaultable claims and, if the latter is not feasible, on various approaches to hedging in an incomplete setting.}
+      \field{booktitle}{Paris-Princeton Lectures on Mathematical Finance 2003}
+      \field{isbn}{978-3-540-44468-8}
+      \field{langid}{english}
+      \field{title}{Hedging of Defaultable Claims}
+      \field{urlday}{27}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2004}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{1\bibrangedash 132}
+      \range{pages}{132}
+      \verb{doi}
+      \verb 10.1007/978-3-540-44468-8_1
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1007/978-3-540-44468-8_1
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1007/978-3-540-44468-8_1
+      \endverb
+      \keyw{91B28,91B70,93E20,60H30,91B44,92B24}
+    \endentry
+    \entry{black_pricing_1973}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=93277dfc1ebe8d44428e74799781e4d7}{%
+           family={Black},
+           familyi={B\bibinitperiod},
+           given={Fischer},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=301bb16d9f303a488dac1c73931c0eff}{%
+           family={Scholes},
+           familyi={S\bibinitperiod},
+           given={Myron},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \strng{fullhash}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \strng{fullhashraw}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \strng{bibnamehash}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \strng{authorbibnamehash}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \strng{authornamehash}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \strng{authorfullhash}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \strng{authorfullhashraw}{0bcdbf94b820ddcda24f3e8d73d9a4ec}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{If options are correctly priced in the market, it should not be possible to make sure profits by creating portfolios of long and short positions in options and their underlying stocks. Using this principle, a theoretical valuation formula for options is derived. Since almost all corporate liabilities can be viewed as combinations of options, the formula and the analysis that led to it are also applicable to corporate liabilities such as common stock, corporate bonds, and warrants. In particular, the formula can be used to derive the discount that should be applied to a corporate bond because of the possibility of default.}
+      \field{issn}{0022-3808}
+      \field{journaltitle}{Journal of Political Economy}
+      \field{note}{Publisher: The University of Chicago Press}
+      \field{number}{3}
+      \field{title}{The Pricing of Options and Corporate Liabilities}
+      \field{urlday}{24}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{81}
+      \field{year}{1973}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{637\bibrangedash 654}
+      \range{pages}{18}
+      \verb{doi}
+      \verb 10.1086/260062
+      \endverb
+      \verb{urlraw}
+      \verb https://www.jstor.org/stable/1831029
+      \endverb
+      \verb{url}
+      \verb https://www.jstor.org/stable/1831029
+      \endverb
+    \endentry
+    \entry{brennan_continuous_1979}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=706025450421620c4d63ff4e383d046f}{%
+           family={Brennan},
+           familyi={B\bibinitperiod},
+           given={Michael\bibnamedelima J.},
+           giveni={M\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=cfd00cf12d03dd072fefdfdb28693c64}{%
+           family={Schwartz},
+           familyi={S\bibinitperiod},
+           given={Eduardo\bibnamedelima S.},
+           giveni={E\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{a48542c6fc4a712288db96728828d8d4}
+      \strng{fullhash}{a48542c6fc4a712288db96728828d8d4}
+      \strng{fullhashraw}{a48542c6fc4a712288db96728828d8d4}
+      \strng{bibnamehash}{a48542c6fc4a712288db96728828d8d4}
+      \strng{authorbibnamehash}{a48542c6fc4a712288db96728828d8d4}
+      \strng{authornamehash}{a48542c6fc4a712288db96728828d8d4}
+      \strng{authorfullhash}{a48542c6fc4a712288db96728828d8d4}
+      \strng{authorfullhashraw}{a48542c6fc4a712288db96728828d8d4}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper develops an arbitrage model of the term structure of interest rates based on the assumptions that the whole term structure at any point in time may be expressed as a function of the yields on the longest and shortest maturity default free instruments and that these two yields follow a Gauss-Wiener process. Arbitrage arguments are used to derive a partial differential equation which must be satisfied by the values of all default free bonds. The joint stochastic process for the two yields is estimated using Canadian data and the model is used to price a sample of Government of Canada bonds.}
+      \field{day}{1}
+      \field{issn}{0378-4266}
+      \field{journaltitle}{Journal of Banking \& Finance}
+      \field{month}{7}
+      \field{number}{2}
+      \field{shortjournal}{Journal of Banking \& Finance}
+      \field{title}{A continuous time approach to the pricing of bonds}
+      \field{urlday}{2}
+      \field{urlmonth}{12}
+      \field{urlyear}{2025}
+      \field{volume}{3}
+      \field{year}{1979}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{133\bibrangedash 155}
+      \range{pages}{23}
+      \verb{doi}
+      \verb 10.1016/0378-4266(79)90011-6
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/0378426679900116
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/0378426679900116
+      \endverb
+    \endentry
+    \entry{cont_financial_2004}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=4adbb1a85104895dfcc25d4e2cac8cce}{%
+           family={Cont},
+           familyi={C\bibinitperiod},
+           given={Rama},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=382299cc9d6c0ec5abe5a7caafcacbc6}{%
+           family={Tankov},
+           familyi={T\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Boca Raton, Fla.}%
+      }
+      \list{publisher}{1}{%
+        {Chapman \& Hall/{CRC}}%
+      }
+      \strng{namehash}{d62742cd92b7328b68ab4be91c19d08e}
+      \strng{fullhash}{d62742cd92b7328b68ab4be91c19d08e}
+      \strng{fullhashraw}{d62742cd92b7328b68ab4be91c19d08e}
+      \strng{bibnamehash}{d62742cd92b7328b68ab4be91c19d08e}
+      \strng{authorbibnamehash}{d62742cd92b7328b68ab4be91c19d08e}
+      \strng{authornamehash}{d62742cd92b7328b68ab4be91c19d08e}
+      \strng{authorfullhash}{d62742cd92b7328b68ab4be91c19d08e}
+      \strng{authorfullhashraw}{d62742cd92b7328b68ab4be91c19d08e}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-1-58488-413-2}
+      \field{pagetotal}{535}
+      \field{series}{Chapman \& Hall/{CRC} financial mathematics series}
+      \field{title}{Financial modelling with jump processes}
+      \field{year}{2004}
+      \field{dateera}{ce}
+    \endentry
+    \entry{cox_valuation_1976}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=0d88b4a591c5402d328fe670bc33bf1b}{%
+           family={Cox},
+           familyi={C\bibinitperiod},
+           given={John\bibnamedelima C.},
+           giveni={J\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=98b2227c5a8dba76158ffb9a20138b89}{%
+           family={Ross},
+           familyi={R\bibinitperiod},
+           given={Stephen\bibnamedelima A.},
+           giveni={S\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{bbe480841c1aefcf84fa017036c9ce0e}
+      \strng{fullhash}{bbe480841c1aefcf84fa017036c9ce0e}
+      \strng{fullhashraw}{bbe480841c1aefcf84fa017036c9ce0e}
+      \strng{bibnamehash}{bbe480841c1aefcf84fa017036c9ce0e}
+      \strng{authorbibnamehash}{bbe480841c1aefcf84fa017036c9ce0e}
+      \strng{authornamehash}{bbe480841c1aefcf84fa017036c9ce0e}
+      \strng{authorfullhash}{bbe480841c1aefcf84fa017036c9ce0e}
+      \strng{authorfullhashraw}{bbe480841c1aefcf84fa017036c9ce0e}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper examines the structure of option valuation problems and develops a new technique for their solution. It also introduces several jump and diffusion processes which have not been used in previous models. The technique is applied to these processes to find explicit option valuation formulas, and solutions to some previously unsolved problems involving the pricing of securities with payouts and potential bankruptcy.}
+      \field{day}{1}
+      \field{issn}{0304-405X}
+      \field{journaltitle}{Journal of Financial Economics}
+      \field{month}{1}
+      \field{number}{1}
+      \field{shortjournal}{Journal of Financial Economics}
+      \field{title}{The valuation of options for alternative stochastic processes}
+      \field{urlday}{25}
+      \field{urlmonth}{12}
+      \field{urlyear}{2025}
+      \field{volume}{3}
+      \field{year}{1976}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{145\bibrangedash 166}
+      \range{pages}{22}
+      \verb{doi}
+      \verb 10.1016/0304-405X(76)90023-4
+      \endverb
+      \verb{file}
+      \verb ScienceDirect Full Text PDF:C\:\\Users\\Zac Kienzle\\Zotero\\storage\\BDCL532J\\Cox and Ross - 1976 - The valuation of options for alternative stochastic processes.pdf:application/pdf;ScienceDirect Snapshot:C\:\\Users\\Zac Kienzle\\Zotero\\storage\\F4PFU2RI\\0304405X76900234.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/0304405X76900234
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/0304405X76900234
+      \endverb
+    \endentry
+    \entry{harrison_martingales_1981}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=a312e67e11ff3de136fda9d6a66399ec}{%
+           family={Harrison},
+           familyi={H\bibinitperiod},
+           given={J.\bibnamedelimi Michael},
+           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=a6650eb9037686b9151967d50717b043}{%
+           family={Pliska},
+           familyi={P\bibinitperiod},
+           given={Stanley\bibnamedelima R.},
+           giveni={S\bibinitperiod\bibinitdelim R\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \strng{fullhash}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \strng{fullhashraw}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \strng{bibnamehash}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \strng{authorbibnamehash}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \strng{authornamehash}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \strng{authorfullhash}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \strng{authorfullhashraw}{cd740bfc346ddba31c9c72b69d4b67a0}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper develops a general stochastic model of a frictionless security market with continuous trading. The vector price process is given by a semimartingale of a certain class, and the general stochastic integral is used to represent capital gains. Within the framework of this model, we discuss the modern theory of contingent claim valuation, including the celebrated option pricing formula of Black and Scholes. It is shown that the security market is complete if and only if its vector price process has a certain martingale representation property. A multidimensional generalization of the Black-Scholes model is examined in some detail, and some other examples are discussed briefly.}
+      \field{day}{1}
+      \field{issn}{0304-4149}
+      \field{journaltitle}{Stochastic Processes and their Applications}
+      \field{month}{8}
+      \field{number}{3}
+      \field{shortjournal}{Stochastic Processes and their Applications}
+      \field{title}{Martingales and stochastic integrals in the theory of continuous trading}
+      \field{urlday}{31}
+      \field{urlmonth}{12}
+      \field{urlyear}{2025}
+      \field{volume}{11}
+      \field{year}{1981}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{215\bibrangedash 260}
+      \range{pages}{46}
+      \verb{doi}
+      \verb 10.1016/0304-4149(81)90026-0
+      \endverb
+      \verb{file}
+      \verb ScienceDirect Full Text PDF:C\:\\Users\\Zac Kienzle\\Zotero\\storage\\GGB9548I\\Harrison and Pliska - 1981 - Martingales and stochastic integrals in the theory of continuous trading.pdf:application/pdf;ScienceDirect Snapshot:C\:\\Users\\Zac Kienzle\\Zotero\\storage\\EF6I6EAB\\0304414981900260.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/0304414981900260
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/0304414981900260
+      \endverb
+      \keyw{option pricing,Contingent claim valuation,continous trading,diffusion processes,representation of martingales,semimartingales,stochastic integrals}
+    \endentry
+    \entry{heath_ex-dividend_1988}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=5970654d0f7368cee8b6cbeed2efdbcd}{%
+           family={Heath},
+           familyi={H\bibinitperiod},
+           given={David\bibnamedelima C.},
+           giveni={D\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0454728fc026e6999f732ca7e51b3869}{%
+           family={Jarrow},
+           familyi={J\bibinitperiod},
+           given={Robert\bibnamedelima A.},
+           giveni={R\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{bf6660179ccc227bd5778f62e53459e2}
+      \strng{fullhash}{bf6660179ccc227bd5778f62e53459e2}
+      \strng{fullhashraw}{bf6660179ccc227bd5778f62e53459e2}
+      \strng{bibnamehash}{bf6660179ccc227bd5778f62e53459e2}
+      \strng{authorbibnamehash}{bf6660179ccc227bd5778f62e53459e2}
+      \strng{authornamehash}{bf6660179ccc227bd5778f62e53459e2}
+      \strng{authorfullhash}{bf6660179ccc227bd5778f62e53459e2}
+      \strng{authorfullhashraw}{bf6660179ccc227bd5778f62e53459e2}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper investigates the relation between ex-dividend stock-price behavior and arbitrage opportunities. In a continuous trading, frictionless economy, we demonstrate that is possible for the ex-dividend stock price drop to differ from the dividend, and still short-term traders cannot generate arbitrage profits. Our argument is independent of transaction costs. The relevance of this insight to estimating the marginal tax bracket based on ex-dividend stock price drops is explored. Furthermore, this insight is also applied to the area of option pricing in which the special class of escrowed dividend stock price processes is studied. We show that most elements from this class of stock price processes generate invalid option pricing formulas.}
+      \field{issn}{0021-9398}
+      \field{journaltitle}{The Journal of Business}
+      \field{note}{Publisher: University of Chicago Press}
+      \field{number}{1}
+      \field{title}{Ex-Dividend Stock Price Behavior and Arbitrage Opportunities}
+      \field{urlday}{11}
+      \field{urlmonth}{12}
+      \field{urlyear}{2025}
+      \field{volume}{61}
+      \field{year}{1988}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{95\bibrangedash 108}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1086/296421
+      \endverb
+      \verb{urlraw}
+      \verb https://www.jstor.org/stable/2352981
+      \endverb
+      \verb{url}
+      \verb https://www.jstor.org/stable/2352981
+      \endverb
+    \endentry
+    \entry{heston_closed-form_1993}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=da886e16f39671df2e1cc9208589b67d}{%
+           family={Heston},
+           familyi={H\bibinitperiod},
+           given={Steven\bibnamedelima L.},
+           giveni={S\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{da886e16f39671df2e1cc9208589b67d}
+      \strng{fullhash}{da886e16f39671df2e1cc9208589b67d}
+      \strng{fullhashraw}{da886e16f39671df2e1cc9208589b67d}
+      \strng{bibnamehash}{da886e16f39671df2e1cc9208589b67d}
+      \strng{authorbibnamehash}{da886e16f39671df2e1cc9208589b67d}
+      \strng{authornamehash}{da886e16f39671df2e1cc9208589b67d}
+      \strng{authorfullhash}{da886e16f39671df2e1cc9208589b67d}
+      \strng{authorfullhashraw}{da886e16f39671df2e1cc9208589b67d}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{I use a new technique to derive a closed-form solution for the price of a European call option on an asset with stochastic volatility. The model allows arbitrary correlation between volatility and spot-asset returns. I introduce stochastic interest rates and show how to apply the model to bond options and foreign currency options. Simulations show that correlation between volatility and the spot asset's price is important for explaining return skewness and strike-price biases in the Black-Scholes (1973) model. The solution technique is based on characteristic functions and can be applied to other problems.}
+      \field{issn}{0893-9454}
+      \field{journaltitle}{The Review of Financial Studies}
+      \field{note}{Publisher: [Oxford University Press, Society for Financial Studies]}
+      \field{number}{2}
+      \field{title}{A Closed-Form Solution for Options with Stochastic Volatility with Applications to Bond and Currency Options}
+      \field{urlday}{4}
+      \field{urlmonth}{9}
+      \field{urlyear}{2025}
+      \field{volume}{6}
+      \field{year}{1993}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{327\bibrangedash 343}
+      \range{pages}{17}
+      \verb{doi}
+      \verb 10.1093/rfs/6.2.327
+      \endverb
+      \verb{urlraw}
+      \verb https://www.jstor.org/stable/2962057
+      \endverb
+      \verb{url}
+      \verb https://www.jstor.org/stable/2962057
+      \endverb
+    \endentry
+    \entry{kyprianou_fluctuations_2014}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ecf1ad01cc8b6591c54e614f80ae0b29}{%
+           family={Kyprianou},
+           familyi={K\bibinitperiod},
+           given={Andreas\bibnamedelima E.},
+           giveni={A\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Berlin, Heidelberg}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \strng{fullhash}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \strng{fullhashraw}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \strng{bibnamehash}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \strng{authorbibnamehash}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \strng{authornamehash}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \strng{authorfullhash}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \strng{authorfullhashraw}{ecf1ad01cc8b6591c54e614f80ae0b29}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{isbn}{978-3-642-37631-3 978-3-642-37632-0}
+      \field{langid}{english}
+      \field{series}{Universitext}
+      \field{shorttitle}{Fluctuations of Lévy Processes with Applications}
+      \field{title}{Fluctuations of Lévy Processes with Applications: Introductory Lectures}
+      \field{urlday}{8}
+      \field{urlmonth}{12}
+      \field{urlyear}{2025}
+      \field{year}{2014}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.1007/978-3-642-37632-0
+      \endverb
+      \verb{urlraw}
+      \verb https://link.springer.com/10.1007/978-3-642-37632-0
+      \endverb
+      \verb{url}
+      \verb https://link.springer.com/10.1007/978-3-642-37632-0
+      \endverb
+      \keyw{quantitative finance,60G50,60G51,60G52,Potential Analysis,Probability Theory,Stochastic Processes}
+    \endentry
+    \entry{merton_theory_1973}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=b1e2894bce14479f5a711418ce8f8ffa}{%
+           family={Merton},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{fullhash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{fullhashraw}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{bibnamehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authorbibnamehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authornamehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authorfullhash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authorfullhashraw}{b1e2894bce14479f5a711418ce8f8ffa}
+      \field{extraname}{1}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The long history of the theory of option pricing began in 1900 when the French mathematician Louis Bachelier deduced an option pricing formula based on the assumption that stock prices follow a Brownian motion with zero drift. Since that time, numerous researchers have contributed to the theory. The present paper begins by deducing a set of restrictions on option pricing formulas from the assumption that investors prefer more to less. These restrictions are necessary conditions for a formula to be consistent with a rational pricing theory. Attention is given to the problems created when dividends are paid on the underlying common stock and when the terms of the option contract can be changed explicitly by a change in exercise price or implicitly by a shift in the investment or capital structure policy of the firm. Since the deduced restrictions are not sufficient to uniquely determine an option pricing formula, additional assumptions are introduced to examine and extend the seminal Black-Scholes theory of option pricing. Explicit formulas for pricing both call and put options as well as for warrants and the new "down-and-out" option are derived. The effects of dividends and call provisions on the warrant price are examined. The possibilities for further extension of the theory to the pricing of corporate liabilities are discussed.}
+      \field{issn}{0005-8556}
+      \field{journaltitle}{The Bell Journal of Economics and Management Science}
+      \field{note}{Publisher: [Wiley, {RAND} Corporation]}
+      \field{number}{1}
+      \field{title}{Theory of Rational Option Pricing}
+      \field{urlday}{24}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{4}
+      \field{year}{1973}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{141\bibrangedash 183}
+      \range{pages}{43}
+      \verb{doi}
+      \verb 10.2307/3003143
+      \endverb
+      \verb{urlraw}
+      \verb https://www.jstor.org/stable/3003143
+      \endverb
+      \verb{url}
+      \verb https://www.jstor.org/stable/3003143
+      \endverb
+    \endentry
+    \entry{merton_pricing_1974}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=b1e2894bce14479f5a711418ce8f8ffa}{%
+           family={Merton},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{fullhash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{fullhashraw}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{bibnamehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authorbibnamehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authornamehash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authorfullhash}{b1e2894bce14479f5a711418ce8f8ffa}
+      \strng{authorfullhashraw}{b1e2894bce14479f5a711418ce8f8ffa}
+      \field{extraname}{2}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{issn}{0022-1082}
+      \field{journaltitle}{The Journal of Finance}
+      \field{note}{Publisher: [American Finance Association, Wiley]}
+      \field{number}{2}
+      \field{shorttitle}{On the Pricing of Corporate Debt}
+      \field{title}{On the Pricing of Corporate Debt: The Risk Structure of Interest Rates}
+      \field{urlday}{24}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{volume}{29}
+      \field{year}{1974}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{449\bibrangedash 470}
+      \range{pages}{22}
+      \verb{doi}
+      \verb 10.2307/2978814
+      \endverb
+      \verb{urlraw}
+      \verb https://www.jstor.org/stable/2978814
+      \endverb
+      \verb{url}
+      \verb https://www.jstor.org/stable/2978814
+      \endverb
+    \endentry
+    \entry{sato_levy_2013}{book}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=1bb282830d01c5398cbd88176ce65ed4}{%
+           family={Sato},
+           familyi={S\bibinitperiod},
+           given={Ken-iti},
+           giveni={K\bibinithyphendelim i\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {Cambridge}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge Univ. Press}%
+      }
+      \strng{namehash}{1bb282830d01c5398cbd88176ce65ed4}
+      \strng{fullhash}{1bb282830d01c5398cbd88176ce65ed4}
+      \strng{fullhashraw}{1bb282830d01c5398cbd88176ce65ed4}
+      \strng{bibnamehash}{1bb282830d01c5398cbd88176ce65ed4}
+      \strng{authorbibnamehash}{1bb282830d01c5398cbd88176ce65ed4}
+      \strng{authornamehash}{1bb282830d01c5398cbd88176ce65ed4}
+      \strng{authorfullhash}{1bb282830d01c5398cbd88176ce65ed4}
+      \strng{authorfullhashraw}{1bb282830d01c5398cbd88176ce65ed4}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Revisted edition, corrected paperback edition}
+      \field{isbn}{978-0-521-55302-5 978-1-107-65649-9}
+      \field{number}{68}
+      \field{pagetotal}{521}
+      \field{series}{Cambridge studies in advanced mathematics}
+      \field{title}{Lévy processes and infinitely divisible distributions}
+      \field{year}{2013}
+      \field{dateera}{ce}
+    \endentry
+    \entry{schilling_introduction_2016}{misc}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=7a00c127965d37c19f5761f42a49433d}{%
+           family={Schilling},
+           familyi={S\bibinitperiod},
+           given={René\bibnamedelima L.},
+           giveni={R\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{7a00c127965d37c19f5761f42a49433d}
+      \strng{fullhash}{7a00c127965d37c19f5761f42a49433d}
+      \strng{fullhashraw}{7a00c127965d37c19f5761f42a49433d}
+      \strng{bibnamehash}{7a00c127965d37c19f5761f42a49433d}
+      \strng{authorbibnamehash}{7a00c127965d37c19f5761f42a49433d}
+      \strng{authornamehash}{7a00c127965d37c19f5761f42a49433d}
+      \strng{authorfullhash}{7a00c127965d37c19f5761f42a49433d}
+      \strng{authorfullhashraw}{7a00c127965d37c19f5761f42a49433d}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{These lecture notes are an extended version of my lectures on Lévy and Lévy-type (Feller) processes given at the "Second Barcelona Summer School on Stochastic Analysis" 2014 organized by the Centre de Recerca Matemaatica ({CRM}). The lectures are aimed at advanced graduate and {PhD} students. In order to read these notes, one should have sound knowledge of measure theoretic probability theory and some background in stochastic processes, as it is covered in my books "Measures, Integals and Martingales" (Cambridge University Press) and "Brownian Motion" (de Gruyter). My purpose in these lectures is to give an introduction to Levy processes, and to show how one can extend this approach to space inhomogeneous processes which behave locally like Lévy processes: Lévy-type or Feller processes. These course notes will be published, together Davar Khoshnevisan's notes on "Invariance and Comparison Principles for Parabolic {SPDEs}" as "From Lévy-Type Processes to Parabolic {SPDEs}" by the {CRM}, Barcelona and Birkäuser, Cham 2017 ({ISBN}: 978-3-319-34119-4). The {arXiv}-version and the published version may differ in layout, pagination and wording, but not in content}
+      \field{day}{17}
+      \field{eprinttype}{arxiv}
+      \field{month}{10}
+      \field{number}{{arXiv}:1603.00251}
+      \field{title}{An Introduction to Lévy and Feller Processes. Advanced Courses in Mathematics - {CRM} Barcelona 2014}
+      \field{urlday}{24}
+      \field{urlmonth}{11}
+      \field{urlyear}{2025}
+      \field{year}{2016}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.1603.00251
+      \endverb
+      \verb{eprint}
+      \verb 1603.00251 [math]
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1603.00251
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1603.00251
+      \endverb
+      \keyw{Mathematics - Probability}
+    \endentry
+  \enddatalist
+  \missing{coxOptionPricingSimplified1979a}
+  \missing{gouldTransactionsCostsRelationship1974}
+  \missing{kahnMethodsReducingSample1953}
+  \missing{klemkoskyPutCallParityMarket1979}
+  \missing{kolmogorovFoundationsTheoryProbability2013}
+  \missing{lecuyerGoodParametersImplementations1999}
+  \missing{williamsProbabilityMartingales2018}
+\endrefsection
 \endinput
 

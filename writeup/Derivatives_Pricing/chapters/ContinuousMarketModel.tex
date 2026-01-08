@@ -133,7 +133,7 @@ a trading strategy (or dynamic portfolio process). (The conditions ensure that t
 	\end{enumerate}
 \end{defn}
 
-\begin{xtip}
+\begin{xtip}{Interpretation of Self-Financing Condition}{InterpretationSelfFinancing}
 	\begin{enumerate}[label=(\roman*)]
 		\item The financial implications of the above equations are that all changes in the wealth of the portfolio are due to capital gains, as opposed to withdrawals of cash or injections of new funds.
 		\item The definition of a trading strategy includes regularity assumptions in order to ensure the existence of stochastic integrals. In the current rather general setup these conditions are flexible enough to allow a discussion of the no-arbitrage condition; however, they prove too restrictive for the question of market completeness (see below).
@@ -200,7 +200,7 @@ It is convenient to reformulate the self-financing condition in terms of the dis
 	Of course, \(V_{\varphi}(t) \ge 0\) if and only if \(\widetilde{V}_{\varphi}(t) \ge 0\).
 \end{prop}
 
-\begin{xtip}
+\begin{xtip}{Construction of Self-Financing Strategies}{ConstructionSelfFinancing}
 	The above result shows that a self-financing strategy is completely determined by its initial value and the components \(\varphi_1, \dots, \varphi_d\). In other words, any set of predictable processes \(\varphi_1, \dots, \varphi_d\) such that the stochastic integrals \(\int \varphi_i \di \widetilde{S}_i\) exist can be uniquely extended to a self-financing strategy \(\varphi\) with specified initial value \(\widetilde{V}_{\varphi}(0)=v\) by setting
 
 	\[
@@ -272,3 +272,232 @@ This observation is the key to our first central result:
 \begin{thm}{Market Model Arbitrage}{MarketModelNoArbitrage}
 	Assume $\scP \neq \emptyset$. Then the market model contains no arbitrage opportunities in $\Phi$.
 \end{thm}
+
+\begin{proof}
+	For any $\varphi \in \Phi$ and under any $\bQ \in \scP$ $\tilde{V}_{\varphi}(t)$ is a supermartingale by \Cref{prop:ValueProcessMartingale}. That is,
+	\[
+		\E_{\bQ}\left(\tilde{V}_{\varphi}(t) \middle| \scF_u\right) \le \tilde{V}_{\varphi}(u), \text{ for all } u \le t \le T.
+	\]
+	For $\varphi \in \Phi$ to be an arbitrage opportunity we must have $\tilde{V}_{\varphi}(0) = V_{\varphi}(0) = 0$. So
+	\[
+		\E_{\bQ}\left(\tilde{V}_{\varphi}(t)\right) \le 0, \text{ for all } 0 \le t \le T.
+	\]
+	Now $\varphi$ is tame, so $\tilde{V}_{\varphi}(t) \ge 0$, $0 \le t \le T$, implying $\E_{\bQ}\left(\tilde{V}_{\varphi}(t)\right) = 0$, $0 \le t \le T$, and in particular $\E_{\bQ}\left(\tilde{V}_{\varphi}(T)\right) = 0$. But an arbitrage opportunity $\varphi$ also has to satisfy $\Pm(V_{\varphi}(T) \ge 0) = 1$, and since $\bQ \sim \Pm$, this means $\bQ(V_{\varphi}(T) \ge 0) = 1$. Both together yield
+	\[
+		\bQ(V_{\varphi}(T) > 0) = \Pm(V_{\varphi}(T) > 0) = 0,
+	\]
+	and hence the result follows.
+\end{proof}
+
+The following fundamental theorem of asset pricing is proved in [55].
+
+\begin{thm}{Fundamental Theorem of Asset Pricing}{FundamentalTheoremOfAssetPricing}
+	There exists an equivalent martingale measure for the financial market model $\cM(\Pm)$ if and only if the condition \textit{NFLVR} holds true.
+\end{thm}
+
+\subsection{Risk-neutral Pricing}
+
+We now assume that there exists a strong equivalent martingale measure $\Pm^*$ (which implies that there are no arbitrage opportunities with respect to $\Phi$ in the financial market model $\cM$.) Until further notice we use $\Pm^*$ as our reference measure, and when using the terms martingale and local martingale we always assume that the underlying probability measure is $\Pm^*$. In particular, we restrict our attention to contingent claims $X$ such that $X/S_0(T) \in L^1(\scF, \Pm^*)$.
+
+We now define a further subclass of trading strategies:
+
+\begin{defn}{Admissible Strategy}{AdmissibleStrategy}
+	A self-financing trading strategy $\varphi$ is called \textit{($\Pm^*$-) admissible} if the relative gains process
+	\[
+		\tilde{G}_{\varphi}(t) = \int_0^t \varphi(u)d\tilde{S}(u)
+	\]
+	is a ($\Pm^*$-) martingale. The class of all ($\Pm^*$-) admissible trading strategies is denoted $\Phi(\Pm^*)$.
+\end{defn}
+
+By definition $\tilde{S}$ is a martingale, and $\tilde{G}$ is the stochastic integral with respect to $\tilde{S}$. By \Cref{xtip:ConstructionSelfFinancing} we see that any sufficiently integrable processes $\varphi_1, \dots, \varphi_d$ give rise to $\Pm^*$-admissible trading strategies.
+
+We do not assume that admissible trading strategies are tame. However, since we only used the supermartingale property of \(\tilde{G}_{\varphi}\) in the proof of \Cref{thm:MarketModelNoArbitrage}, we can repeat the above argument to obtain
+
+\begin{thm}{No Arbitrage for Admissible Strategies}{NoArbitrageForAdmissibleStrategies}
+	The financial market model $\cM$ contains no arbitrage opportunities in $\Phi(\Pm^*)$.
+\end{thm}
+
+Under the assumption that no arbitrage opportunities exist, the question of pricing and hedging a contingent claim reduces to the existence of replicating self-financing trading strategies. Formally:
+
+\begin{defn}{Attainable Claims and Market Completeness}{AttainableClaimsAndMarketCompleteness}
+	\begin{enumerate}[label=(\roman*), leftmargin=*]
+		\item A contingent claim $X$ is called \textit{attainable} if there exists an admissible trading strategy $\varphi \in \Phi(\Pm^*)$ such that
+		      \[
+			      V_{\varphi}(T) = X.
+		      \]
+		      Such a $\varphi$ is called a \textit{replicating strategy} for $X$.
+		\item The financial market model $\cM$ is \textit{complete} if every contingent claim is attainable.
+	\end{enumerate}
+\end{defn}
+
+Again we emphasise that this depends on the class of trading strategies. On the other hand, it does not depend on the num\'{e}raire: it is an easy exercise to show that if a contingent claim is attainable in a given num\'{e}raire it is also attainable in any other num\'{e}raire and the replicating strategies are the same.
+
+If a contingent claim $X$ is attainable, $X$ can be replicated by a portfolio $\varphi \in \Phi(\Prob^*)$. This means that holding the portfolio and holding the contingent claim are equivalent from a financial point of view. In the absence of arbitrage the (arbitrage) price process $\Pi_X(t)$ of the contingent claim must therefore satisfy
+\[
+	\Pi_X(t) = V_{\varphi}(t).
+\]
+Of course the questions arise of what will happen if $X$ can be replicated by more than one portfolio, and what the relation of the price process to the equivalent martingale measure(s) is. The following central theorem is the key to answering these questions:
+
+\begin{thm}{Risk-Neutral Valuation Formula}{RiskNeutralValuationFormula}
+	The arbitrage price process of any attainable claim is given by the risk-neutral valuation formula
+	\begin{equation}
+		\Pi_X(t) = S_0(t)\E_{\Prob^*} \left[ \frac{X}{S_0(T)} \Bigg| \cF_t \right].
+	\end{equation}
+\end{thm}
+
+\begin{proof}
+	Since $X$ is attainable, there exists a replicating strategy $\varphi \in \Phi(\Prob^*)$ such that $V_{\varphi}(T) = X$ and $\Pi_X(t) = V_{\varphi}(t)$. Since $\varphi \in \Phi(\Prob^*)$ the discounted value process $\tilde{V}_{\varphi}(t)$ is a martingale, and hence
+	\begin{align*}
+		\Pi_X(t) & = V_{\varphi}(t) = S_0(t)\tilde{V}_{\varphi}(t)                                                                                                       \\
+		         & = S_0(t)\E_{\Prob^*} \left[ \tilde{V}_{\varphi}(T) \Big| \cF_t \right] = S_0(t)\E_{\Prob^*} \left[ \frac{V_{\varphi}(T)}{S_0(T)} \Bigg| \cF_t \right] \\
+		         & = S_0(t)\E_{\Prob^*} \left[ \frac{X}{S_0(T)} \Bigg| \cF_t \right].
+	\end{align*}
+\end{proof}
+
+The uniqueness question is immediate from the above theorem:
+
+\begin{cor}{Uniqueness of Replicating Portfolio Value}{UniquenessOfReplicatingPortfolioValue}
+	For any two replicating portfolios $\varphi, \psi \in \Phi(\Prob^*)$ we have
+	\[
+		V_{\varphi}(t) = V_{\psi}(t).
+	\]
+\end{cor}
+
+\begin{xattention}{Choice of Martingale Measure}{ChoiceOfMartingaleMeasure}
+	The above argument addresses only the case of different replicating portfolios for $X$ in $\Phi(\Prob^*)$. Of course the choice of $\Prob^*$ was itself completely arbitrary, and we could have several - indeed, many - equivalent martingale measures $\bQ$. This makes the definition of admissible strategies with respect to different martingale measures somewhat unsatisfactory. However, if we combine our previous two definitions and call a self-financing trading strategy $\varphi$ admissible, if $\varphi$ is tame and $\bQ$-admissible for some $\bQ \in \scP$, and $X$ attainable, if there exists an admissible $\varphi$ replicating it, we show that for admissible $\varphi_1 \in \Phi(\bQ_1)$ and $\varphi_2 \in \Phi(\bQ_2)$ replicating $X$ we have
+	\[
+		\E_{\bQ_1} \left[ \frac{X}{S_0(T)} \Bigg| \cF_t \right] = \E_{\bQ_2} \left[ \frac{X}{S_0(T)} \Bigg| \cF_t \right],
+	\]
+	implying that the arbitrage price process is unique. More generally, one can even show that
+	\[
+		\Pi_X(0) = \sup_{\bQ \in \scP} S_0(0)\E_{\bQ} \left[ \frac{X}{S_0(T)} \Bigg| \cF_t \right] = \inf_{\varphi \in \theta(X)} V_{\varphi}(0),
+	\]
+	where $\theta(X)$ is the class of all admissible (in the wider sense) trading strategies replicating $X$.
+\end{xattention}
+
+\begin{xtip}{Existence of Equivalent Martingale Measures}{ExistenceOfEMM}
+	The question of existence of (strong) equivalent martingale measures for a given stochastic process $S$ in our market model is closely related to properties of the stochastic (Doléans) exponential $\mathcal{E}(U)$. Loosely speaking, a probability measure $\bQ$ on $(\Omega, \cF_T)$ is equivalent to the underlying probability measure $\Prob$ if the Radon-Nikodým derivative $d\bQ/d\Prob$ is of the form $\mathcal{E}(U)$ for some local martingale $U$.
+\end{xtip}
+
+For pure pricing purposes it is sufficient to find a strong equivalent martingale measure, but for risk-management purposes it is more important to find the replicating portfolio. We have the following useful result, which shows that hedging is equivalent to the existence of a stochastic integral representation of the discounted claim.
+
+\begin{lem}{Integral Representation Implies Attainability}{IntegralRepImpliesAttainability}
+	Assume that the discounted contingent claim $X/S_0(T)$ is $\Prob^*$-integrable. If the $(\Prob^*)$-martingale $M$ defined by
+	\[
+		M(t) = \E_{\Prob^*} \left[ \frac{X}{S_0(T)} \Bigg| \cF_t \right]
+	\]
+	admits an integral representation of the form
+	\[
+		M(t) = x + \sum_{i=1}^d \int_0^t \varphi_i(u) \di \tilde{S}_i(u),
+	\]
+	with $\varphi_1, \dots, \varphi_d$ predictable and locally bounded, then $X$ is attainable.
+\end{lem}
+
+\begin{proof}
+	We are looking for a trading strategy $\varphi \in \Phi(\Prob^*)$ such that $V_{\varphi}(T) = X$. We use the components $\varphi_1, \dots, \varphi_d$ from the definition of the integral representation of $M$ and then define $\varphi_0$ as in \Cref{xtip:ConstructionSelfFinancing}, with $v=x$. Then $\varphi = (\varphi_0, \varphi_1, \dots, \varphi_d)$ is a self-financing trading strategy with
+	\[
+		\tilde{V}_{\varphi}(t) = v + \tilde{G}_{\varphi}(t) = x + \sum_{i=1}^d \int_0^t \varphi_i(u) \di \tilde{S}_i(u) = M(t).
+	\]
+	By definition $M$ is a non-negative martingale, so $\varphi \in \Phi(\Prob^*)$ follows, and also by definition
+	\[
+		V_{\varphi}(T) = S_0(T)\tilde{V}_{\varphi}(T) = S_0(T)M(T) = S_0(T)\frac{X}{S_0(T)} = X.
+	\]
+\end{proof}
+
+We thus see that (given some integrability conditions) attainability, and hence completeness, is closely linked to martingale representation theorems. Statement and proofs of the martingale representation property require rather technical definitions involving the fine structure of the filtration $\cF$. Moreover, in a general set-up the conditions on the process $\varphi$ (the integrand) no longer guarantee that $\varphi$ may be used as a suitable trading strategy.
+
+We close by stating the following partial analogue of the completeness theorem in the discrete setting:
+
+\begin{thm}{Restricted Completeness}{RestrictedCompleteness}
+	If the strong martingale measure $\Prob^*$ is the unique martingale measure for the financial market model $\cM$, then $\cM$ is complete, in the restricted sense that every contingent claim $X$ satisfying
+	\[
+		\frac{X}{S_0(T)} \in L^1(\cF, \Prob^*)
+	\]
+	is attainable.
+\end{thm}
+
+\subsection{Change of Num\'{e}raire}
+
+We now develop the technique of change of num\'{e}raire, which will be extremely useful in the valuation of contingent claims, and also for deduction of theoretical results.
+
+We put ourselves in the following framework. Assume that we used \(S_0(t)\) as num\'{e}raire, and that there exists an equivalent martingale measure \(\Prob^*\).
+
+\begin{thm}{Numéraire Change Measure}{NumeraireChangeMeasure}
+	Let $X(t)$ be a non-dividend-paying num\'{e}raire such that $X(t)/S_0(t)$ is a $\Prob^*$-martingale. Then there exists a probability measure $\bQ_X$, defined by its Radon-Nikodým derivative $\eta(T)$ with respect to $\Prob^*$,
+	\[
+		\eta(t) = \frac{\di \bQ_X}{\di \Prob^*} \bigg|_{\cF_t} = \frac{X(t)}{X(0)S_0(t)},
+	\]
+	such that:
+	\begin{enumerate}[label=(\roman*), ref=(\roman*), leftmargin=*]
+		\item the basic security prices discounted with respect to $X$ are $\bQ_X$-local martingales;
+		\item if a contingent claim $Y$ is attainable under $(S_0(t), \Prob^*)$, then it is attainable under $(X(t), \bQ_X)$, and the replicating portfolio is the same. So the arbitrage price processes, given by the risk-neutral valuation formula, coincide.
+	\end{enumerate}
+\end{thm}
+
+\begin{proof}
+	\begin{enumerate}[label=(\roman*), leftmargin=*]
+		\item Denote by $\bar{Z} = Z(t)/X(t)$ the relative price of a security $Z$ (it may be one of the components $S_i$) with respect to the num\'{e}raire $X(t)$. Since $\eta(t) = X(t)/X(0)S_0(t)$ is a $\Prob^*$-martingale we can use the Bayes formula and the $\Prob^*$-martingale property of $Z(t)/S_0(t)$ to get for $0 \le u \le t$
+		      \begin{align*}
+			      \E_{\bQ_X} \left[ \bar{Z}(t) \middle| \cF_u \right]
+			       & = \frac{1}{\eta(u)} \E_{\Prob^*} \left[ \bar{Z}(t)\eta(t) \middle| \cF_u \right]                             \\
+			       & = \frac{X(0)S_0(u)}{X(u)} \E_{\Prob^*} \left[ \frac{Z(t)}{X(t)} \frac{X(t)}{X(0)S_0(t)} \Bigg| \cF_u \right] \\
+			       & = \frac{S_0(u)}{X(u)} \frac{Z(u)}{S_0(u)} = \frac{Z(u)}{X(u)} = \bar{Z}(u).
+		      \end{align*}
+		      So the basic securities are martingales, and hence so is any portfolio.
+		\item If $Y$ is attainable under $\Prob^*$, then there exists a $\Prob^*$-admissible portfolio $\varphi$ such that $V_{\varphi}(T) = Y$, and by the risk-neutral valuation formula
+		      \[
+			      V_{\varphi}(t) = S_0(t)\E_{\Prob^*} \left[ \frac{Y}{S_0(T)} \Bigg| \cF_t \right].
+		      \]
+		      Using again the Bayes formula we obtain
+		      \begin{align*}
+			      \E_{\bQ_X} \left[ \frac{Y}{X(T)} \Bigg| \cF_t \right]
+			       & = \frac{1}{\eta(t)} \E_{\Prob^*} \left[ \frac{Y}{X(T)} \eta(T) \Bigg| \cF_t \right]                       \\
+			       & = \frac{X(0)S_0(t)}{X(t)} \E_{\Prob^*} \left[ \frac{Y}{X(T)} \frac{X(T)}{X(0)S_0(T)} \Bigg| \cF_t \right] \\
+			       & = \frac{V_{\varphi}(t)}{X(t)}.
+		      \end{align*}
+		      Since self-financing portfolios remain self-financing under a change of num\'{e}raire (by the num\'{e}raire invariance theorem), and since by part (i) $V_{\varphi}(t)$ is a $\bQ_X$-martingale, it follows that $\varphi$ is $\bQ_X$-admissible and the result follows.
+	\end{enumerate}
+\end{proof}
+
+\begin{cor}{Change of Numéraire Expectation Formula}{ChangeOfNumeraireExpectation}
+	Let $X(t), Y(t)$ be numéraires satisfying the assumptions of the above proposition and $Z$ a contingent claim. Then we have the change of numéraire formula
+	\begin{equation}\label{eq:ChangeOfNumeraireExpectationFormula}
+		X(t)\E_{\bQ_X} \left[ \frac{Z}{X(T)} \Bigg| \cF_t \right] = Y(t)\E_{\bQ_Y} \left[ \frac{Z}{Y(T)} \Bigg| \cF_t \right].
+	\end{equation}
+\end{cor}
+
+\begin{proof}
+	We can use the second part of the above proposition, or use the Radon-Nikodým derivative
+	\[
+		\frac{\di \bQ_X}{\di \bQ_Y} \bigg|_{\cF_T} = \frac{\di \bQ_X}{\di \Prob^*} \bigg/ \frac{\di \bQ_Y}{\di \Prob^*} = \frac{X(T)}{X(0)S_0(T)} \bigg/ \frac{Y(T)}{Y(0)S_0(T)} = \frac{X(T)/Y(T)}{X(0)/Y(0)}
+	\]
+	and repeat the argument.
+\end{proof}
+
+The main application of changes of num\'{e}raire is its usefulness in pricing contingent claims. In short, we claim there is a best num\'{e}raire for any given problem, and it pays to find it and work with it.
+
+\begin{prop}{Option Pricing under Numéraire Change}{OptionPricingNumeraireChange}
+	Denote by $T$ and $K$ respectively the maturity and exercise price of a European call option on an asset $Z$. The time $t=0$ price $C(0)$ of the call can be written as
+	\[
+		\frac{C(0)}{p(0,T)} = \E_{\bQ^T} \left[ (Z(T) - K)^+ \right],
+	\],
+	or
+	\[
+		C(0) = Z(0)\bQ_Z(A) - Kp(0,T)\bQ^T(A),
+	\]
+	where $A = \{ \omega : Z(T, \omega) > K \}$.
+\end{prop}
+
+\begin{proof}
+	The first expression is immediate from \Cref{thm:NumeraireChangeMeasure}. To derive the second write
+	\[
+		\frac{C(0)}{p(0,T)} = \E_{\bQ^T} \left[ (Z(T) - K)^+ \right] = \E_{\bQ^T} \left[ Z(T)\I_A \right] - K\bQ^T(A).
+	\]
+	Using $Z$ as a numéraire in the middle expectation, we have by the change of numéraire, \Cref{eq:ChangeOfNumeraireExpectationFormula}
+	\[
+		p(0,T)\E_{\bQ^T} \left[ \frac{Z(T)}{p(T,T)} \I_A \right] = Z(0)\E_Z \left[ \I_A \right],
+	\]
+	which gives the second expression.
+\end{proof}
+
+

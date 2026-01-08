@@ -6,44 +6,44 @@ We will first examine the case when the dividend yield, rather than the dividend
 The dividend payments should be used in full, either to purchase additional shares of stock or to invest in risk-free bonds (however, intertemporal consumption or infusion of funds is not allowed).
 
 \begin{defn}{Self-Financing Strategy}{SelfFinancingStrategy}
-A trading strategy $\phi = (\phi^1, \phi^2)$ is said to be \textit{self-financing} when its wealth process $V(\phi)$, which equals $V_t(\phi) = \phi^1_t S_t + \phi^2_t B_t$, satisfies
-\begin{equation}
-    dV_t(\phi) = \phi^1_t dS_t + \kappa \phi^1_t S_t dt + \phi^2_t dB_t.
-    \label{eq:WealthDynamicsBasic}
-\end{equation}
+	A trading strategy $\phi = (\phi^1, \phi^2)$ is said to be \textit{self-financing} when its wealth process $V(\phi)$, which equals $V_t(\phi) = \phi^1_t S_t + \phi^2_t B_t$, satisfies
+	\begin{equation}
+		dV_t(\phi) = \phi^1_t dS_t + \kappa \phi^1_t S_t dt + \phi^2_t dB_t.
+		\label{eq:WealthDynamicsBasic}
+	\end{equation}
 \end{defn}
 
-In view of the postulated dynamics of the stock price, formula \cref{eq:WealthDynamicsBasic} can also be represented as follows
+In view of the postulated dynamics of the stock price, formula \Cref{eq:WealthDynamicsBasic} can also be represented as follows
 \begin{equation}
-    dV_t(\phi) = \phi^1_t(\mu + \kappa)S_t dt + \phi^1_t \sigma S_t dW_t + \phi^2_t dB_t.
-    \label{eq:WealthDynamicsExpanded}
+	dV_t(\phi) = \phi^1_t(\mu + \kappa)S_t dt + \phi^1_t \sigma S_t dW_t + \phi^2_t dB_t.
+	\label{eq:WealthDynamicsExpanded}
 \end{equation}
 
 We find it convenient to introduce an auxiliary process $\tilde{S}_t = e^{\kappa t} S_t$, whose dynamics are given by the SDE
 \begin{equation}
-    d\tilde{S}_t = e^{\kappa t}(dS_t + \kappa S_t dt) = \mu_\kappa \tilde{S}_t dt + \sigma \tilde{S}_t dW_t,
-    \label{eq:AuxiliaryProcessDynamics}
+	d\tilde{S}_t = e^{\kappa t}(dS_t + \kappa S_t dt) = \mu_\kappa \tilde{S}_t dt + \sigma \tilde{S}_t dW_t,
+	\label{eq:AuxiliaryProcessDynamics}
 \end{equation}
 where we write $\mu_\kappa = \mu + \kappa$. In terms of the process $\tilde{S}$, we obtain
 \begin{equation}
-    V_t(\phi) = \phi^1_t e^{-\kappa t} \tilde{S}_t + \phi^2_t B_t
-    \label{eq:WealthProcessAuxiliary}
+	V_t(\phi) = \phi^1_t e^{-\kappa t} \tilde{S}_t + \phi^2_t B_t
+	\label{eq:WealthProcessAuxiliary}
 \end{equation}
 and
 \begin{equation}
-    dV_t(\phi) = \phi^1_t e^{-\kappa t} d\tilde{S}_t + \phi^2_t dB_t.
-    \label{eq:WealthDifferentialAuxiliary}
+	dV_t(\phi) = \phi^1_t e^{-\kappa t} d\tilde{S}_t + \phi^2_t dB_t.
+	\label{eq:WealthDifferentialAuxiliary}
 \end{equation}
 
 Also, it is not difficult to check that the discounted wealth $V^*(\phi)$ satisfies
 \begin{equation}
-    dV^*_t(\phi) = \phi^1_t e^{-\kappa t} d\tilde{S}^*_t,
-    \label{eq:DiscountedWealthSimple}
+	dV^*_t(\phi) = \phi^1_t e^{-\kappa t} d\tilde{S}^*_t,
+	\label{eq:DiscountedWealthSimple}
 \end{equation}
 where we denote $\tilde{S}^*_t = \tilde{S}_t B_t^{-1}$. More explicitly, we have that
 \begin{equation}
-    dV^*_t(\phi) = \sigma \phi^1_t e^{-\kappa t} \tilde{S}^*_t (dW_t + \sigma^{-1}(\mu_\kappa - r)dt).
-    \label{eq:DiscountedWealthExplicit}
+	dV^*_t(\phi) = \sigma \phi^1_t e^{-\kappa t} \tilde{S}^*_t (dW_t + \sigma^{-1}(\mu_\kappa - r)dt).
+	\label{eq:DiscountedWealthExplicit}
 \end{equation}
 
 \subsection{Case of Known Dividends}
@@ -51,60 +51,60 @@ We will now focus on valuing European options on a stock with declared dividends
 
 As usual, it is sufficient to consider the case $t = 0$. Assume that the dividends $\kappa_1, \dots, \kappa_m$ are to be paid at the dates $0 < T_1 < \dots < T_m < T$. We assume, in addition, that dividend payments are known in advance; that is, $\kappa_1, \dots, \kappa_m$ are real numbers. The present value of all future dividend payments equals
 \begin{equation}
-    \tilde{I}_t = \sum_{j=1}^{m} \kappa_j e^{-r(T_j - t)} \I_{[t, T]}(T_j), \quad \forall t \in [0, T],
-    \label{eq:PresentValueDividends}
+	\tilde{I}_t = \sum_{j=1}^{m} \kappa_j e^{-r(T_j - t)} \I_{[t, T]}(T_j), \quad \forall t \in [0, T],
+	\label{eq:PresentValueDividends}
 \end{equation}
 and the value of all the dividends paid after time $t$ and compounded at the risk-free rate to the option's expiry date $T$ is given by the expression
 \begin{equation}
-    I_t = \sum_{j=1}^{m} \kappa_j e^{r(T - T_j)} \I_{[t, T]}(T_j), \quad \forall t \in [0, T].
-    \label{eq:CompoundedValueDividends}
+	I_t = \sum_{j=1}^{m} \kappa_j e^{r(T - T_j)} \I_{[t, T]}(T_j), \quad \forall t \in [0, T].
+	\label{eq:CompoundedValueDividends}
 \end{equation}
-In modelling the stock price, we will separate the capital gains process from the impact of dividend payments. The capital gains process $G$ is assumed to follow the usual stochastic differential equation \citep{heathExDividendStockPrice1988}.
+In modelling the stock price, we will separate the capital gains process from the impact of dividend payments. The capital gains process $G$ is assumed to follow the usual stochastic differential equation \citep{heath_ex-dividend_1988}.
 \begin{equation}
-    dG_t = \mu G_t dt + \sigma G_t dW_t, \quad G_0 > 0,
-    \label{eq:GeometricBrownianMotionG}
+	dG_t = \mu G_t dt + \sigma G_t dW_t, \quad G_0 > 0,
+	\label{eq:GeometricBrownianMotionG}
 \end{equation}
 hence $G$ follows a geometric Brownian motion. The process $S$, representing the price of a stock that pays dividends $\kappa_1, \dots, \kappa_m$ at times $T_1, \dots, T_m$ may be introduced by setting
 \begin{equation}
-    S_t = G_t - \sum_{j=1}^{m} \kappa_j e^{r(t-T_j)} \I_{[T_j, T]}(t) = G_t - D_t,
-    \label{eq:StockPriceDividendsOne}
+	S_t = G_t - \sum_{j=1}^{m} \kappa_j e^{r(t-T_j)} \I_{[T_j, T]}(t) = G_t - D_t,
+	\label{eq:StockPriceDividendsOne}
 \end{equation}
 where the process $D$, given by the equality
 \begin{equation}
-    D_t = \sum_{j=1}^{m} \kappa_j e^{r(t-T_j)} \I_{[T_j, T]}(t),
-    \label{eq:DividendProcessOne}
+	D_t = \sum_{j=1}^{m} \kappa_j e^{r(t-T_j)} \I_{[T_j, T]}(t),
+	\label{eq:DividendProcessOne}
 \end{equation}
 accounts for the impact of ex-dividend stock price decline. Alternatively, one may put, for $t \in [0, T]$,
 \begin{equation}
-    S_t = G_t + \sum_{j=1}^{m} \kappa_j e^{-r(T_j - t)} \I_{[0, T_j]}(t) = G_t + \tilde{D}_t,
-    \label{eq:StockPriceDividendsTwo}
+	S_t = G_t + \sum_{j=1}^{m} \kappa_j e^{-r(T_j - t)} \I_{[0, T_j]}(t) = G_t + \tilde{D}_t,
+	\label{eq:StockPriceDividendsTwo}
 \end{equation}
 where $\tilde{D}$ now satisfies
 \begin{equation}
-    \tilde{D}_t = \sum_{j=1}^{m} \kappa_j e^{-r(T_j - t)} \I_{[0, T_j]}(t).
-    \label{eq:DividendProcessTwo}
+	\tilde{D}_t = \sum_{j=1}^{m} \kappa_j e^{-r(T_j - t)} \I_{[0, T_j]}(t).
+	\label{eq:DividendProcessTwo}
 \end{equation}
 Note that in the first case we have $G_0 = S_0$ and $G_T = S_T + D_T = S_T + I_0$, while in the second case $G_0 = S_0 - \tilde{D}_0 = S_0 - \tilde{I}_0$ and $G_T = S_T$.
 
-Not surprisingly, the option valuation formulas corresponding to various specifications of the stock price, that is, to \cref{eq:StockPriceDividendsOne,eq:StockPriceDividendsTwo} are not identical.
+Not surprisingly, the option valuation formulas corresponding to various specifications of the stock price, that is, to \Cref{eq:StockPriceDividendsOne,eq:StockPriceDividendsTwo} are not identical.
 
 As usual, the first step in option valuation is to introduce the notion of a self-financing trading strategy. Under the present assumptions, it is natural to assume that if $\phi = (\phi^1, \phi^2)$ is a self-financing trading strategy, then all dividends received during the option's lifetime are immediately reinvested in stocks or bonds. Hence the wealth process of any trading strategy $\phi$, which equals $V_t(\phi) = \phi_t^1 S_t + \phi_t^2 B_t$, satisfies, as usual,
 \begin{equation}
-    dV_t(\phi) = \phi_t^1 dG_t + \phi_t^2 dB_t.
-    \label{eq:WealthProcessDividends}
+	dV_t(\phi) = \phi_t^1 dG_t + \phi_t^2 dB_t.
+	\label{eq:WealthProcessDividends}
 \end{equation}
-Intuitively, since the decline of the stock price equals the dividend, the wealth of a portfolio is not influenced by dividend payments. It turns out that the resulting option valuation formula will not agree with the standard Black-Scholes result, however. In view of \cref{eq:WealthProcessDividends}, the martingale measure $\mathbb{P}^*$ for the security market model corresponds to the unique martingale measure for the discounted capital gains process $G_t^* = G_t B_t^{-1}$. Hence $\mathbb{P}^*$ can be found in exactly the same way as in the proof of \Cref{thm:ArbitragePrice}. We can also price options using the standard risk-neutral valuation approach.
+Intuitively, since the decline of the stock price equals the dividend, the wealth of a portfolio is not influenced by dividend payments. It turns out that the resulting option valuation formula will not agree with the standard Black-Scholes result, however. In view of \Cref{eq:WealthProcessDividends}, the martingale measure $\mathbb{P}^*$ for the security market model corresponds to the unique martingale measure for the discounted capital gains process $G_t^* = G_t B_t^{-1}$. Hence $\mathbb{P}^*$ can be found in exactly the same way as in the proof of \Cref{thm:ArbitragePrice}. We can also price options using the standard risk-neutral valuation approach.
 
 \begin{prop}{Valuation with Deterministic Dividends}{ValuationDividendsModelOne}
-Consider a European call option with strike price $K$ and expiry date $T$, written on a stock $S$ that pays deterministic dividends $\kappa_1, \dots, \kappa_m$ at times $T_1, \dots, T_m$. Assume that the stock price $S$ satisfies \cref{eq:GeometricBrownianMotionG,eq:StockPriceDividendsOne}. Then the arbitrage price at time $t$ of this option equals
-\begin{equation}
-    C_t^K = S_t N(h_1(S_t, T-t)) - e^{-r(T-t)}(K + I_t)N(h_2(S_t, T-t)),
-    \label{eq:CallPriceModelOne}
-\end{equation}
-where $I_t$ is given by expression \eqref{eq:CompoundedValueDividends}, and
-\begin{equation}
-    h_{1,2}(S_t, T-t) = \frac{\ln S_t - \ln(K + I_t) + (r \pm \frac{1}{2}\sigma^2)(T-t)}{\sigma\sqrt{T-t}}.
-    \label{eq:d1d2ModelOne}
-\end{equation}
+	Consider a European call option with strike price $K$ and expiry date $T$, written on a stock $S$ that pays deterministic dividends $\kappa_1, \dots, \kappa_m$ at times $T_1, \dots, T_m$. Assume that the stock price $S$ satisfies \Cref{eq:GeometricBrownianMotionG,eq:StockPriceDividendsOne}. Then the arbitrage price at time $t$ of this option equals
+	\begin{equation}
+		C_t^K = S_t N(h_1(S_t, T-t)) - e^{-r(T-t)}(K + I_t)N(h_2(S_t, T-t)),
+		\label{eq:CallPriceModelOne}
+	\end{equation}
+	where $I_t$ is given by expression \Cref{eq:CompoundedValueDividends}, and
+	\begin{equation}
+		h_{1,2}(S_t, T-t) = \frac{\ln S_t - \ln(K + I_t) + (r \pm \frac{1}{2}\sigma^2)(T-t)}{\sigma\sqrt{T-t}}.
+		\label{eq:d1d2ModelOne}
+	\end{equation}
 \end{prop}
 
