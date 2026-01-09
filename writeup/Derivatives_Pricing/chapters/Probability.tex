@@ -1,6 +1,6 @@
 \subsection{Modelling Random Experiments}
 
-Probability theory is about modelling and analysing \textit{random experiments}: experiments whose outcome cannot be determined in advance, but are nevertheless still subject to analysis. Mathematically, we can model a random experiment by defining a specific measure space \((\Omega, \cH, \Pm)\), which we call a \textit{probability space} \citep{kolmogorovFoundationsTheoryProbability2013}, where the three components are: a \textit{sample space}, a collection of \textit{events}, and a \textit{probability measure}.
+Probability theory is about modelling and analysing \textit{random experiments}: experiments whose outcome cannot be determined in advance, but are nevertheless still subject to analysis. Mathematically, we can model a random experiment by defining a specific measure space \((\Omega, \cH, \Pm)\), which we call a \textit{probability space}, where the three components are: a \textit{sample space}, a collection of \textit{events}, and a \textit{probability measure}.
 
 The \textit{sample space} \(\Omega\) of a random experiment is the set of all possible outcomes of the random experiment. Sample spaces can be countable, such as \(\N\), or uncountable, such as \(\R^n\) or \(\{0, 1\}^\infty\). The sets in the \(\sigma\)-algebra \(\cH\) are called \textit{events}. These are the subsets to which we wish to assign a probability. We can view \(\cH\) as the family of events. An event \(A\) \textit{occurs} if the outcome of the experiment is one of the elements in \(A\). The properties of \(\cH\) are natural in the context of random experiments and events:
 
@@ -11,11 +11,11 @@ The \textit{sample space} \(\Omega\) of a random experiment is the set of all po
 	\item The set \(\Omega\) itself is an event, namely the \textit{certain event} (it always occurs). Similarly, \(\emptyset\) is an event, namely the \textit{impossible event} (it never occurs).
 \end{itemize}
 
-When the sample space \(\Omega\) is \(\R\), the natural \(\sigma\)-algebra \(\cH\) is the \textit{Borel \(\sigma\)-algebra} \(\cB\). Recall that this is the smallest \(\sigma\)-algebra on \(\R\) that contains all the intervals of the form \((-\infty, x]\) for \(x \in \R\). This \(\sigma\)-algebra of sets is big enough to contain all important sets and small enough to allow us to assign a probability to all events \citep{williamsProbabilityMartingales2018}.
+When the sample space \(\Omega\) is \(\R\), the natural \(\sigma\)-algebra \(\cH\) is the \textit{Borel \(\sigma\)-algebra} \(\cB\). Recall that this is the smallest \(\sigma\)-algebra on \(\R\) that contains all the intervals of the form \((-\infty, x]\) for \(x \in \R\). This \(\sigma\)-algebra of sets is big enough to contain all important sets and small enough to allow us to assign a probability to all events.
 
 The third ingredient in the model for a random experiment is the specification of the probability of the events. In fact, this is the crucial part of the model. Mathematically, we are looking for a \textit{measure} \(\Pm\) that assigns to each event \(A\) a number \(\Pm(A)\) in \([0, 1]\) describing how likely or probable that event is.
 
-\begin{defn}{Probability Measure}{}
+\begin{defn}{Probability Measure}{ProbabilityMeasure}
 	A \textit{probability measure} is a measure on $(\Omega, \cH)$ with $\Prob(\Omega) = 1$. Thus, $\Prob$ is a mapping from $\cH$ to $[0, 1]$ with the following properties:
 	\begin{enumerate}
 		\item $\Prob(\emptyset) = 0$ and $\Prob(\Omega) = 1$.
@@ -26,6 +26,8 @@ The third ingredient in the model for a random experiment is the specification o
 		      \end{equation}
 	\end{enumerate}
 \end{defn}
+
+An event \(A\) is said to occur \textit{almost surely} (a.s.) if \(\Pm(A) = 1\).
 
 \begin{thm}{Properties of a Probability Measure}{}
 	Let $\Prob$ be a probability measure on a measurable space $(\Omega, \cH)$, and let $A, B$ and $A_1, A_2, \dots$ be events. Then, the following hold:
@@ -54,15 +56,28 @@ The third ingredient in the model for a random experiment is the specification o
 \end{thm}
 
 \subsection{Random Variables}
-Usually, the most convenient way to describe quantities of interest connected with random experiments is by using random variables.
+Usually, the most convenient way to describe quantities of interest connected with random experiments is by using random variables. Random variables allow us to use intuitive notatios for certain events, such as \(\{X \in A\}\), etc. Intuitively, we can think of a random variable \(X\) as a measurement on a random experiment that will become available \textit{tomorrow}. However, all the think work can be done \textit{today}. If for each possible outcome \(\omega\), the measurement is \(X(\omega)\), we can specify today probabilities such as \(\Pm(X \in A)\).
 
-\begin{defn}{Random Variable}{}
+We can translate our intuitive notion of a random variable into rigorous mathematics by defining a random variable to be a measurable function from \((\Omega, \cH)\) to a measurable space \((E, \cE)\).
+
+\begin{defn}{Random Variable}{RandomVariable}
 	Let $(\Omega, \cH, \Prob)$ be a probability space and $(E, \cE)$ a measurable space. A \textit{random variable} $X$ taking values in $E$ is an $\cH/\cE$-measurable function; that is, a mapping $X : \Omega \to E$ that satisfies
 	\begin{equation}
 		X^{-1}A = \{X \in A\} = \{\omega \in \Omega : X(\omega) \in A\} \in \cH \quad \text{for all } A \in \cE.
 		\label{eq:RandomVariableDef}
 	\end{equation}
 \end{defn}
+
+Often a random experiment is described via more than one random variable. Let $(\Omega,\cH,\Pm)$ be a probability space and let $\mathbb{T}$ be an arbitrary index set, which may be countable or uncountable. Think of $\mathbb{T}$ as a set of times. For each $t \in \mathbb{T}$, let $(E_t,\cE_t)$ be a measurable space. The product measurable space of $\{(E_t,\cE_t): t \in \mathbb{T}\}$ is
+\[
+	\Big(\times_{t \in \mathbb{T}} E_t,\;\bigotimes_{t \in \mathbb{T}} \cE_t\Big).
+\]
+Each element $x \in \times_{t \in \mathbb{T}} E_t$ is of the form $x = (x_t)_{t \in \mathbb{T}}$. Often $(E_t,\cE_t)$ is the same space $(E,\cE)$ for all $t$, in which case $x$ can be viewed as a function $x:\mathbb{T} \to E$. The $\sigma$-algebra on $\times_{t \in \mathbb{T}} E_t$ is generated by the rectangles
+\begin{equation}
+	R\big((A_t)_{t \in \mathbb{T}}\big) \idef \Big\{\,x \in \times_{t \in \mathbb{T}} E_t : x_t \in A_t \text{ for each } t \in \mathbb{T}\,\Big\},
+	\label{eq:ProductRectangles}
+\end{equation}
+where $A_t \in \cE_t$ and $A_t = E_t$ except for finitely many $t$.
 
 \begin{defn}{Stochastic Process}{}
 	A collection of random variables $X \coloneqq \{X_t, t \in \mathbb{T}\}$, where $\mathbb{T}$ is any index set, is called a \textit{stochastic process}. When $\mathbb{T}$ is finite, $X$ is called a \textit{random vector}.
@@ -73,6 +88,19 @@ Usually, the most convenient way to describe quantities of interest connected wi
 \end{thm}
 
 \subsection{Probability Distributions}
+Let $(\Omega, \cH, \Pm)$ be a probability space and let $X$ be a random variable taking values
+in a set $E$ with $\sigma$-algebra $\cE$. To simplify our usage, we also say that ``$X$ takes values
+in $(E, \cE)$''. If we wish to describe our experiment via $X$, then we need to specify
+the probabilities of events such as $\set{X \in B}, B \in \cE$. In elementary probability
+theory we usually made a distinction between ``discrete'' and ``continuous'' random
+variables. However, it is sometimes better to analyse random variables in a more
+unified manner; many definitions and properties of random variables do not depend
+on whether they are ``discrete'' or ``continuous''. Moreover, some random variables
+are neither discrete nor continuous.
+
+Recall that by definition \textit{all} the sets $\set{X \in B}$ with $B \in \cE$ are events. So we
+may assign a probability to each of these events. This leads to the notion of the
+\textit{distribution} of a random variable.
 
 \begin{defn}{Probability Distribution}{}
 	Let $(\Omega, \mathcal{H}, \mathbb{P})$ be a probability space and let $X$ be a random variable taking values in $(E, \mathcal{E})$. The (\textit{probability}) \textit{distribution} of $X$ is the image measure $\mu$ of $\mathbb{P}$ under $X$. That is,
@@ -113,6 +141,18 @@ Usually, the most convenient way to describe quantities of interest connected wi
 	\end{equation*}
 \end{defn}
 
+The function \(f\) is thus the \textit{(probability) density function} (pdf) of \(X\) with respect to the measure, \(\lambda\) often taken to be the Lebesgue measure. Note that \(\mu\) is absolutely continuous with respect to \(\lambda\) in the sense that for all \(B \in \cE: \lambda(B) = 0 \implies \mu(B) = 0\).
+\begin{figure}[H]
+	\centering
+	\input{plotting/ProbabilityDensityFunction.pgf}
+	\caption{A probability density function of a numerical random variable}
+	\label{fig:ProbabilityDensityFunction}
+\end{figure}
+
+Describing an experiment via a random variable and its probability distribution or density is often more convenient than specifying the probability space. In fact, the probability space usually stays in the background. The question remains, however, whether there \textit{exists} a probability space \(\Omega, \cH, \Pm\) and a numerical random variable \(X\) for a given probability distribution. Fortunately, existence can be established for all practical probability models.
+
+The concept of independence is of great importance in the study of random experiments and the construction of probability distributions. Loosely speaking, independence is about the lack of shared information between random objects.
+
 \begin{defn}{Independent Random Variables}{}
 	Let $X$ and $Y$ be random variables taking values in $(E, \cE)$ and $(F, \cF)$, respectively. They are said to be \textit{independent} if for any $A \in \cE$ and $B \in \cF$ it holds that
 	\begin{equation}
@@ -121,6 +161,8 @@ Usually, the most convenient way to describe quantities of interest connected wi
 	\end{equation}
 \end{defn}
 
+Intuitively, this means that information regarding \(X\) does not affect our knowledge of \(Y\) and vice versa. Mathematically, \Cref{eq:IndependentRandomVariablesDef} simply states that the distribution, \(\mu\) say,of \((X,Y)\) is given by the \textit{product measure} of the distributions \(\mu_X\) of \(X\) and \(\mu_Y\) of \(Y\). We can extend the independence concept to a finite or infinite collection of random variables as follows:
+
 \begin{defn}{Independency}{}
 	We say that a collection of random variables $\{X_t, t \in \mathbb{T}\}$, with each $X_t$ taking values in $(E_t, \mathcal{E}_t)$, is an \textit{independency} if for any finite choice of indexes $t_1, \dots, t_n \in \mathbb{T}$ and sets $A_{t_1} \in \mathcal{E}_{t_1}, \dots, A_{t_n} \in \mathcal{E}_{t_n}$ it holds that
 	\begin{equation*}
@@ -128,10 +170,25 @@ Usually, the most convenient way to describe quantities of interest connected wi
 	\end{equation*}
 \end{defn}
 
-\subsection{Expectation}
-The expectation of a (numerical) random variable is a weighted average of all the values that the random variable can take.
+\begin{xattention}{Independence as a Modelling Assumption}{IndependenceAsAModellingAssumption}
+	More often than not, the independence of random variables is a model \textit{assumption}, rather than a consequence. Instead of describing a random experiment via an explicit description of \(\Omega\) and \(\Pm\), we will usually model the experiment through one or more (independent) random variables
+\end{xattention}
 
-\begin{defn}{Expectation}{}
+\subsection{Expectation}
+The expectation of a (numerical) random variable is a weighted average of all the values that the random variable can take. The expectation of a \textit{discrete} random variable \(X\) is defined as:
+\begin{equation*}
+	\E X \coloneqq \sum_x x \Prob(X = x),
+\end{equation*}
+
+and for a \textit{continuous} random variable \(X\) with pdf \(f\) it is defined as:
+\begin{equation*}
+	\E X \coloneqq \int_{-\infty}^{\infty} x f(x) \di x.
+\end{equation*}
+
+Having to define the expectation in two ways is unsatisfactory. Also, there are cases wherein random variables are neither discrete nor continuous. How should we define the expectation for these random variables? Here is the formal definition:w4
+
+
+\begin{defn}{Expectation}{Expectation}
 	Let $(\Omega, \mathcal{H}, \Prob)$ be a probability space and $X$ a numerical random variable. The \textit{expectation} of $X$ is defined as the integral
 	\begin{equation*}
 		\E X \coloneqq \Prob X = \int X \di \Prob.
