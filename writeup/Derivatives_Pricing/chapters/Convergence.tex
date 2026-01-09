@@ -1,3 +1,4 @@
+\subsection{Motivation}
 \begin{prop}{Cauchy Criteria for Convergence}{}
 	The following statements satisfy (1) $\iff$ (2) and (3) $\implies$ (2):
 	\begin{enumerate}
@@ -6,6 +7,8 @@
 		\item $\sum_n \I_{\{|x_{n+1} - x_n| > \varepsilon_n\}} < \infty$ for any $(\varepsilon_n)$ such that $c \coloneqq \sum_n \varepsilon_n < \infty$.
 	\end{enumerate}
 \end{prop}
+
+\subsection{Almost Sure Convergence}
 
 \begin{defn}{Almost Sure Convergence}{}
 	The sequence of random variables $(X_n)$ converges \textit{almost surely} ($\text{a.s.}$) to a random variable $X$ if
@@ -62,6 +65,8 @@
 	\end{enumerate}
 \end{lem}
 
+\subsection{Convergence in Probability}
+
 \begin{defn}{Convergence in Probability}{}
 	The sequence of random variables $(X_n)$ converges in probability to a random variable $X$ if, for all $\varepsilon > 0$,
 	\begin{equation*}
@@ -82,6 +87,7 @@
 	\end{equation}
 \end{prop}
 
+\subsection{Convergence in Distribution}
 \begin{defn}{Convergence in Distribution}{}
 	The sequence of random variables $(X_n)$ is said to \textit{convege in distribution} to a random variable $X$ with cdf $F$ provided that:
 	\begin{equation}
@@ -99,6 +105,8 @@
 		\item $\lim_n \E h(\vecb{X}_n) = \E h(\vecb{X})$ for all bounded continuous functions $h: \R^d \to \R$.
 	\end{enumerate}
 \end{thm}
+
+\subsection{Convergence in $L^p$ Norm}
 
 \begin{defn}{Convergence in $L^p$ Norm}{}
 	The sequence of random variables $(X_n)$ converges in $L^p$ norm (for some $p \in [1, \infty]$) to a random variable $X$, if $\|X_n\|_p < \infty$ for all $n$, $\|X\|_p < \infty$, and
@@ -156,7 +164,9 @@
 	A sequence $(X_n)$ of real-valued integrable random variables converges in $L^1$ if and only if it converges in probability and is uniformly integrable.
 \end{thm}
 
-\begin{thm}{Weak Law of Large Numbers}{}
+\subsection{Law of Large Numbers and Central Limit Theorem}
+
+\begin{thm}{Weak Law of Large Numbers}{WeakLawLargeNumbers}
 	If $X_1, X_2, \dots$ are $\iid$ with finite expectation $\mu$, then for all $\varepsilon > 0$
 	\begin{equation*}
 		\lim_{n \to \infty} \Prob(|\xbar{X}_n - \mu| > \varepsilon) = 0.
@@ -164,7 +174,7 @@
 	In other words, $\xbar{X}_n \xrightarrow{\Prob} \mu$.
 \end{thm}
 
-\begin{thm}{Strong Law of Large Numbers}{}
+\begin{thm}{Strong Law of Large Numbers}{StrongLawLargeNumbers}
 	If $X_1, X_2, \dots$ are $\iid$ with expectation $\mu$ and $\E X^2 < \infty$, then for all $\varepsilon > 0$
 	\begin{equation*}
 		\lim_{m \to \infty} \Prob \left( \sup_{n \ge m} |\xbar{X}_n - \mu| > \varepsilon \right) = 0.
@@ -172,7 +182,7 @@
 	In other words, $\xbar{X}_n \xrightarrow{\text{a.s.}} \mu$.
 \end{thm}
 
-\begin{thm}{Central Limit Theorem}{}
+\begin{thm}{Central Limit Theorem}{CentralLimitTheorem}
 	If $X_1, X_2, \dots$ are $\iid$ with finite expectation $\mu$ and finite variance $\sigma^2$, then for all $x \in \R$,
 	\begin{equation*}
 		\lim_{n \to \infty} \Prob \left( \frac{\xbar{X}_n - \mu}{\sigma/\sqrt{n}} \le x \right) = \Phi(x),
