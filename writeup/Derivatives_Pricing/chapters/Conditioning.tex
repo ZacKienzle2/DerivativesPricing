@@ -1,4 +1,7 @@
-\begin{defn}{Conditional Expectation}{}
+\subsection{Conditional Expectation}
+In elementary probability, we define the conditional expectation after defining conditional probability. In advanced probability, it is more convenient to reverse the order, as we often want to condition on $\sigma$-algebras. In what follows, $(\Omega, \cH, \Prob)$ is a probability space, $X$ a random variable, and $\cF$ a sub-$\sigma$-algebra of $\cH$; that is a $\sigma$-algebra whose every member (i.e., set) belongs to $\cH$ as well. Recall the notation $V \in \cF_+$ to mean that $V \geq 0$ and is $\cF$-measurable.
+
+\begin{defn}{Conditional Expectation}{ConditionalExpectation}
 The conditional expectation of $X$ given $\cF$, denoted $\E_{\cF} X$, is defined in two steps:
 \begin{enumerate}
     \item For $X \ge 0$, $\E_{\cF} X$ is defined as any random variable $\hat{X}$ with
@@ -9,6 +12,8 @@ The conditional expectation of $X$ given $\cF$, denoted $\E_{\cF} X$, is defined
     \item For arbitrary $X$, if $\E X$ exists (possibly $\pm \infty$), $\E_{\cF} X \coloneqq \E_{\cF} X^+ - \E_{\cF} X^-$. Otherwise, the conditional expectation is left undefined.
 \end{enumerate}
 \end{defn}
+
+Note that the conditional expectation is defined \textit{almost surely}.
 
 \begin{figure}[H]
     \centering
@@ -33,11 +38,30 @@ Let $\cF$ and $\mathcal{G}$ be sub-$\sigma$-algebras of $\cH$. Let $W$ and $X$ b
 \end{enumerate}
 \end{thm}
 
+There is an amusing way to remember repeated conditioning: the $\sigma$-algebras $\cF$ and $\cG$ represent the information about the measurement on a random experiment by a fool and a genius. The fool has no use for the genius' information,
+\[
+    \E_{\cF}\E_{\cG} X = \E_{\cF} X,
+\]
+and, sadly, the genius cannot further improve on the poor information of the fool,
+\[
+    \E_{\cG}\E_{\cF} X = \E_{\cF} X.
+\]
+
+In many applications of conditioning, we wish to take the expectation of a random variable $X$ conditional on one or more random variables or, in general, on a stochastic process $Y \coloneqq \{Y_t, t \in \bb{T}\}$, in which case $\cF = \sigma(Y) = \sigma\{Y_t, t \in \bb{T}\}$. In this case we often write
+\[
+    \E_{\cF} X = \E[X \gvn Y_t, t \in \bb{T}] = \E[X \gvn Y].
+\]
+
+When conditioning on a random variable $Y$, we can use the fact (see \Cref{thm:SigmaXNumericalRandomVariables}) that any random variable in $\sigma(Y)$, in particular $\E[X \gvn Y]$, must be a deterministic measurable function of $Y$; that is, $\E[X \gvn Y] = h(Y)$ for some measurable function $h$. This is in accordance with our use of conditional expectations in elementary probability: we first determine $h(y) \coloneqq \E[X \gvn Y = y]$ and then use $\E[X \gvn Y] = h(Y)$ in computations.
+
+
 \begin{thm}{Conditional Expectation in $L^2$}{}
 For $X \in L^2$, the conditional expectation $\E_{\cF} X$ is the orthogonal projection of $X$ onto the subspace $\mathcal{V}$ of $\cF$-measurable random variables in $L^2$.
 \end{thm}
 
-\begin{defn}{Conditional Probability for Events}{}
+\subsection{Conditional Probability and Distribution}
+
+\begin{defn}{Conditional Probability for Events}{ConditionalProbabilityEvents}
 Let $A$ and $B$ be two events with $\Prob(B) > 0$. The \textit{conditional probability} that $A$ occurs given that $B$ occurs is denoted by
 \begin{equation}
     \Prob(A \mid B) \coloneqq \frac{\Prob(A \cap B)}{\Prob(B)}.
@@ -111,6 +135,9 @@ For every standard measurable space $(E, \cE)$ there exists a version of the con
     \Pm(B_0 \times \cdots \times B_n \times E_{n+1} \times \cdots) = \pi_n(B_0 \times \cdots \times B_n), \quad B_i \in \cE_i, i = 0, \dots, n.
 \end{equation}
 
+\subsection{Existence of Probability Spaces}
+
+
 \begin{thm}{Ionescu--Tulcea's Existence Theorem}{IonescuTulceasExistenceTheorem}
     There exists a unique probability measure $\Pm$ on $(\Omega, \cH)$ such that \cref{eq:ITConsistencyCondition} holds.
 \end{thm}
@@ -141,9 +168,16 @@ For every standard measurable space $(E, \cE)$ there exists a version of the con
     then for every $\alpha \in (0, q/p)$ there is a modification $\widetilde{X}$ of $X$ that is almost surely Hölder continuous of order $\alpha$ on $[0, 1]$.
 \end{thm}
 
+\subsection{Markov Property}
+One of the most studied stochastic processes is the Markov process. In a way it can be viewed as the probabilistic analogue of a difference or differential equation, in the sense that, conditional on the past history, future increments depend only on the present state. The concepts of conditional probability and expectation are thus essential to the analysis.
+
+Throughout this section, $\bb{T}$ is some subset of $\R$ and $X \idef (X_t, t \in \bb{T})$ is a stochastic process on some probability space $(\Omega, \cH, \Prob)$, taking values in some measurable space $(E, \cE)$.
+
 \begin{defn}{Adaptedness}{Adaptedness}
     A stochastic process $X \coloneqq (X_t, t \in \bb{T})$ taking values in some measurable space $(E, \cE)$ is said to be \emph{adapted} to a filtration $\cF \coloneqq (\cF_t, t \in \bb{T})$ if for all $t \in \bb{T}$, $X_t$ is $\cF_t/\cE$-measurable.
 \end{defn}
+
+In what follows, we assume that the process $X$ is adapted to some filtration $\F \idef (\F_t, t \in \bb{T})$ --- for example, the natural filtration of $X$, in which case $\F_t \idef \sigma(X_u, u \leq t, u \in \bb{T})$. Let $\cG_t \idef \sigma(X_u, u \geq t, u \in \bb{T})$ be the \textit{future} $\sigma$-algebra of $X$ for time $t$.
 
 \begin{defn}{Markov Property}{MarkovProperty}
     $X$ is said to be \emph{Markovian} relative to $\cF$ if for every $t$, the past $\cF_t$ and the future $\cG_t$ are conditionally independent, given the present state $X_t$.
@@ -155,6 +189,23 @@ For every standard measurable space $(E, \cE)$ there exists a version of the con
         P_{s,t}P_{t,u} = P_{s,u}, \quad s < t \leq u.
     \end{equation}
 \end{defn}
+
+A Markovian process $X$ is said to admit $(P_{t,u})$ as a transition function if
+\[
+    \E[f(X_u) \gvn X_t] = (P_{t,u}f)(X_t), \quad t < u, \ f \in \cE_+.
+\]
+For $f = \I_A$ with $A \in \cE$, this means
+\[
+    \Prob(X_u \in A \gvn X_t = x) = P_{t,u}(x, A),
+\]
+giving an intuitive meaning to the transition functions.
+
+Define $P_t \idef P_{0,t}$. If $P_{t,u} = P_{u-t}$ for all $t \leq u$, the associated Markovian process $X$ is said to be \textit{time-homogeneous} and $P_t$ satisfies the \textit{semi-group property}
+\[
+    P_{t+s} = P_s P_t, \quad s, t \geq 0.
+\]
+
+Markov processes can be classified according to the nature (discrete or continuous) of their state space $E$ and time set $\bb{T}$. We call a Markovian process a \textit{Markov chain}\footnote{There is no consensus on this nomenclature. Some call a Markovian process a Markov chain if $E$ is discrete.} if $\bb{T}$ is discrete. The Markov process \textit{par excellence} in continuous time is the \Levy{} process; this includes the Wiener, Poisson, compound Poisson, and pure-jump \Levy{} processes.
 
 \begin{thm}{Generator of a Markov Jump Process}{GeneratorOfAMarkovJumpProcess}
     The infinitesimal generator of a Markov jump process with Lévy kernel $L$ is given by
