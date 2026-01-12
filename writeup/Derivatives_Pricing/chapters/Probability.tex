@@ -29,7 +29,7 @@ The third ingredient in the model for a random experiment is the specification o
 
 An event \(A\) is said to occur \textit{almost surely} (a.s.) if \(\Pm(A) = 1\).
 
-\begin{thm}{Properties of a Probability Measure}{}
+\begin{thm}{Properties of a Probability Measure}{PropertiesOfAProbabilityMeasure}
 	Let $\Prob$ be a probability measure on a measurable space $(\Omega, \cH)$, and let $A, B$ and $A_1, A_2, \dots$ be events. Then, the following hold:
 	\begin{enumerate}
 		\item (\textit{Monotonicity}): $A \subseteq B \implies \Prob(A) \le \Prob(B)$.
@@ -421,7 +421,7 @@ We conclude by highlighting some key classes of stochastic processes, including 
 	\end{enumerate}
 \end{defn}
 
-\begin{thm}{$\Levy-\Ito$ Decomposition}{}
+\begin{thm}{\Levy{}-\Ito{} Decomposition}{}
 	The process $\vecb{X} \coloneqq (\vecb{X}_t, t \ge 0)$ is a Lévy process if and only if there exists a $d$-dimensional Brownian motion process $\vecb{B} \coloneqq (\vecb{B}_t, t \ge 0)$ starting at $\vecb{0}$ and a Poisson random measure $N$ on $\R_+ \times \R^d$ that is independent of $\vecb{B}$ and has mean measure $\text{Leb} \otimes \nu$, with $\nu$ satisfying
 	\begin{equation}
 		\int_{\R^d} \nu(\di \vecb{x}) (|\vecb{x}|^2 \wedge 1) < \infty,

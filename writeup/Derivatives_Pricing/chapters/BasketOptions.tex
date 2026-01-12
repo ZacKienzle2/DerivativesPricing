@@ -2,106 +2,106 @@ A \textit{basket option}, as its name suggests, is a type of option contract tha
 
 From the analytical viewpoint, there is a close analogy between basket options and Asian options. Let us denote by $S^i$, $i=1,\dots,k$, the price processes of $k$ underlying assets; they will be referred to as stocks in what follows. In this case, it seems natural to refer to such a basket option as the \textit{stock index option} (in market practice, options on a basket of currencies are also quite common). The payoff at expiry of a basket call option is defined in the following way
 \begin{equation} \label{eq:BasketCallPayoff}
-    C_T^B \idef \biggl( \sum_{i=1}^k w_i S_T^i - K \biggr)^+ = (A_T - K)^+,
+	C_T^B \idef \biggl( \sum_{i=1}^k w_i S_T^i - K \biggr)^+ = (A_T - K)^+,
 \end{equation}
 where $w_i \ge 0$ is the weight of the $i^{\text{th}}$ asset, so that $\sum_{i=1}^k w_i = 1$. Note that $A_T$ stands for the weighted arithmetic average $A_T = \sum_{i=1}^k w_i S_T^i$. We assume that each stock price $S^i$ follows a geometric Brownian motion. More explicitly, under the martingale measure $\Pm^*$, we have
 \begin{equation} \label{eq:StockDynamicsVector}
-    dS_t^i = S_t^i (r \, dt + \hat{\sigma}_i \cdot dW_t^*)
+	dS_t^i = S_t^i (r \, dt + \hat{\sigma}_i \cdot dW_t^*)
 \end{equation}
 for some non-zero vectors $\hat{\sigma}_i \in \R^k$, where $W^* = (W^{1*}, \dots, W^{k*})$ stands for a $k$-dimensional Brownian motion under $\Pm^*$, and $r$ is the risk-free interest rate. Observe that for any fixed $i$, we can find a standard one-dimensional Brownian motion $\tilde{W}^i$ such that
 \begin{equation} \label{eq:StockDynamicsScalar}
-    dS_t^i = S_t^i (r \, dt + \sigma_i \, d\tilde{W}_t^i)
+	dS_t^i = S_t^i (r \, dt + \sigma_i \, d\tilde{W}_t^i)
 \end{equation}
 and $\sigma_i = \abs{\hat{\sigma}_i}$, where $\abs{\hat{\sigma}_i}$ is the Euclidean norm of $\hat{\sigma}_i$. Let us denote by $\rho_{i,j}$ the instantaneous correlation coefficient
 \[
-    \rho_{i,j} = \frac{\hat{\sigma}_i \cdot \hat{\sigma}_j}{\sigma_i \sigma_j} = \frac{\hat{\sigma}_i \cdot \hat{\sigma}_j}{\abs{\hat{\sigma}_i} \abs{\hat{\sigma}_j}}.
+	\rho_{i,j} = \frac{\hat{\sigma}_i \cdot \hat{\sigma}_j}{\sigma_i \sigma_j} = \frac{\hat{\sigma}_i \cdot \hat{\sigma}_j}{\abs{\hat{\sigma}_i} \abs{\hat{\sigma}_j}}.
 \]
 
-We may thus alternatively assume that the dynamics of price processes $S^i$ are given by \eqref{eq:StockDynamicsScalar}, where $\tilde{W}^i$, $i=1,\dots,k$ are one-dimensional Brownian motions, whose cross-variations satisfy $\inner{\tilde{W}^i}{\tilde{W}^j}_t = \rho_{i,j} t$ for every $i,j=1,\dots,k$. Let us return to the problem of valuation of basket options. For similar reasons as those applying to Asian options, basket options are rather intractable analytically. developed a simple technique of pricing basket options on a bivariate binomial lattice, thus generalising the standard Cox-Ross-Rubinstein methodology. Unfortunately, this numerical method is very time-consuming, especially where there are several underlying assets. To overcome this, a proposed valuation of a basket using an approximation of the weighted arithmetic mean in the form of its geometric counterpart (this follows the approach of Asian options). For a fixed $t \le T$, let us denote by $\hat{w}_i$ the modified weights
+We may thus alternatively assume that the dynamics of price processes $S^i$ are given by \Cref{eq:StockDynamicsScalar}, where $\tilde{W}^i$, $i=1,\dots,k$ are one-dimensional Brownian motions, whose cross-variations satisfy $\inner{\tilde{W}^i}{\tilde{W}^j}_t = \rho_{i,j} t$ for every $i,j=1,\dots,k$. Let us return to the problem of valuation of basket options. For similar reasons as those applying to Asian options, basket options are rather intractable analytically. developed a simple technique of pricing basket options on a bivariate binomial lattice, thus generalising the standard Cox-Ross-Rubinstein methodology. Unfortunately, this numerical method is very time-consuming, especially where there are several underlying assets. To overcome this, a proposed valuation of a basket using an approximation of the weighted arithmetic mean in the form of its geometric counterpart (this follows the approach of Asian options). For a fixed $t \le T$, let us denote by $\hat{w}_i$ the modified weights
 \begin{equation} \label{eq:ModifiedWeights}
-    \hat{w}_i = \frac{w_i S_t^i}{\sum_{j=1}^k w_j S_t^j} = \frac{w_i F_{S^i}(t, T)}{\sum_{j=1}^k w_j F_{S^j}(t, T)},
+	\hat{w}_i = \frac{w_i S_t^i}{\sum_{j=1}^k w_j S_t^j} = \frac{w_i F_{S^i}(t, T)}{\sum_{j=1}^k w_j F_{S^j}(t, T)},
 \end{equation}
 where $F_{S^i}(t, T)$ is the forward price at time $t$ of the $i^{\text{th}}$ asset for the settlement date $T$.
 
-We may rewrite \eqref{eq:BasketCallPayoff} as follows\footnote{This representation is introduced because it appears to give a better approximation of the price of a basket option than formula \eqref{eq:BasketCallPayoff}.}
+We may rewrite \Cref{eq:BasketCallPayoff} as follows\footnote{This representation is introduced because it appears to give a better approximation of the price of a basket option than formula \Cref{eq:BasketCallPayoff}.}
 \begin{equation} \label{eq:BasketRewrite}
-\begin{aligned}
-    C_T^B &= \biggl( \sum_{j=1}^k w_j F_{S^j}(t, T) \biggr) \biggl( \sum_{i=1}^k \hat{w}_i \tilde{S}_T^i - \tilde{K} \biggr)^+ \\
-    &= \biggl( \sum_{j=1}^k w_j F_{S^j}(t, T) \biggr) (\tilde{A}_T - \tilde{K})^+,
-\end{aligned}
+	\begin{aligned}
+		C_T^B & = \biggl( \sum_{j=1}^k w_j F_{S^j}(t, T) \biggr) \biggl( \sum_{i=1}^k \hat{w}_i \tilde{S}_T^i - \tilde{K} \biggr)^+ \\
+		      & = \biggl( \sum_{j=1}^k w_j F_{S^j}(t, T) \biggr) (\tilde{A}_T - \tilde{K})^+,
+	\end{aligned}
 \end{equation}
 where $\tilde{S}_T^i = S_T^i / F_{S^i}(t, T)$, $\tilde{A}_T = \sum_{i=1}^k \hat{w}_i \tilde{S}_T^i$, and
 \begin{equation} \label{eq:KtildeDef}
-    \tilde{K} = \frac{K}{\sum_{j=1}^k w_j F_{S^j}(t, T)} = \frac{e^{-r(T-t)} K}{\sum_{j=1}^k w_j S_t^j}.
+	\tilde{K} = \frac{K}{\sum_{j=1}^k w_j F_{S^j}(t, T)} = \frac{e^{-r(T-t)} K}{\sum_{j=1}^k w_j S_t^j}.
 \end{equation}
 The arbitrage price at time $t$ of a basket call option thus equals
 \[
-    C_t^B = e^{-r(T-t)} \biggl( \sum_{j=1}^k w_j F_{S^j}(t, T) \biggr) \E_{\Pm^*} \bigl( (\tilde{A}_T - \tilde{K})^+ \bigm| \cF_t \bigr),
+	C_t^B = e^{-r(T-t)} \biggl( \sum_{j=1}^k w_j F_{S^j}(t, T) \biggr) \E_{\Pm^*} \bigl( (\tilde{A}_T - \tilde{K})^+ \bigm| \cF_t \bigr),
 \]
 or equivalently,
 \begin{equation} \label{eq:BasketPriceT}
-    C_t^B = \biggl( \sum_{j=1}^k w_j S_t^j \biggr) \E_{\Pm^*} \bigl( (\tilde{A}_T - \tilde{K})^+ \bigm| \cF_t \bigr).
+	C_t^B = \biggl( \sum_{j=1}^k w_j S_t^j \biggr) \E_{\Pm^*} \bigl( (\tilde{A}_T - \tilde{K})^+ \bigm| \cF_t \bigr).
 \end{equation}
 The next step relies on an approximation of the weighted arithmetic mean $\sum_{i=1}^k \hat{w}_i \tilde{S}_T^i$ using a similarly weighted geometric mean. More specifically, we approximate the price $C_0^B$ of the basket option using the number $\hat{C}_0^B$ given by the formula (for ease of notation, we set $t = 0$ in what follows)
 \begin{equation} \label{eq:BasketApproxPrice}
-    \hat{C}_0^B = \biggl( \sum_{j=1}^k w_j S_0^j \biggr) \E_{\Pm^*} (\tilde{G}_T - \hat{K})^+,
+	\hat{C}_0^B = \biggl( \sum_{j=1}^k w_j S_0^j \biggr) \E_{\Pm^*} (\tilde{G}_T - \hat{K})^+,
 \end{equation}
 where $\tilde{G}_T = \prod_{i=1}^k (\tilde{S}_T^i)^{\hat{w}_i}$ and
 \begin{equation} \label{eq:KhatDef}
-    \hat{K} = \tilde{K} + \E_{\Pm^*} (\tilde{G}_T - \tilde{A}_T).
+	\hat{K} = \tilde{K} + \E_{\Pm^*} (\tilde{G}_T - \tilde{A}_T).
 \end{equation}
-In view of \eqref{eq:StockDynamicsVector}, we have (recall that $F_{S^i}(0, T) = e^{rT} S_0^i$)
+In view of \Cref{eq:StockDynamicsVector}, we have (recall that $F_{S^i}(0, T) = e^{rT} S_0^i$)
 \[
-    \tilde{S}_T^i = S_T^i / F_{S^i}(0, T) = e^{\hat{\sigma}_i \cdot W_T^* - \sigma_i^2 T / 2},
+	\tilde{S}_T^i = S_T^i / F_{S^i}(0, T) = e^{\hat{\sigma}_i \cdot W_T^* - \sigma_i^2 T / 2},
 \]
 and thus the weighted geometric average $\tilde{G}_T$ equals
 \begin{equation} \label{eq:GeometricAverage}
-    \tilde{G}_T = e^{c_1 \cdot W_T^* - c_2 T / 2} = e^{\eta_T - c_2 T / 2},
+	\tilde{G}_T = e^{c_1 \cdot W_T^* - c_2 T / 2} = e^{\eta_T - c_2 T / 2},
 \end{equation}
 with $\eta_T = c_1 \cdot W_T^*$, where we write $c_1 = \sum_{i=1}^k \hat{w}_i \hat{\sigma}_i$ and $c_2 = \sum_{i=1}^k \hat{w}_i \sigma_i^2$. We conclude that the random variable $\tilde{G}_T$ is log-normally distributed under $\Pm^*$.
 
-More precisely, the random variable $\eta_T$ in \eqref{eq:GeometricAverage} has Gaussian distribution with expected value $0$ and variance
+More precisely, the random variable $\eta_T$ in \Cref{eq:GeometricAverage} has Gaussian distribution with expected value $0$ and variance
 \begin{align*}
-    \Var_{\Pm^*} (\eta_T) &= \E_{\Pm^*} \biggl\{ \biggl( \sum_{i,l=1}^k \hat{w}_i \hat{\sigma}_{il} W_T^{l*} \biggr) \biggl( \sum_{j,m=1}^k \hat{w}_j \hat{\sigma}_{jm} W_T^{m*} \biggr) \biggr\} \\
-    &= \sum_{i,j,l,m=1}^k \hat{w}_i \hat{w}_j \hat{\sigma}_{il} \hat{\sigma}_{jm} \E_{\Pm^*} (W_T^{l*} W_T^{m*}) = \sum_{i,j=1}^k \hat{w}_i \hat{w}_j \hat{\sigma}_i \cdot \hat{\sigma}_j T = v^2 T,
+	\Var_{\Pm^*} (\eta_T) & = \E_{\Pm^*} \biggl\{ \biggl( \sum_{i,l=1}^k \hat{w}_i \hat{\sigma}_{il} W_T^{l*} \biggr) \biggl( \sum_{j,m=1}^k \hat{w}_j \hat{\sigma}_{jm} W_T^{m*} \biggr) \biggr\}                          \\
+	                      & = \sum_{i,j,l,m=1}^k \hat{w}_i \hat{w}_j \hat{\sigma}_{il} \hat{\sigma}_{jm} \E_{\Pm^*} (W_T^{l*} W_T^{m*}) = \sum_{i,j=1}^k \hat{w}_i \hat{w}_j \hat{\sigma}_i \cdot \hat{\sigma}_j T = v^2 T,
 \end{align*}
 where we write $v^2 = \sum_{i,j=1}^k \rho_{i,j} \hat{w}_i \hat{w}_j \sigma_i \sigma_j$. We have used here the equality $\E_{\Pm^*} (W_T^{l*} W_T^{m*}) = \delta_{lm} T$, where $\delta_{lm}$ stands for Kronecker's delta; that is, $\delta_{lm}$ equals $1$ if $l = m$ and zero otherwise. Note that
 \[
-    \E_{\Pm^*} (\tilde{A}_T) = \sum_{j=1}^k \hat{w}_j S_0^j \E_{\Pm^*} (e^{-rT} S_T^i) = \sum_{j=1}^k \hat{w}_j = 1,
+	\E_{\Pm^*} (\tilde{A}_T) = \sum_{j=1}^k \hat{w}_j S_0^j \E_{\Pm^*} (e^{-rT} S_T^i) = \sum_{j=1}^k \hat{w}_j = 1,
 \]
 and
 \[
-    \E_{\Pm^*} (\tilde{G}_T) = e^{(v^2 - c_2) T / 2} \E_{\Pm^*} (e^{\eta_T - \frac{1}{2} \Var(\eta_T)}) = e^{(v^2 - c_2) T / 2} \idef c.
+	\E_{\Pm^*} (\tilde{G}_T) = e^{(v^2 - c_2) T / 2} \E_{\Pm^*} (e^{\eta_T - \frac{1}{2} \Var(\eta_T)}) = e^{(v^2 - c_2) T / 2} \idef c.
 \]
-We conclude that $\hat{K} = \tilde{K} + c - 1$. The expectation in \eqref{eq:ApproxBasketPrice} can now be evaluated explicitly.
+We conclude that $\hat{K} = \tilde{K} + c - 1$. The expectation in \Cref{eq:ApproxBasketPrice} can now be evaluated explicitly.
 
 \begin{lem}{Gaussian Expectation}{GaussianExpectation}
-    Let $\xi$ be a Gaussian random variable on $(\Omega, \cF, \Pm)$ with expected value $0$ and variance $\sigma^2 > 0$. For any real numbers $a, b > 0$, we have
-    \begin{equation} \label{eq:GaussianExpectationFormula}
-        \E_{\Pm} (a e^{\xi - \frac{1}{2} \sigma^2} - b)^+ = a N(h) - b N(h - \sigma),
-    \end{equation}
-    where $h = \sigma^{-1} \ln(a/b) + \frac{1}{2} \sigma$.
+	Let $\xi$ be a Gaussian random variable on $(\Omega, \cF, \Pm)$ with expected value $0$ and variance $\sigma^2 > 0$. For any real numbers $a, b > 0$, we have
+	\begin{equation} \label{eq:GaussianExpectationFormula}
+		\E_{\Pm} (a e^{\xi - \frac{1}{2} \sigma^2} - b)^+ = a N(h) - b N(h - \sigma),
+	\end{equation}
+	where $h = \sigma^{-1} \ln(a/b) + \frac{1}{2} \sigma$.
 \end{lem}
 
 We have
 \[
-    \E_{\Pm^*} (\tilde{G}_T - \hat{K})^+ = \E_{\Pm^*} (c e^{\eta_T - \frac{1}{2} \Var(\eta_T)} - (\tilde{K} + c - 1))^+,
+	\E_{\Pm^*} (\tilde{G}_T - \hat{K})^+ = \E_{\Pm^*} (c e^{\eta_T - \frac{1}{2} \Var(\eta_T)} - (\tilde{K} + c - 1))^+,
 \]
 so that we may set $\xi = \eta_T$, $a = c$ and $b = \tilde{K} + c - 1$. In view of \cref{lem:GaussianExpectation}, the following result is straightforward.
 
 \begin{prop}{Approximate Basket Option Valuation}{ApproxBasketValuation}
-    The approximate value $\hat{C}_t^B$ of the price $C_t^B$ of a basket call option with strike price $K$ and expiry date $T$ equals
-    \begin{equation} \label{eq:ApproxBasketCallPrice}
-        \hat{C}_t^B = \biggl( \sum_{j=1}^k w_j S_t^j \biggr) (c N(l_1(T-t)) - (\tilde{K} + c - 1) N(l_2(T-t))),
-    \end{equation}
-    where
-    \begin{equation} \label{eq:ParameterC}
-        c = \exp \biggl\{ \biggl( \frac{1}{2} \sum_{i,j=1}^k \rho_{i,j} \hat{w}_i \hat{w}_j \sigma_i \sigma_j - \sum_{j=1}^k \hat{w}_j \sigma_j^2 \biggr) (T-t) \biggr\},
-    \end{equation}
-    and where the modified weights $\hat{w}_i$ are given by \eqref{eq:ModifiedWeights}, $\tilde{K}$ is given by \eqref{eq:KtildeDef}, and
-    \begin{equation} \label{eq:LTermsDef}
-        l_{1,2}(t) = \frac{\ln c - \ln(\tilde{K} + c - 1) \pm \frac{1}{2} v^2 t}{v \sqrt{t}}.
-    \end{equation}
+	The approximate value $\hat{C}_t^B$ of the price $C_t^B$ of a basket call option with strike price $K$ and expiry date $T$ equals
+	\begin{equation} \label{eq:ApproxBasketCallPrice}
+		\hat{C}_t^B = \biggl( \sum_{j=1}^k w_j S_t^j \biggr) (c N(l_1(T-t)) - (\tilde{K} + c - 1) N(l_2(T-t))),
+	\end{equation}
+	where
+	\begin{equation} \label{eq:ParameterC}
+		c = \exp \biggl\{ \biggl( \frac{1}{2} \sum_{i,j=1}^k \rho_{i,j} \hat{w}_i \hat{w}_j \sigma_i \sigma_j - \sum_{j=1}^k \hat{w}_j \sigma_j^2 \biggr) (T-t) \biggr\},
+	\end{equation}
+	and where the modified weights $\hat{w}_i$ are given by \Cref{eq:ModifiedWeights}, $\tilde{K}$ is given by \Cref{eq:KtildeDef}, and
+	\begin{equation} \label{eq:LTermsDef}
+		l_{1,2}(t) = \frac{\ln c - \ln(\tilde{K} + c - 1) \pm \frac{1}{2} v^2 t}{v \sqrt{t}}.
+	\end{equation}
 \end{prop}
 
-Suppose that $k=1$. In this case, $w_1 = 1$, and the arithmetic average agrees with the geometric one. Consequently, $c=1$ and \eqref{eq:ApproxBasketCallPrice} reduces to the standard Black-Scholes formula. In this approach, the weighted average $\tilde{A}_T$ in \eqref{eq:BasketPriceT} is directly replaced by a log-normally distributed random variable. Then the series expansion of the true distribution of $\tilde{A}_T$ is derived in terms of an approximating log-normal distribution. An estimate of the basket option price can thus be obtained by direct integration.
+Suppose that $k=1$. In this case, $w_1 = 1$, and the arithmetic average agrees with the geometric one. Consequently, $c=1$ and \Cref{eq:ApproxBasketCallPrice} reduces to the standard Black-Scholes formula. In this approach, the weighted average $\tilde{A}_T$ in \Cref{eq:BasketPriceT} is directly replaced by a log-normally distributed random variable. Then the series expansion of the true distribution of $\tilde{A}_T$ is derived in terms of an approximating log-normal distribution. An estimate of the basket option price can thus be obtained by direct integration.
