@@ -1,180 +1,262 @@
 \subsection{\Ito{} Integral}
 We will work with a Wiener process $W$ on a complete probability space $(\Omega, \cH, \Pm)$ with a right-continuous filtration $\cF \coloneqq (\cF_s, s \ge 0)$ and such that $W$ is adapted to $\cF$. We also use the following definition.
+
 \begin{defn}{Simple Processes}{SimpleProcesses}
-    A process $F \coloneqq (F_s, s \in [0, t])$ is called \emph{simple} if it is of the form
-    \begin{equation}\label{eq:SimpleProcessDef}
-        F_s \coloneqq \xi_0 \I_{\{0\}}(s) + \sum_{k=0}^{n-1} \xi_k \I_{(s_k, s_{k+1}]}(s), \quad s \in [0, t],
-    \end{equation}
-    where $\{s_0, \dots, s_n : 0 = s_0 < \dots < s_n = t\} =: \Pi_n, n \in \N$, is a segmentation of $[0, t]$ and $\xi_k \in \cF_{s_k}$ for all $k$.
+	A process $F \coloneqq (F_s, s \in [0, t])$ is called \emph{simple} if it is of the form
+	\begin{equation}\label{eq:SimpleProcessDef}
+		F_s \coloneqq \xi_0 \I_{\{0\}}(s) + \sum_{k=0}^{n-1} \xi_k \I_{(s_k, s_{k+1}]}(s), \quad s \in [0, t],
+	\end{equation}
+	where $\{s_0, \dots, s_n : 0 = s_0 < \dots < s_n = t\} =: \Pi_n, n \in \N$, is a segmentation of $[0, t]$ and $\xi_k \in \cF_{s_k}$ for all $k$.
 \end{defn}
-Note that the simple process in \eqref{eq:SimpleProcessDef} is right-continuous at $s = 0$ and is left-continuous at $s \in (0, t]$. \Cref{fig:SimpleProcessRealisation} shows a realisation of a simple process on $[0, 1]$ for the segmentation
-\[
-\{s_0, \dots, s_{10}\} = \{0, 0.07, 0.13, 0.19, 0.41, 0.49, 0.52, 0.67, 0.71, 0.76, 1\}.
-\]
+
+Note that the simple process in \Cref{eq:SimpleProcessDef} is right-continuous at $s = 0$ and is left-continuous at $s \in (0, t]$. \Cref{fig:SimpleProcessPath} shows a realisation of a simple process.
+
 \begin{figure}[H]
-    \centering
-    \input{plotting/simpleProcessRealisation.pgf}
-    \caption{A realisation of a simple process.}
-    \label{fig:SimpleProcessRealisation}
+	\centering
+	\input{plotting/SimpleProcessPath.pgf}
+	\caption{A path of a simple process.}
+	\label{fig:SimpleProcessPath}
 \end{figure}
 
+We will consider the interplay between the simple process $F_t$ and the Brownian motion $W(t)$ in the following way. Regard $W(t)$ as the price per share of an asset at time $t$. Since Brownian motion can take both negative and positive values, it is not a suitable model for the price of a limited-liability asset, such as a stock. Notwithstanding, for the sake of this illustration, we ignore that issue. Think of $t_0, t_1, \dots, t_{n-1}$ as the \textit{trading dates} in the asset, and think of $F_{t_0}, F_{t_1}, \dots, F_{t_{n-1}}$ as the position (number of shares) taken in the asset at each trading date and held to the next trading date. The gain from trading at each time $t$ is given by
+\begin{align}
+	I(t) & = F_{t_0}\big[W(t) - W(t_0)\big] = F_0\,W(t),                                      &  & 0 \le t \le t_1,   \\
+	I(t) & = F_0\,W(t_1) + F_{t_1}\big[W(t) - W(t_1)\big],                                    &  & t_1 \le t \le t_2, \\
+	I(t) & = F_0\,W(t_1) + F_{t_1}\big[W(t_2) - W(t_1)\big] + F_{t_2}\big[W(t) - W(t_2)\big], &  & t_2 \le t \le t_3.
+\end{align}
+and so on. In general, if $t_k \le t \le t_{k+1}$, then
+\begin{equation}\label{eq:TradingGain}
+	I(t) = \sum_{j=0}^{k-1} F_{t_j}\big[W(t_{j+1}) - W(t_j)\big] + F_{t_k}\big[W(t) - W(t_k)\big].
+\end{equation}
+
+We are now ready to define the \Ito{} Integral for simple processes
+
 \begin{defn}{\Ito{} Integral for Simple Processes}{ItoIntegralForSimpleProcesses}
-    Suppose that $F$ is a simple process of the form \cref{eq:SimpleProcessDef}, with $\int_0^t \E F_s^2 \di s < \infty$. Then, the \emph{\Ito{} integral} of $F$ with respect to $W$ over $[0, r]$ is defined as
-    \begin{equation}\label{eq:ItoIntegralSimpleDef}
-        \int_0^r F_s \di W_s \coloneqq \sum_{k=0}^{n-1} \xi_k (W_{s_{k+1} \wedge r} - W_{s_k \wedge r}), \quad r \in [0, t].
-    \end{equation}
+	Suppose that $F$ is a simple process of the form \Cref{eq:SimpleProcessDef}, with $\int_0^t \E F_s^2 \di s < \infty$. Then, the \emph{\Ito{} integral} of $F$ with respect to $W$ over $[0, r]$ is defined as
+	\begin{equation}\label{eq:ItoIntegralSimpleDef}
+		\int_0^r F_s \di W_s \coloneqq \sum_{k=0}^{n-1} \xi_k (W_{s_{k+1} \wedge r} - W_{s_k \wedge r}), \quad r \in [0, t].
+	\end{equation}
 \end{defn}
 
+The \Ito{} integral from $r$ to $t$ is naturally defined as the difference of two integrals:
+\begin{equation}
+	\int_{r}^{t} F_{s} \, \di W_{s}
+	= \int_{0}^{t} F_{s} \, \di W_{s} - \int_{0}^{r} F_{s} \, \di W_{s}.
+\end{equation}
+
+The \Ito{} integral has the important \textit{isometry} property:
+\begin{equation}
+	\E\!\left[ \left( \int_{0}^{t} F_{s} \, \di W_{s} \right)^{2} \right]
+	= \int_{0}^{t} \E\!\left[ F_{s}^{2} \right] \, \di s,
+\end{equation}
+which allows us to compute the variance of the \Ito{} integral. In fact, the \Ito{} integral satisfies the following four important properties:
+
 \begin{thm}{Properties of the \Ito{} Integral}{PropertiesOfTheItoIntegral}
-    Assume that the \Ito{} integral is well-defined. Then, for $\alpha, \beta \in \R$ and $r \in [0, t]$:
-    \begin{enumerate}
-        \item \emph{(Linearity):} $\int_0^r [\alpha F_s + \beta G_s] \di W_s = \alpha \int_0^r F_s \di W_s + \beta \int_0^r G_s \di W_s$.
-        \item \emph{(Zero mean):} $\E \int_0^r F_s \di W_s = 0$.
-        \item \emph{(Isometry):} $\E \left[ \int_0^r F_s \di W_s \times \int_0^r G_s \di W_s \right] = \int_0^r \E [F_s G_s] \di s$.
-        \item \emph{(Martingale):} $(\int_0^r F_s \di W_s, r \in [0, t])$ is an $L^2$-martingale.
-    \end{enumerate}
+	Assume that the \Ito{} integral is well-defined. Then, for $\alpha, \beta \in \R$ and $r \in [0, t]$:
+	\begin{enumerate}
+		\item \emph{(Linearity):} $\int_0^r [\alpha F_s + \beta G_s] \di W_s = \alpha \int_0^r F_s \di W_s + \beta \int_0^r G_s \di W_s$.
+		\item \emph{(Zero mean):} $\E \int_0^r F_s \di W_s = 0$.
+		\item \emph{(Isometry):} $\E \left[ \int_0^r F_s \di W_s \times \int_0^r G_s \di W_s \right] = \int_0^r \E [F_s G_s] \di s$.
+		\item \emph{(Martingale):} $(\int_0^r F_s \di W_s, r \in [0, t])$ is an $L^2$-martingale.
+	\end{enumerate}
 \end{thm}
 
 \begin{defn}{Canonical Approximation}{CanonicalApproximation}
-    For any $\cF$-adapted process $F \coloneqq (F_s, s \in [0, t])$, we define its \emph{canonical approximation} as
-    \begin{equation}\label{eq:CanonicalApproximationDef}
-        F_s^{(n)} \coloneqq F_0 \I_{\{0\}}(s) + \sum_{k=0}^{n-1} F_{s_k} \I_{(s_k, s_{k+1}]}(s), \quad s \in [0, t].
-    \end{equation}
+	For any $\cF$-adapted process $F \coloneqq (F_s, s \in [0, t])$, we define its \emph{canonical approximation} as
+	\begin{equation}\label{eq:CanonicalApproximationDef}
+		F_s^{(n)} \coloneqq F_0 \I_{\{0\}}(s) + \sum_{k=0}^{n-1} F_{s_k} \I_{(s_k, s_{k+1}]}(s), \quad s \in [0, t].
+	\end{equation}
 \end{defn}
 
+\begin{figure}[H]
+	\centering
+	\input{plotting/WienerProcessApproximation.pgf}
+	\caption{A Wiener process \(F \coloneqq (W_s, s \in [0, t])\), its canonical approximation \(F^{(n)}\) and the \Ito{} integral process \(Z^{(n)} = (\int_0^r F_s^{(n)} \di W_s, r \in [0, 1])\)}
+	\label{fig:WienerProcessApproximation}
+\end{figure}
+
+Having defined the \Ito{} integral for simple processes, we are now ready to extend the definition to more general predictable processes.
+
+\subsubsection{\Ito{} Integral for Predictable Processes}
+While simple processes of the form \Cref{eq:SimpleProcessDef} are \(\cF\)-predictable, it is not immediately clear if more general processes are also \(\cF\)-predictable. The following result shows that any process \(F \coloneqq (F_s, s \in [0, t])\) adapted to \(\cF\) and left-continuous on \((0,t]\) is not only \(\cF\)-predictable, but also \textit{indistinguishable} from any other left-continuous modificaiton \(\tilde{F}\) of \(F\); that is, if \(\Pm(F_s=\widetilde{F}_s)=1\) for all \(s \in [0,t]\), then \(\Pm(F_s = \widetilde{F}_s\) for all \(s \in [0,t]) = 1\). Moreover, \(F\) is \textit{progressively measurable}; that is, the mapping \(F : [0,t] \times \Omega \rightarrow \R\) is measurable with respect to the product \(\sigma\)-algebra \(\cB_{[0,t]} \otimes \cF_t\).
+
 \begin{thm}{Properties of Left-continuous Adapted Processes}{PropertiesOfLeftContinuousAdaptedProcesses}
-    Suppose that $F \coloneqq (F_s, s \in [0, t])$ is a process on $(\Omega, \cH, \Pm)$ that is adapted to the filtration $\cF$ and is left-continuous on $(0, t]$. Then, the following hold:
-    \begin{enumerate}
-        \item \emph{(Predictable):} The process $F$ is $\cF$-predictable (i.e., $\cF^P$-measurable).
-        \item \emph{(Progressively Measurable):} For each $t$, the mapping $F : [0, t] \times \Omega \to \R$ is jointly measurable with respect to $\cB_{[0, t]} \otimes \cF_t$.
-        \item \emph{(Indistinguishable):} If $\widetilde{F}$ is a modification of $F$ and almost surely left-continuous, then $\Pm(\cap_{s \le t} \{F_s = \widetilde{F}_s\}) = 1$.
-    \end{enumerate}
+	Suppose that $F \coloneqq (F_s, s \in [0, t])$ is a process on $(\Omega, \cH, \Pm)$ that is adapted to the filtration $\cF$ and is left-continuous on $(0, t]$. Then, the following hold:
+	\begin{enumerate}
+		\item \emph{(Predictable):} The process $F$ is $\cF$-predictable (i.e., $\cF^P$-measurable).
+		\item \emph{(Progressively Measurable):} For each $t$, the mapping $F : [0, t] \times \Omega \to \R$ is jointly measurable with respect to $\cB_{[0, t]} \otimes \cF_t$.
+		\item \emph{(Indistinguishable):} If $\widetilde{F}$ is a modification of $F$ and almost surely left-continuous, then $\Pm(\cap_{s \le t} \{F_s = \widetilde{F}_s\}) = 1$.
+	\end{enumerate}
 \end{thm}
 
+\begin{proof}
+	Consider the canonical approximation \(F^{(n)}\) of \(F\), given in \eqref{eq:CanonicalApproximationDef}, where the segmentation \(\Pi_n\) satisfies \(\mathrm{mesh}(\Pi_n) \to 0\).
+
+	For \(s = 0\) and \(\omega \in \Omega\), we have \(F_0(\omega) = F_0^{(n)}(\omega)\) by construction. For any \(s \in (0, t]\), choose \(k\) (depending on \(n\) and \(s\)) with \(s_k < s \le s_{k+1}\). Define
+	\begin{equation}\label{eq:EpsilonNs}
+		\varepsilon_{n,s} \idef s - s_k, \qquad 0 < \varepsilon_{n,s} \le \mathrm{mesh}(\Pi_n).
+	\end{equation}
+	Then
+	\begin{equation}\label{eq:FnConvergencePointwise}
+		F_s - F^{(n)}_s
+		= F_s - F_{s_k} + \underbrace{F_{s_k} - F^{(n)}_s}_{=\,0}
+		= F_s - F_{s - \varepsilon_{n,s}},
+	\end{equation}
+	and the last difference vanishes as \(n \uparrow \infty\) because \(F\) is left-continuous. Hence, \(F^{(n)}_s(\omega) \to F_s(\omega)\) for all \(s \in [0, t]\) and \(\omega \in \Omega\).
+
+	Since \(F\) is adapted to \(\F\), Example~7.4 implies that each simple process \(F^{(n)}\) is \(\F\)-predictable. Consequently, for each \(t\), the mapping \(F^{(n)} : [0, t] \times \Omega \to \R\) is jointly measurable with respect to \(\cB_{[0, t]} \otimes \F_t\). Because pointwise limits of measurable functions are measurable, the same properties hold for the limit \(F\). This establishes \(\F\)-predictability and progressive measurability for \(F\).
+
+	Now assume that \(\widetilde{F}\) is a modification of \(F\); that is, \(\Prob(\widetilde{F}_s \ne F_s) = 0\) for all \(s \in [0, t]\). Let
+	\begin{equation}\label{eq:EventB}
+		B \idef \{\text{both } F \text{ and } \widetilde{F} \text{ are left-continuous on } (0, t]\},
+	\end{equation}
+	so that \(\Prob(B) = 1\). Let \(\Q_t \idef [0, t] \cap \Q\) and define
+	\begin{equation}\label{eq:EventA}
+		A \idef \bigcap_{s \in \Q_t} \{\widetilde{F}_s = F_s\}.
+	\end{equation}
+	Since \(\Q_t\) is countable, by countable subadditivity \Cref{thm:PropertiesOfAProbabilityMeasure},
+	\begin{equation}\label{eq:AprobOne}
+		\Prob(A^c)
+		= \Prob\!\left(\bigcup_{s \in \Q_t} \{\widetilde{F}_s \ne F_s\}\right)
+		\le \sum_{s \in \Q_t} \Prob(\widetilde{F}_s \ne F_s) = 0,
+	\end{equation}
+	so \(\Prob(A) = 1\).
+
+	By denseness of \(\Q_t\), for any \(s \in [0, t]\) there exists a sequence \((s_n) \subset \Q_t\) with \(s_n \uparrow s\). Therefore, for all \(\omega \in A \cap B\),
+	\begin{equation}\label{eq:Indistinguishable}
+		F_s(\omega) - \widetilde{F}_s(\omega)
+		= \lim_{n \uparrow \infty} \big(F_{s_n}(\omega) - \widetilde{F}_{s_n}(\omega)\big)
+		= 0, \qquad \forall s \in [0, t].
+	\end{equation}
+	Since \(\Prob(A \cap B) = 1\), we conclude that \(F\) and \(\widetilde{F}\) are indistinguishable.
+\end{proof}
+
+We have so far considered stochastic processes that are left-continuous and adapted to the filtration \(\cF\). However, in order to define the \Ito{} integral for these more general processes, additional regularity conditions are needed.
+
 \begin{defn}{The Class of Processes $\mathcal{P}_t$}{}
-Let $\mathcal{P}_t$ be the class of stochastic processes $F \coloneqq (F_s, s \in [0, t])$ that are left-continuous on $(0, t]$, $\cF$-adapted, and satisfy the norm condition:
-\begin{equation*}
-\|F\|_{\mathcal{P}_t}^2 \coloneqq \E \int_0^t F_s^2 \di s < \infty.
-\end{equation*}
+	Let $\mathcal{P}_t$ be the class of stochastic processes $F \coloneqq (F_s, s \in [0, t])$ that are left-continuous on $(0, t]$, $\cF$-adapted, and satisfy the norm condition:
+	\begin{equation*}
+		\|F\|_{\mathcal{P}_t}^2 \coloneqq \E \int_0^t F_s^2 \di s < \infty.
+	\end{equation*}
 \end{defn}
 
 \begin{thm}{Approximating the Class $\mathcal{P}_t$ via Simple Processes}{ApproximatingClassPtViaSimpleProcesses}
-    Suppose that $F \in \mathcal{P}_t$. Then, there exists a sequence $(F^{(n)})$ of simple processes of the form \cref{eq:SimpleProcessDef} such that $\mathrm{mesh}(\Pi_n) \to 0$ implies that $F_s^{(n)} \xrightarrow{\text{a.s.}} F_s$ for all $s \in [0, t]$ and
-    \begin{equation}\label{eq:L2ConvergenceSimple}
-        \lim_{n \to \infty} \|F^{(n)} - F\|_{\mathcal{P}_t} = 0.
-    \end{equation}
+	Suppose that $F \in \mathcal{P}_t$. Then, there exists a sequence $(F^{(n)})$ of simple processes of the form \Cref{eq:SimpleProcessDef} such that $\mathrm{mesh}(\Pi_n) \to 0$ implies that $F_s^{(n)} \xrightarrow{\text{a.s.}} F_s$ for all $s \in [0, t]$ and
+	\begin{equation}\label{eq:L2ConvergenceSimple}
+		\lim_{n \to \infty} \|F^{(n)} - F\|_{\mathcal{P}_t} = 0.
+	\end{equation}
 \end{thm}
 
 \begin{prop}{Deterministic Integrands and Gaussian Processes}{DeterministicIntegrandsAndGaussianProcesses}
-    Let $f : \R_+ \times \R_+ \to \R$ be left-continuous in the first argument and such that $\|f(\cdot, t)\|_{\mathcal{P}_t}^2 = \int_0^t f^2(s, t) \di s < \infty$. Then, the stochastic integral process
-    \begin{equation}\label{eq:GaussianIntegralProcess}
-        Z_t := \int_0^t f(s, t) \di W_s, \quad t \ge 0,
-    \end{equation}
-    is a zero-mean Gaussian process with covariance function
-    \begin{equation}\label{eq:GaussianCovariance}
-        \Cov(Z_{t_1}, Z_{t_2}) = \int_0^{t_1 \wedge t_2} f(s, t_1) f(s, t_2) \di s, \quad t_1, t_2 \ge 0.
-    \end{equation}
+	Let $f : \R_+ \times \R_+ \to \R$ be left-continuous in the first argument and such that $\|f(\cdot, t)\|_{\mathcal{P}_t}^2 = \int_0^t f^2(s, t) \di s < \infty$. Then, the stochastic integral process
+	\begin{equation}\label{eq:GaussianIntegralProcess}
+		Z_t := \int_0^t f(s, t) \di W_s, \quad t \ge 0,
+	\end{equation}
+	is a zero-mean Gaussian process with covariance function
+	\begin{equation}\label{eq:GaussianCovariance}
+		\Cov(Z_{t_1}, Z_{t_2}) = \int_0^{t_1 \wedge t_2} f(s, t_1) f(s, t_2) \di s, \quad t_1, t_2 \ge 0.
+	\end{equation}
 \end{prop}
 
 \begin{equation}\label{eq:UniformIntegrabilityCondition}
-    \lim_{m \to \infty} \sup_{s \in [0, t]} \E F_s^2 \I_{\{F_s^2 > m\}} = 0.
+	\lim_{m \to \infty} \sup_{s \in [0, t]} \E F_s^2 \I_{\{F_s^2 > m\}} = 0.
 \end{equation}
 
 \begin{lem}{Quadratic Variation Integral}{QuadraticVariationIntegral}
-    Suppose that $F \in \mathcal{P}_t$ satisfies the condition \cref{eq:UniformIntegrabilityCondition}. Then, as $\mathrm{mesh}(\Pi_n) \to 0$:
-    \begin{equation}\label{eq:QuadraticVariationLimit}
-        \sum_{k=0}^{n-1} F_{s_k} (W_{s_{k+1}} - W_{s_k})^2 \xrightarrow{L^2} \int_0^t F_s \di s.
-    \end{equation}
+	Suppose that $F \in \mathcal{P}_t$ satisfies the condition \Cref{eq:UniformIntegrabilityCondition}. Then, as $\mathrm{mesh}(\Pi_n) \to 0$:
+	\begin{equation}\label{eq:QuadraticVariationLimit}
+		\sum_{k=0}^{n-1} F_{s_k} (W_{s_{k+1}} - W_{s_k})^2 \xrightarrow{L^2} \int_0^t F_s \di s.
+	\end{equation}
 \end{lem}
 
 \begin{thm}{Enlarging the Class $\scP_t$ via Localization}{EnlargingClassPt}
-Let $F := (F_s, s \in [0, t])$ be an $\scF$-adapted process, left-continuous on $(0, t]$, and such that (7.34) holds. Then, there exists a localizing sequence $(T_n)$ such that the stopped process $(\int_0^{r \wedge T_n} F_s \di W_s, r \in [0, t])$ is a square-integrable martingale. In addition, the \Ito\ integral of $F$ with respect to $W$ on $[0, t]$ is defined as the almost sure limit:
-\begin{equation}
-\int_0^t F_s \di W_s \coloneqq \lim_{n \to \infty} \int_0^{t \wedge T_n} F_s \di W_s.
-\label{eq:LocalizedIntegralLimit}
-\end{equation}
+	Let $F := (F_s, s \in [0, t])$ be an $\scF$-adapted process, left-continuous on $(0, t]$, and such that (7.34) holds. Then, there exists a localizing sequence $(T_n)$ such that the stopped process $(\int_0^{r \wedge T_n} F_s \di W_s, r \in [0, t])$ is a square-integrable martingale. In addition, the \Ito\ integral of $F$ with respect to $W$ on $[0, t]$ is defined as the almost sure limit:
+	\begin{equation}
+		\int_0^t F_s \di W_s \coloneqq \lim_{n \to \infty} \int_0^{t \wedge T_n} F_s \di W_s.
+		\label{eq:LocalizedIntegralLimit}
+	\end{equation}
 \end{thm}
 
 \begin{prop}{Continuous Modification and Stopping Times}{ContinuousModificationStopping}
-If $F \in \scP_t$ and $T \le t$ is a stopping time with respect to $\scF$, then almost surely:
-\begin{equation}
-\int_0^T F_s \di W_s = \int_0^t \I_{[0, T]}(s) F_s \di W_s.
-\label{eq:StoppedIntegralIdentity}
-\end{equation}
+	If $F \in \scP_t$ and $T \le t$ is a stopping time with respect to $\scF$, then almost surely:
+	\begin{equation}
+		\int_0^T F_s \di W_s = \int_0^t \I_{[0, T]}(s) F_s \di W_s.
+		\label{eq:StoppedIntegralIdentity}
+	\end{equation}
 \end{prop}
 
 \begin{thm}{Continuous Modification of the \Ito\ Integral}{ContinuousModificationIto}
-Suppose that $F \in \scP_t$ and $(F^{(n)})$ is a sequence of simple processes satisfying (7.17). Denote the limit $\int_0^r F_s^{(n)} \di W_s =: Z_r^{(n)} \xrightarrow{L^2} Z_r$ as the \Ito\ integral on $[0, r]$ for $r \le t$. Then, there exists a modification $\widetilde{Z}$ of $(Z_r, r \in [0, t])$ such that the mapping $r \mapsto \widetilde{Z}_r$ is almost surely continuous. Moreover, this modification is unique up to indistinguishability.
+	Suppose that $F \in \scP_t$ and $(F^{(n)})$ is a sequence of simple processes satisfying (7.17). Denote the limit $\int_0^r F_s^{(n)} \di W_s =: Z_r^{(n)} \xrightarrow{L^2} Z_r$ as the \Ito\ integral on $[0, r]$ for $r \le t$. Then, there exists a modification $\widetilde{Z}$ of $(Z_r, r \in [0, t])$ such that the mapping $r \mapsto \widetilde{Z}_r$ is almost surely continuous. Moreover, this modification is unique up to indistinguishability.
 \end{thm}
 
 \begin{thm}{Existence of the \Ito\ Integral with Integrand $F \in \scP_t$}{ExistenceItoIntegral}
-Suppose that $F \in \scP_t$ and $(F^{(n)})$ is a sequence of simple processes satisfying (7.17). Then, the following limit exists in $L^2$ norm:
-\begin{equation}
-\int_0^t F_s \di W_s \coloneqq \lim_{n \to \infty} \int_0^t F_s^{(n)} \di W_s, \quad r \in [0, t],
-\label{eq:ItoIntegralL2Limit}
-\end{equation}
-and it defines the \textit{\Ito\ integral} of $F$ with respect to $W$ on $[0, t]$.
+	Suppose that $F \in \scP_t$ and $(F^{(n)})$ is a sequence of simple processes satisfying (7.17). Then, the following limit exists in $L^2$ norm:
+	\begin{equation}
+		\int_0^t F_s \di W_s \coloneqq \lim_{n \to \infty} \int_0^t F_s^{(n)} \di W_s, \quad r \in [0, t],
+		\label{eq:ItoIntegralL2Limit}
+	\end{equation}
+	and it defines the \textit{\Ito\ integral} of $F$ with respect to $W$ on $[0, t]$.
 \end{thm}
 
 \subsection{\Ito{} Calculus}
 \begin{thm}{\Ito{} Formula for the Wiener Process}{}
-Let $W$ be a Wiener process and $f : \R \to \R$ be twice continuously differentiable with derivatives $f'$ and $f''$. Then, almost surely
-\begin{equation*}
-f(W_t) - f(W_0) = \int_0^t f'(W_s) \di W_s + \frac{1}{2} \int_0^t f''(W_s) \di s.
-\end{equation*}
+	Let $W$ be a Wiener process and $f : \R \to \R$ be twice continuously differentiable with derivatives $f'$ and $f''$. Then, almost surely
+	\begin{equation*}
+		f(W_t) - f(W_0) = \int_0^t f'(W_s) \di W_s + \frac{1}{2} \int_0^t f''(W_s) \di s.
+	\end{equation*}
 \end{thm}
 
 \begin{defn}{Integral With Respect To An \Ito\ Process}{IntegralItoProcess}
-Let $X$ be an \Ito$(\mu, \sigma)$ process and $F$ a left-continuous $\scF$-adapted process such that almost surely $\int_{0}^{t}(|F_s\mu_s| + (F_s\sigma_s)^2)\di s < \infty$ for all $t$. Then, the integral of $F$ with respect to $X$ is defined as the \Ito$(F\mu, F\sigma)$ process with:
-\begin{equation}
-\int_{0}^{t} F_s \di X_s \coloneqq \int_{0}^{t} F_s \mu_s \di s + \int_{0}^{t} F_s \sigma_s \di W_s.
-\end{equation}
+	Let $X$ be an \Ito$(\mu, \sigma)$ process and $F$ a left-continuous $\scF$-adapted process such that almost surely $\int_{0}^{t}(|F_s\mu_s| + (F_s\sigma_s)^2)\di s < \infty$ for all $t$. Then, the integral of $F$ with respect to $X$ is defined as the \Ito$(F\mu, F\sigma)$ process with:
+	\begin{equation}
+		\int_{0}^{t} F_s \di X_s \coloneqq \int_{0}^{t} F_s \mu_s \di s + \int_{0}^{t} F_s \sigma_s \di W_s.
+	\end{equation}
 \end{defn}
 
 \begin{defn}{Quadratic Variation On $[0, t]$}{QuadraticVariation}
-Let $\Pi_n \coloneqq \{s_k, k = 0, \dots, n\}$ be a segmentation of $[0, t]$ and let $(X^{(n)})$ be a sequence of simple processes with almost sure limit $X_s \coloneqq \lim_n X^{(n)}_s$ for all $s \in [0, t]$ as $\mathrm{mesh}(\Pi_n) \to 0$. The \textit{quadratic variation} of $X \coloneqq (X_s, s \in [0, t])$ over $[0, t]$, denoted as $\langle X \rangle_t$, is defined as the limit in probability of
-\begin{equation}
-\langle X^{(n)} \rangle_t \coloneqq \sum_{k=0}^{n-1} (X^{(n)}_{s_{k+1}} - X^{(n)}_{s_k})^2.
-\end{equation}
+	Let $\Pi_n \coloneqq \{s_k, k = 0, \dots, n\}$ be a segmentation of $[0, t]$ and let $(X^{(n)})$ be a sequence of simple processes with almost sure limit $X_s \coloneqq \lim_n X^{(n)}_s$ for all $s \in [0, t]$ as $\mathrm{mesh}(\Pi_n) \to 0$. The \textit{quadratic variation} of $X \coloneqq (X_s, s \in [0, t])$ over $[0, t]$, denoted as $\langle X \rangle_t$, is defined as the limit in probability of
+	\begin{equation}
+		\langle X^{(n)} \rangle_t \coloneqq \sum_{k=0}^{n-1} (X^{(n)}_{s_{k+1}} - X^{(n)}_{s_k})^2.
+	\end{equation}
 \end{defn}
 
 \begin{thm}{Quadratic Variation Of An \Ito\ Process}{QuadraticVariationIto}
-If $X$ is an \Ito$(\mu, \sigma)$ process, then
-\begin{equation}
-\langle X^{(n)} \rangle_t \xrightarrow{L^2} \langle X \rangle_t = \int_{0}^{t} \sigma_s^2 \di s.
-\end{equation}
-Furthermore, if $F \in \scP_t$ satisfies the condition (7.19) and $\mathrm{mesh}(\Pi_n) \to 0$, then:
-\begin{equation}
-\sum_{k=0}^{n-1} F_{s_k} (X_{s_{k+1}} - X_{s_k})^2 \xrightarrow{L^2} \int_{0}^{t} F_s \sigma_s^2 \di s.
-\end{equation}
+	If $X$ is an \Ito$(\mu, \sigma)$ process, then
+	\begin{equation}
+		\langle X^{(n)} \rangle_t \xrightarrow{L^2} \langle X \rangle_t = \int_{0}^{t} \sigma_s^2 \di s.
+	\end{equation}
+	Furthermore, if $F \in \scP_t$ satisfies the condition (7.19) and $\mathrm{mesh}(\Pi_n) \to 0$, then:
+	\begin{equation}
+		\sum_{k=0}^{n-1} F_{s_k} (X_{s_{k+1}} - X_{s_k})^2 \xrightarrow{L^2} \int_{0}^{t} F_s \sigma_s^2 \di s.
+	\end{equation}
 \end{thm}
 
 \begin{thm}{\Ito's Formula For \Ito\ Processes}{ItosFormula}
-Let $X$ be an \Ito\ process and let $f$ be twice continuously differentiable. Then,
-\begin{equation}
-f(X_t) = f(X_0) + \int_{0}^{t} f'(X_s) \di X_s + \frac{1}{2} \int_{0}^{t} f''(X_s) \di \langle X \rangle_s.
-\label{eq:ItoFormula}
-\end{equation}
+	Let $X$ be an \Ito\ process and let $f$ be twice continuously differentiable. Then,
+	\begin{equation}
+		f(X_t) = f(X_0) + \int_{0}^{t} f'(X_s) \di X_s + \frac{1}{2} \int_{0}^{t} f''(X_s) \di \langle X \rangle_s.
+		\label{eq:ItoFormula}
+	\end{equation}
 \end{thm}
 
 \begin{defn}{Covariation Of Two \Ito\ Processes}{CovariationIto}
-Let $X$ and $Y$ be two \Ito\ processes adapted to the same filtration $\scF$. Then, the \textit{covariation} between $X$ and $Y$ is defined as the quantity:
-\begin{equation}
-\langle X, Y \rangle_t \coloneqq \frac{\langle X + Y \rangle_t - \langle X \rangle_t - \langle Y \rangle_t}{2}.
-\label{eq:CovariationDef}
-\end{equation}
+	Let $X$ and $Y$ be two \Ito\ processes adapted to the same filtration $\scF$. Then, the \textit{covariation} between $X$ and $Y$ is defined as the quantity:
+	\begin{equation}
+		\langle X, Y \rangle_t \coloneqq \frac{\langle X + Y \rangle_t - \langle X \rangle_t - \langle Y \rangle_t}{2}.
+		\label{eq:CovariationDef}
+	\end{equation}
 \end{defn}
 
 \begin{thm}{\Ito's Formula In $\R^d$}{ItoFormulaMultiDim}
-Let $(X_t)$ be a $d$-dimensional \Ito\ process, and let $f : \R^d \to \R$ be twice continuously differentiable in all variables. Then,
-\begin{equation}
-\di f(X_t) = \sum_{i=1}^{d} \partial_i f(X_t) \di X_{t,i} + \frac{1}{2} \sum_{i=1}^{d} \sum_{j=1}^{d} \partial_{ij} f(X_t) \di \langle X_{\cdot, i}, X_{\cdot, j} \rangle_t.
-\label{eq:DifferentialItoMulti}
-\end{equation}
+	Let $(X_t)$ be a $d$-dimensional \Ito\ process, and let $f : \R^d \to \R$ be twice continuously differentiable in all variables. Then,
+	\begin{equation}
+		\di f(X_t) = \sum_{i=1}^{d} \partial_i f(X_t) \di X_{t,i} + \frac{1}{2} \sum_{i=1}^{d} \sum_{j=1}^{d} \partial_{ij} f(X_t) \di \langle X_{\cdot, i}, X_{\cdot, j} \rangle_t.
+		\label{eq:DifferentialItoMulti}
+	\end{equation}
 \end{thm}
 
 \begin{thm}{\Ito\ Processes And Martingales}{ItoMartingaleDrift}
-An \Ito\ process in $\R^d$ is a local martingale if and only if its drift is 0.
+	An \Ito\ process in $\R^d$ is a local martingale if and only if its drift is 0.
 \end{thm}
 
 \clearpage
@@ -182,101 +264,140 @@ An \Ito\ process in $\R^d$ is a local martingale if and only if its drift is 0.
 Stochastic differential equations are based on the same principle as ordinary differential equations, relating an unknown function to its derivatives, but with the additional feature that part of the unknown function is driven by randomness.
 
 \begin{defn}{Stochastic Differential Equation}{StochasticDifferentialEquation}
-    A \textit{stochastic differential equation} (SDE) for a stochastic process $(X_t, t \ge 0)$ is an expression of the form
-    \begin{equation}
-        \di X_t = a(X_t, t) \di t + b(X_t, t) \di W_t,
-        \label{eq:StochasticDifferentialEquationForm}
-    \end{equation}
-    where $(W_t, t \ge 0)$ is a Wiener process and $a$ and $b$ are deterministic functions, called the \textit{drift} and \textit{diffusion} functions. The resulting process $(X_t, t \ge 0)$ is called an \textit{(\Ito) diffusion}.
+	A \textit{stochastic differential equation} (SDE) for a stochastic process $(X_t, t \ge 0)$ is an expression of the form
+	\begin{equation}
+		\di X_t = a(X_t, t) \di t + b(X_t, t) \di W_t,
+		\label{eq:StochasticDifferentialEquationForm}
+	\end{equation}
+	where $(W_t, t \ge 0)$ is a Wiener process and $a$ and $b$ are deterministic functions, called the \textit{drift} and \textit{diffusion} functions. The resulting process $(X_t, t \ge 0)$ is called an \textit{(\Ito) diffusion}.
 \end{defn}
 
 Consider the autonomous SDE
 \begin{equation}
-    \di X_t = a(X_t) \di t + b(X_t) \di W_t.
-    \label{eq:AutonomousSDE}
+	\di X_t = a(X_t) \di t + b(X_t) \di W_t.
+	\label{eq:AutonomousSDE}
 \end{equation}
 As already mentioned, the meaning of this SDE is that $X$ is a stochastic process that satisfies the integral equation
 \begin{equation}
-    X_t = X_0 + \int_0^t a(X_s) \di s + \int_0^t b(X_s) \di W_s.
-    \label{eq:StochasticIntegralEquation}
+	X_t = X_0 + \int_0^t a(X_s) \di s + \int_0^t b(X_s) \di W_s.
+	\label{eq:StochasticIntegralEquation}
 \end{equation}
 However, it is not clear that such a process indeed exists. We show in this section that under mild conditions on $a$ and $b$ we can obtain a unique solution $X$ of the SDE via a method of successive approximations, similar to \textit{Picard iteration} for ordinary differential equations.
 
 The condition that is placed on $a$ and $b$ is that they be \textit{Lipschitz continuous}; that is, for all $x \in \R$ there exists a constant $c$ such that
 \begin{equation}
-    |a(y) - a(x)| + |b(y) - b(x)| \le c|y - x|.
-    \label{eq:LipschitzCondition1D}
+	|a(y) - a(x)| + |b(y) - b(x)| \le c|y - x|.
+	\label{eq:LipschitzCondition1D}
 \end{equation}
 
 The successive approximation idea is very simple. Suppose that $X_0 = x$. Define $X_t^{(0)} \coloneqq x$ for all $t$, and let
 \begin{equation}
-    X_t^{(n+1)} \coloneqq x + \int_0^t a(X_s^{(n)}) \di s + \int_0^t b(X_s^{(n)}) \di W_s
-    \label{eq:SuccessiveApproximation}
+	X_t^{(n+1)} \coloneqq x + \int_0^t a(X_s^{(n)}) \di s + \int_0^t b(X_s^{(n)}) \di W_s
+	\label{eq:SuccessiveApproximation}
 \end{equation}
 for $n \in \N$. The following is the main existence result for SDEs:
 
 \begin{thm}{Existence of SDE Solutions}{ExistenceOfSDESolutions}
-    For any $t \in [0, v]$, the sequence $(X^{(n)})$ in \eqref{eq:SuccessiveApproximation} converges almost surely in the uniform norm on $[0, t]$ to a process $X$ that satisfies the integral equation \eqref{eq:IntegralEquation}.
+	For any $t \in [0, v]$, the sequence $(X^{(n)})$ in \eqref{eq:SuccessiveApproximation} converges almost surely in the uniform norm on $[0, t]$ to a process $X$ that satisfies the integral equation \eqref{eq:StochasticIntegralEquation}.
 \end{thm}
 
 \begin{lem}{Integral Bound}{IntegralBound}
-    Let $X^{(n)}, n = 1, 2, \dots$ be defined in \eqref{eq:SuccessiveApproximation}, with $X^{(0)} = x$. Then, for every $v > 0$ there exists a constant $\alpha$ such that
-    \begin{equation*}
-        \E \sup_{s \le t} \left( X_s^{(n+1)} - X_s^{(n)} \right)^2 \le \alpha \| X^{(n)} - X^{(n-1)} \|_{\mathscr{P}_t}^2, \qquad t \le v.
-    \end{equation*}
+	Let $X^{(n)}, n = 1, 2, \dots$ be defined in \eqref{eq:SuccessiveApproximation}, with $X^{(0)} = x$. Then, for every $v > 0$ there exists a constant $\alpha$ such that
+	\begin{equation*}
+		\E \sup_{s \le t} \left( X_s^{(n+1)} - X_s^{(n)} \right)^2 \le \alpha \| X^{(n)} - X^{(n-1)} \|_{\mathscr{P}_t}^2, \qquad t \le v.
+	\end{equation*}
 \end{lem}
 
-\begin{defn}{\Ito \; Stratonovich Integral}{ItoStratonovichIntegral}
-    Let $X$ and $Y$ be \Ito processes such that $\int_0^t Y_s \di X_s$ and $\int_0^t X_s \di Y_s$ are well-defined stochastic integrals. Then, the \textit{\Ito--Stratonovich integral} of $Y$ with respect to $X$ is defined as
-    \begin{equation}
-        \int_0^t Y_s \circ \di X_s \coloneqq \int_0^t Y_s \di X_s + \frac{1}{2}\langle X, Y \rangle_t.
-        \label{eq:ItoStratonovichIntegral}
-    \end{equation}
+\begin{defn}{\Ito{} Stratonovich Integral}{ItoStratonovichIntegral}
+	Let $X$ and $Y$ be \Ito{} processes such that $\int_0^t Y_s \di X_s$ and $\int_0^t X_s \di Y_s$ are well-defined stochastic integrals. Then, the \textit{\Ito{} Stratonovich integral} of $Y$ with respect to $X$ is defined as
+	\begin{equation}
+		\int_0^t Y_s \circ \di X_s \coloneqq \int_0^t Y_s \di X_s + \frac{1}{2}\langle X, Y \rangle_t.
+		\label{eq:ItoStratonovichIntegral}
+	\end{equation}
 \end{defn}
 
 \begin{prop}{\Ito \; Stratonovich Formula}{ItoStratonovichFormula}
-    Let $(X_t)$ be a $d$-dimensional \Ito process, and let $f : \R^d \to \R$ be three times continuously differentiable in all variables. Then,
-    \begin{equation}
-        \di f(X_t) = \sum_{i=1}^d \partial_i f(X_t) \circ \di X_{t,i}.
-        \label{eq:ItoStratonovichFormula}
-    \end{equation}
+	Let $(X_t)$ be a $d$-dimensional \Ito process, and let $f : \R^d \to \R$ be three times continuously differentiable in all variables. Then,
+	\begin{equation}
+		\di f(X_t) = \sum_{i=1}^d \partial_i f(X_t) \circ \di X_{t,i}.
+		\label{eq:ItoStratonovichFormula}
+	\end{equation}
 \end{prop}
 \begin{equation}\label{eq:ChangeOfMeasureDef}
-    \widetilde{\Pm}^t(A) := \E M_t \I_A, \quad A \in \cF_t.
+	\widetilde{\Pm}^t(A) := \E M_t \I_A, \quad A \in \cF_t.
 \end{equation}
 \begin{equation}\label{eq:ExponentialMartingaleDef}
-    M_t = \exp\left(\int_0^t \mu_s \di W_s - \frac{1}{2} \int_0^t \mu_s^2 \di s\right) = \e^{Z_t - \frac{1}{2}\langle Z \rangle_t}, \quad t \ge 0,
+	M_t = \exp\left(\int_0^t \mu_s \di W_s - \frac{1}{2} \int_0^t \mu_s^2 \di s\right) = \e^{Z_t - \frac{1}{2}\langle Z \rangle_t}, \quad t \ge 0,
 \end{equation}
 \begin{equation}\label{eq:KrylovCondition}
-    \lim_{\varepsilon \downarrow 0} \varepsilon \ln \E \exp((1 - \varepsilon)\langle Z \rangle_t / 2) = 0.
+	\lim_{\varepsilon \downarrow 0} \varepsilon \ln \E \exp((1 - \varepsilon)\langle Z \rangle_t / 2) = 0.
 \end{equation}
+
+\subsubsection{Methods for Solving Simple SDEs}
+
+If a strong solution of the \Ito{} diffusion SDE exists, then it can be expressed as \(X_t = \phi(X_0,(W_s, s \in [0,t]), t)\) for some function \(\phi\). Finding an analytical solution for \(\phi\) is usually impossible, however, except in a few special cases.
+
+\paragraph{Linear Stochastic Differential Equations}
+
+One setting where the strong solution of an SDE can be expressed as a simple analytical formula is when both the drift and diffusion of the SDE are linear functions of the state variables. In particular, suppose that
+
+\begin{align*}
+	a(x, t) & = \alpha_t x + \beta_t,  \\
+	b(x, t) & = \delta_t x + \gamma_t.
+\end{align*}
+
+An SDE of the form
+\begin{equation}
+	\di X_t = (\alpha_t  + \beta_t X_t) \di t + (\delta_t + \gamma_t X_t) \di W_t
+	\label{eq:LinearSDE}
+\end{equation}
+is said to be \textit{linear}.
+
+The solution to the general linear SDE in \Cref{eq:LinearSDE} is given next.
+
+\begin{prop}{Solution to a Linear Diffusion SDE}{SolutionToALinearDiffusionSDE}
+	The solution to the linear SDE \Cref{eq:LinearSDE} is given by
+	\begin{equation}\label{eq:LinearSDESolution}
+		X_t
+		= Y_t \left(
+		X_0
+		+ \int_0^t \frac{\alpha_s - \delta_s \gamma_s}{Y_s} \di s
+		+ \int_0^t \frac{\delta_s}{Y_s} \di W_s
+		\right).
+	\end{equation}
+	Where
+	\begin{equation}\label{eq:LinearSDEIntegratingFactor}
+		Y_t
+		= \exp \left(
+		\int_0^t \left( \beta_s - \frac{\gamma_s^2}{2} \right) \di s
+		+ \int_0^t \gamma_s \di W_s
+		\right)
+	\end{equation}
+	is the stochastic exponential of an \Ito$(\beta, \gamma)$ process.
+\end{prop}
+
 \begin{thm}{Girsanov's Change of Measure}{GirsanovsChangeOfMeasure}
-    Suppose that $\mu$ satisfies the Krylov condition \cref{eq:KrylovCondition} and $M$ is the exponential martingale \cref{eq:ExponentialMartingaleDef}. Then, under the change of measure \cref{eq:ChangeOfMeasureDef} induced by $M$, the \Ito{} process
-    \begin{equation*}
-        \widetilde{W}_t := -\int_0^t \mu_s \di s + W_t, \quad t \ge 0
-    \end{equation*}
-    is a Wiener process.
+	Suppose that $\mu$ satisfies the Krylov condition \Cref{eq:KrylovCondition} and $M$ is the exponential martingale \Cref{eq:ExponentialMartingaleDef}. Then, under the change of measure \Cref{eq:ChangeOfMeasureDef} induced by $M$, the \Ito{} process
+	\begin{equation*}
+		\widetilde{W}_t := -\int_0^t \mu_s \di s + W_t, \quad t \ge 0
+	\end{equation*}
+	is a Wiener process.
 \end{thm}
 
+A fundamental stochastic process in finance is defined as the solution to the SDE
+
 \begin{Pcode}{GBM.py}
-N, T = 1000, 1.0
-mu, sigma = 0.5, 0.2
-dt = T / N
-t = np.linspace(0, T, N + 1)
+	# Generate Brownian Motion
+	t = np.linspace(0, T, N + 1)
+	W = np.concatenate(([0], np.cumsum(dW)))
 
-rng = np.random.default_rng(4)
-dW = rng.normal(0, np.sqrt(dt), N)
-W = np.r_[0, np.cumsum(dW)]
-
-drift = (mu - 0.5 * sigma**2) * t
-diffusion = sigma * W
-S_t = np.exp(drift + diffusion)
-E_St = np.exp(mu * t)
+	# Exact Solution
+	S_t = S_0 * np.exp((mu - 0.5 * sigma**2) * t + sigma * W)
 \end{Pcode}
 
 \begin{figure}[H]
-    \centering
-    \input{plotting/geometricBrownianMotion.pgf}
-    \caption{Geometric Brownian motion sample path and expectation for $\mu=0.5$, $\sigma=0.2$ and $S_0=1$.}
-    \label{fig:geometricBrownianMotion}
+	\centering
+	\input{plotting/geometricBrownianMotion.pgf}
+	\caption{Geometric Brownian motion sample path and expectation for $\mu=0.5$, $\sigma=0.2$ and $S_0=1$.}
+	\label{fig:geometricBrownianMotion}
 \end{figure}

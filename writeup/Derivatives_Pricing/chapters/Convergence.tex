@@ -164,6 +164,58 @@
 	A sequence $(X_n)$ of real-valued integrable random variables converges in $L^1$ if and only if it converges in probability and is uniformly integrable.
 \end{thm}
 
+\subsection{Relations Between Modes of Convergence}
+
+\begin{thm}{Modes of Convergence}{ModesOfConvergence}
+	The most general relationships among the various modes of convergence for numerical random variables are shown below.
+	\begin{center}
+		\begin{tikzpicture}[node distance=1.2cm and 1.5cm, auto]
+			\node[draw, rectangle] (cpl) {$X_n \xrightarrow{\mathrm{cpl}} X$};
+			\node[draw, rectangle, right=of cpl] (as) {$X_n \cas X$};
+			\node[draw, rectangle, below=of as] (P) {$X_n \xrightarrow{P} X$};
+			\node[draw, rectangle, right=of P] (d) {$X_n \convdistr X$};
+			\node[draw, rectangle, below=of P] (Lp) {$X_n \xrightarrow{L^p} X$};
+			\node[draw, rectangle, left=of Lp] (Lq) {$X_n \xrightarrow{L^q} X$};
+
+
+			\path (cpl) -- node[sloped] {$\implies$} (as);
+			\path (P) -- node[sloped] {$\implies$} (d);
+			\path (Lq) -- node[sloped] {$\implies$} node[above=0.2cm] {\scriptsize $q \ge p$} (Lp);
+
+			\path (P) -- node[sloped] {$\impliedby$} (as);
+			\path (Lp) -- node[sloped] {$\implies$} (P);
+		\end{tikzpicture}
+	\end{center}
+\end{thm}
+
+Under certain conditions, the converse statements can be established as follows:
+
+\begin{thm}{Modes of Convergence under Additional Assumptions}{ModesOfConvergenceUnderAdditionalAssumptions}
+	Converse relationships among the various modes of convergence are:
+	\begin{center}
+		\begin{tikzpicture}[node distance=2cm]
+			\tikzset{block/.style={draw, rectangle, thick, inner sep=5pt, align=center}}
+
+			\node[block] (P) at (0,0) {$X_n \xrightarrow{P} X$};
+			\node[block] (as) at (0,1.8) {$X_n \cas X$};
+			\node[block] (L1) at (0,-1.8) {$X_n \xrightarrow{L^1} X$};
+
+			\node[block] (cpl) at (-4,1.8) {$X_n \xrightarrow{\mathrm{cpl.}} X$};
+			\node[block] (Lq) at (-4,-1.8) {$X_n \xrightarrow{L^q} X$};
+
+			\node[block] (d) at (3.5,0) {$X_n \convdistr X$};
+
+			\path (cpl) -- node[sloped] {$\impliedby$} node[above=0.25cm] {\small pairwise ind.} (as);
+			\path (P) -- node[sloped] {$\impliedby$} node[above=0.25cm] {\small $X$ const.} (d);
+			\path (Lq) -- node[sloped] {$\impliedby$} node[above=0.25cm] {\small $(\abs{X_n}^q)$ is UI} (L1);
+
+			\path (P) -- node[sloped] {$\implies$} node[right=0.25cm] {\small subseq.} (as);
+
+			\path (L1) -- node[sloped] {$\impliedby$} node[right=0.25cm] {\small $(X_n)$ is UI} (P);
+		\end{tikzpicture}
+	\end{center}
+\end{thm}
+
 \subsection{Law of Large Numbers and Central Limit Theorem}
 
 \begin{thm}{Weak Law of Large Numbers}{WeakLawLargeNumbers}

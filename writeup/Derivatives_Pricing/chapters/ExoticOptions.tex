@@ -4,6 +4,50 @@ The European calls and puts considered thus far are sometimes called \textit{van
 We present three types of exotic options on a geometric Brownian motion asset and work out a detailed analysis for one option of each type. The types considered are \textit{barrier options}, \textit{lookback options}, and \textit{Asian options}. We work out the standard partial differential equations governing the option price. The first two options have explicit pricing formulas, which are based on the reflection principle for Brownian motion. Such a formula for Asian options is not known. However, for the Asian option there is a change-of-num\'{e}raire argument that reduces the pricing partial differential equation to a simple form that can easily be solved numerically.
 
 \subsection{Maximum of Brownian Motion with Drift}
+
+We derive the joint density for a Brownian motion with drift and its maximum to date. This density is used to obtain explicit pricing formulas for a barrier option and a lookback option.
+
+To derive this formula, we begin with a Brownian motion $\widetilde{W}(t)$, $0 \le t \le T$, defined on a probability space $(\Omega, \F, \widetilde{\Prob})$. Under $\widetilde{\Prob}$, the Brownian motion $\widetilde{W}(t)$ has zero drift (i.e., it is a martingale). Let $\alpha$ be a given number, and define
+\begin{equation}
+	\widehat{W}(t) = \alpha t + \widetilde{W}(t), \quad 0 \le t \le T.
+	\label{eq:DriftBrownianDef}
+\end{equation}
+
+This Brownian motion $\widehat{W}(t)$ has drift $\alpha$ under $\widetilde{\Prob}$. We further define
+\begin{equation}
+	\widehat{M}(T) = \max_{0 \le t \le T} \widehat{W}(t).
+	\label{eq:MaxProcessDef}
+\end{equation}
+
+Because $\widehat{W}(0) = 0$, we have $\widehat{M}(T) \ge 0$. We also have $\widehat{W}(T) \le \widehat{M}(T)$. Therefore, the pair of random variables $(\widehat{M}(t), \widehat{W}(T))$ takes values in the set $\set{(m, w); w \le m, m \ge 0}$ shown in~\Cref{fig:RangeOfMW}.
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/RangeOfMW.pgf}
+	\caption{Range of the pair $(\widehat{M}(T), \widehat{W}(T))$.}
+	\label{fig:RangeOfMW}
+\end{figure}
+
+\begin{thm}{Joint Density Under $\widetilde{\Prob}$}{JointDensity}
+	The joint density under $\widetilde{\Prob}$ of the pair $(\widehat{M}(T), \widehat{W}(T))$ is
+	\begin{equation} \label{eq:JointDensityFormula}
+		\widetilde{f}_{\widehat{M}(T),\widehat{W}(T)}(m, w) = \frac{2(2m-w)}{T\sqrt{2\pi T}} \e^{\alpha w - \frac{1}{2}\alpha^2 T - \frac{1}{2T}(2m-w)^2} , \quad w \leq m, \ m \geq 0,
+	\end{equation}
+	and is zero for other values of $m$ and $w$.
+\end{thm}
+
+\begin{cor}{Marginal Distribution and Density}{Cor:MarginalDistributionAndDensity}
+	We have
+	\begin{equation} \label{eq:MarginalProbability}
+		\widetilde{\Prob}\set{\widehat{M}(T) \leq m} = N \left( \frac{m - \alpha T}{\sqrt{T}} \right) - \e^{2\alpha m} N \left( \frac{-m - \alpha T}{\sqrt{T}} \right), \quad m \geq 0,
+	\end{equation}
+	and the density under $\widetilde{\Prob}$ of the random variable $\widehat{M}(T)$ is
+	\begin{equation} \label{eq:MarginalDensity}
+		\widetilde{f}_{\widehat{M}(T)}(m) = \frac{2}{\sqrt{2\pi T}} \e^{-\frac{1}{2T}(m-\alpha T)^2} - 2\alpha \e^{2\alpha m} N \left( \frac{-m - \alpha T}{\sqrt{T}} \right), \quad m \geq 0,
+	\end{equation}
+	and is zero for $m < 0$.
+\end{cor}
+
 \Cref{fig:runningMax} represents the running maximum process
 \begin{equation}
 	M_0^t \coloneqq \max_{s \in [0,t]} W_s, \quad t \geq 0, \nonumber
