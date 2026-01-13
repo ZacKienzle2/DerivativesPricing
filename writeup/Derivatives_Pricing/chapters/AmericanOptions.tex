@@ -2,6 +2,59 @@ European option contracts specify an expiration date, and if the option is to be
 
 Whereas a European option can be exercised only at a fixed date, an American option can be exercised any time up to its expiration. The value of an American option is the value achieved by exercising optimally. Finding this value entails finding the optimal exercise rule by solving an optimal stopping problem and computing the expected discounted payoff of the option under this rule. The embedded optimisation problem makes this a difficult problem for simulation.
 
+Because an American option can be exercised at any time prior to its expiration,
+it can never be worth less than the payoff associated with immediate exercise.
+This is called the \textit{intrinsic value} of the option.
+
+To price an American option, just as with a European option, we could imagine
+selling the option in exchange for some initial capital and then consider how to
+use this capital to hedge the short position in the option. In this case, we
+would need to be ready to pay off the option at all times prior to the
+expiration date because we do not know when it will be exercised. We could
+determine when, from our point of view, is the worst time for the owner to
+exercise the option. From the owner's point of view, this would be the \textit{optimal
+exercise time}, and we shall call it that. We could then compute the initial
+capital we need in order to be hedged against exercise at the optimal exercise
+time. Finally, we could show how to invest this capital so that we are hedged
+even if the owner exercises at a nonoptimal time. In the subsequent sections, we
+do all these things but begin the analysis at a different point than for
+European options. We define the price of American options using a risk-neutral
+pricing formula and then show that this price is the smallest initial capital
+that permits construction of the hedge just described.
+
+\subsection{Perpetual American Put}
+
+The simplest interesting American option is the \textit{perpetual American put}. It is interesting because the optimal exercise policy is not obvious, and it is simple because this policy can be determined explicitly. Although this is not a traded option, we begin our discussion with it in order to present in a simple context the ideas behind the subsequent analysis of more realistic options.
+The underlying asset in most of this chapter (except where the asset pays dividends, which will be explicitly mentioned) has the price process $S(t)$ given by
+\begin{equation}
+	\label{eq:GBMRiskNeutral}
+  dS(t) = rS(t) , dt + \sigma S(t) , d\widetilde{W}(t), \tag{8.3.1}
+\end{equation}
+where the interest rate $r$ and the volatility $\sigma$ are strictly positive constants and $\widetilde{W}(t)$ is a Brownian motion under the risk-neutral probability measure $\widetilde{\Prob}$. The perpetual American put pays $K - S(t)$ if it is exercised at time $t$. This is its intrinsic value.
+
+\begin{defn}{Perpetual American Put}{PerpetualAmericanPut}
+  Let $\mathcal{T}$ be the set of all stopping times. The price of the perpetual American put is defined to be
+  \begin{equation}
+	\label{eq:PerpetualAmericanPutPrice}
+    v_*(x) = \max_{\tau \in \mathcal{T}} \widetilde{\E} \left[ e^{-r\tau} (K - S(\tau)) \right],
+  \end{equation}
+  where $x = S(0)$ in (8.3.2) is the initial stock price. In the event that $\tau = \infty$, we interpret $e^{-r\tau}(K - S(\tau))$ to be zero.
+\end{defn}
+
+The idea behind \Cref{defn:PerpetualAmericanPut} is that the owner of the perpetual American put can choose an exercise time $\tau$, subject only to the condition that she may not look ahead to determine when to exercise. The mathematical formulation of this ``not look ahead'' restriction is that $\tau$ must be a stopping time. The price of the option at time zero is the risk-neutral expected payoff of the option, discounted from the exercise time back to time zero. If the option is never exercised, its payoff is zero. This explains the term under the expectation on the right-hand side of \Cref{eq:PerpetualAmericanPutPrice}. The owner of the option should choose the exercise strategy that maximizes this expected payoff, discounted back to time zero, and thus we define the price of the option to be the maximum over $\tau \in \mathcal{T}$ of the discounted expected payoffs.
+
+The owner of the perpetual American put can exercise at any time. In particular, there is no expiration date after which the put can no longer be exercised. This makes every date like every other date; the time remaining to expiration is always the same (i.e., infinity). Because every date is like every other date, it is reasonable to expect that the optimal exercise policy depends only on the value of $S(t)$ and not on the time variable $t$. The owner of the put should exercise as soon as $S(t)$ falls far enough below $K$. In other words, it is reasonable to expect that the optimal exercise policy is of the form
+\begin{quote} Exercise the put as soon as $S(t)$ falls to the level $L_*$.
+\end{quote}
+
+We have two questions to answer:
+\begin{enumerate}[label=(\roman*)] \item What is the value of $L_*$, and how do we know it corresponds to optimal exercise?
+\item What is the value of the put?
+\end{enumerate}
+
+For the perpetual American put, we can base the answers to these questions on explicit computations.
+
+
 \subsection{Approximate Continuation Values}
 Regression-based methods posit an expression for the continuation value of the form
 \begin{equation} \label{eq:ContinuationValueExpectation}
