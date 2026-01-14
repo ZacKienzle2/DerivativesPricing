@@ -195,7 +195,7 @@ Having to define the expectation in two ways is unsatisfactory. Also, there are 
 	\end{equation*}
 \end{defn}
 
-\begin{thm}{Properties of an Expectation}{}
+\begin{thm}{Properties of an Expectation}{PropertiesOfAnExpectation}
 	Let $a, b \in \R$ and let $X, Y$, and $(X_n)$ be numerical random variables for which the expectations below are well-defined. Then, the following hold:
 	\begin{enumerate}
 		\item (\textit{Monotonicity}): If $X \le Y$, then $\E X \le \E Y$.
@@ -211,7 +211,7 @@ Having to define the expectation in two ways is unsatisfactory. Also, there are 
 	\end{equation*}
 \end{lem}
 
-\begin{thm}{Dominated and Bounded Convergence}{}
+\begin{thm}{Dominated and Bounded Convergence}{DominatedAndBoundedConvergence}
 	Let $(X_n)$ be a sequence of numerical random variables for which $\lim X_n = X$ exists. Then, the following hold:
 	\begin{enumerate}
 		\item (\textit{Dominated convergence}): If, for each $n$, $|X_n| \le Y$ for some random variable $Y$ with $\E Y < \infty$, then $\E X_n \to \E X < \infty$.
@@ -245,7 +245,7 @@ Let $X$ be a numerical random variable on
 	For each $p \in [1, \infty]$ the space $L^p$ is comprised of all numerical random variables $X$ for which $\|X\|_p < \infty$.
 \end{defn}
 
-\begin{lem}{Jensen's Inequality}{}
+\begin{lem}{Jensen's Inequality}{JensensInequality}
 	Let $h : \mathcal{X} \to \R$ be a convex function and let $X$ be a random variable taking values in $\mathcal{X}$, with expectation vector $\E X$. Then,
 	\begin{equation*}
 		\E h(X) \ge h(\E X).
@@ -271,20 +271,20 @@ Let $X$ be a numerical random variable on
 \end{thm}
 
 \subsection{Integral Transforms}
-Expectations are used in many probabilistic analyses.
+Expectations are used in many probabilistic analyses. In this section, we highlight their use in integral transforms. Many calculations and manipulations involving the use of such transforms facilitate the analysis of probability distributions. We describe two major types of transforms.
 
-\begin{defn}{Moment Generating Function}{}
+\begin{defn}{Moment Generating Function}{MomentGeneratingFunction}
 	The \textit{moment generating function (MGF)} of a numerical random variable $X$ with distribution $\mu$ is the function $M : \R \to [0, \infty]$, given by
 	\begin{equation*}
 		M(s) \coloneqq \E \e^{sX} = \int_{-\infty}^{\infty} \mu(\di x) \e^{sx}, \quad s \in \R.
 	\end{equation*}
 \end{defn}
 
-\begin{thm}{Uniqueness of the MGF}{}
+\begin{thm}{Uniqueness of the MGF}{UniquenessOfTheMGF}
 	A measure $\mu$ is determined by its MGF $M$ if the latter is finite in a neighborhood of $0$.
 \end{thm}
 
-\begin{thm}{Taylor's Theorem for MGFs}{}
+\begin{thm}{Taylor's Theorem for MGFs}{TaylorsTheoremForMGFs}
 	Suppose $M(s) \coloneqq \E \e^{sX}$ is finite in the neighborhood $(-s_0, s_0)$ of $0$. Then, $M$ has the Taylor expansion
 	\begin{equation*}
 		M(s) = \sum_{k=0}^{\infty} \frac{s^k}{k!} \E X^k, \quad |s| < s_0.
