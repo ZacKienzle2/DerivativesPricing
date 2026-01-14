@@ -2,19 +2,16 @@
 We work in a finite-horizon discrete-time model indexed by $\left\{0,1,\dots,N\right\}$
 \begin{center}
 	\begin{tikzpicture}[x=1.5cm, y=1cm]
-		% Continuous horizontal timeline
+
 		\draw[thick] (0,0) -- (6,0);
 
-		% Ticks and Labels for 0, 1, 2, 3
 		\foreach \x in {0, 1, 2, 3} {
 				\draw[ultra thick] (\x, -0.2) -- (\x, 0.2);
 				\node[below=5pt] at (\x, 0) {$\x$};
 			}
 
-		% Ellipsis label in the gap
 		\node[below=5pt] at (4.5, 0) {$\dots$};
 
-		% Final N tick and label
 		\draw[ultra thick] (6, -0.2) -- (6, 0.2);
 		\node[below=5pt] at (6, 0) {$N$};
 	\end{tikzpicture}
