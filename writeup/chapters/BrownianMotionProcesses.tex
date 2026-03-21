@@ -1,0 +1,225 @@
+% !TEX root = ../main.tex
+\subsection{Wiener Process}
+
+We defined the Wiener process as a Gaussian process as follows:
+\begin{defn}{Wiener Process}{}
+	The \textit{Wiener process} \((W_t, t \geq 0)\) is a zero-mean Gaussian process with continuous sample paths and covariance function
+	\begin{equation}
+		\label{eq:WienerProcessCovarianceFunction}
+		\gamma_{s,t} = \min\{s, t\} =: s \wedge t, \quad s, t \geq 0.
+	\end{equation}
+\end{defn}
+
+A Wiener process is a {\Levy} process with \textit{continuous} sample paths, as shown in the following result, which can also serve as an equivalent definition of the Wiener process.
+
+\begin{thm}{Wiener Process as a {\Levy} Process}{}
+	\(W = {\bigl(W_t\bigr)}_{t \geq 0}\) is a Wiener process if and only if the following three properties hold:
+	\begin{enumerate}
+		\item \textit{(Independent increments):} For any \(t_1 < t_2 \leq t_3 < t_4\), the increments \(W_{t_4} - W_{t_3}\) and \(W_{t_2} - W_{t_1}\) are independent.
+		\item \textit{(Gaussian stationarity):} For all \(t, u \geq 0\), \(W_{t+u} - W_t \sim \mathcal{N}(0, u)\).
+		\item \textit{(Continuity of paths):} \(W\) has continuous paths, with \(W_0 = 0\).
+	\end{enumerate}
+\end{thm}
+
+The following algorithm~\cref{alg:SimulatingWienerProcess} uses the same ideas as in the previous proof to simulate the Wiener process at specific time points \(t_1,\ldots,t_n\).
+
+\begin{algorithm}[H]
+	\caption{Simulating a Wiener Process}\label{alg:SimulatingWienerProcess}
+	\begin{algorithmic}[1]
+		\State~Let \(0 = t_0 < t_1 < \cdots < t_n\) be the times at which the process needs to be simulated.
+		\State~Simulate \(Z_1, \ldots, Z_n \iidsim \mathcal{N}(0, 1)\).
+		\State~Return \(W_0 \coloneqq 0\) and \(W_{t_k} \coloneqq \sum_{i=1}^k Z_i \sqrt{t_i - t_{i-1}}, \quad k = 1, \ldots, n\).
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/twoRealisations.pgf}
+	\caption{Two realisations of the Wiener process on the interval \({[0,1]}\).}\label{fig:twoRealisations.pgf}
+\end{figure}
+
+\begin{defn}{Brownian Motion}{}
+	A stochastic process \((B_t, t \ge 0)\) satisfying
+	\begin{equation*}
+		B_t = B_0 + \mu t + \sigma W_t, \quad t \ge 0,
+	\end{equation*}
+	where \((W_t)\) is a Wiener process independent of \(B_0\), is called a \textit{Brownian motion with drift \(\mu\) and diffusion coefficient \(\sigma\)}.
+\end{defn}
+
+A \textit{standard Brownian motion} is one where \(\mu = 0\) and \(\sigma = 1\). The only difference between a Wiener process and a Brownian motion is its (random) starting position.
+
+\begin{algorithm}[H]
+	\caption{Simulating a Brownian Motion}\label{alg:SimulatingBrownianMotion}
+	\begin{algorithmic}[1]
+		\State~Simulate the starting position \(B_0\).
+		\State~Simulate outcomes \(W_{t_1}, \ldots, W_{t_n}\) of a Wiener process at times \(t_1, \ldots, t_n\).
+		\State~Return \(B_{t_i} \coloneqq B_0 + \mu t_i + \sigma W_{t_i}, \quad i = 1, \ldots, n\) as the outcomes of the Brownian motion at times \(t_1, \ldots, t_n\).
+	\end{algorithmic}
+\end{algorithm}
+
+Multidimensional Brownian motions are likewise obtained from an affine transformation \(\bB_t = \bB_0 + \bmu t + \bsig \bW_t\) of a multidimensional Wiener process, where \(\bsig\) is a matrix.
+
+\begin{defn}{Multidimensional Wiener Process}{MultidimensionalWienerProcess}
+	Let \((W_{t,i}, t \ge 0)\), \(i = 1, \ldots, d\) be independent Wiener processes and let \(\vecb{W}_t \coloneqq {\bigl[W_{t,1}, \ldots, W_{t,d}\bigr]}^{\T}\). The process \({(\vecb{W}_t, t \ge 0)}\) is called a \textit{\(d\)-dimensional Wiener process}.
+\end{defn}
+
+If \((W_t)\) is a \(d\)-dimensional Wiener process, then \(W_t\) has a \(\mathcal{N}(\mathbf{0}, t \mathbf{I}_d)\) multivariate normal distribution, where \(\mathbf{I}_d\) denotes the \(d\)-dimensional identity matrix.
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/threeDimensionalBrownianMotionRealisations.pgf}
+	\caption{Three-dimensional Wiener process.}\label{fig:threeDimensionalBrownianMotionRealisations}
+\end{figure}
+
+\begin{thm}{Time-reversal and Time-shifting}{TimeReversalTimeShifting}
+	If \((W_s, s \in [0, t])\) is a Wiener process on \([0, t]\), then so is the time-reversed process \((\widehat{W}_s, s \in [0, t])\) defined by \(\widehat{W}_s \coloneqq W_{t-s} - W_t\). Similarly, if \((W_s, s \ge 0)\) is a Wiener process, then for any \(t \ge 0\) the process \((\widetilde{W}_s, s \ge 0)\) defined by \(\widetilde{W}_s \coloneqq W_{t+s} - W_t\) is also a Wiener process.
+\end{thm}
+
+\begin{proof}
+	Obviously, \((\widehat{W}_s, s \in [0, t])\) is a Gaussian process with zero mean and continuous sample paths, as these properties are inherited from \(W\). It remains to check that \(\E[\widehat{W}_s \widehat{W}_u] = s\) for all \(0 < s < u < t\). This follows from
+	\begin{align*}
+		\E[\widehat{W}_s \widehat{W}_u]
+		 & = \E\big[(W_{t-s} - W_t)(W_{t-u} - W_t)\big]                          \\
+		 & = \E[W_{t-s} W_{t-u}] + \E[W_t^2] - \E[W_t W_{t-u}] - \E[W_{t-s} W_t] \\
+		 & = (t - u) + t - (t - u) - (t - s)                                     \\
+		 & = s.
+	\end{align*}
+	A similar argument shows that \((\widetilde{W}_s, s \ge 0)\) is a Wiener process.
+\end{proof}
+
+\begin{thm}{Scaling}{Scaling}
+	If \((W_t)\) is a Wiener process, then so is \((X_t)\), with \(X_t \coloneqq W_{at}/\sqrt{a}\), \(t \ge 0\) for any \(a > 0\).
+\end{thm}
+
+\begin{proof}
+	That the scaled process is continuous, Gaussian, and has zero-mean is obvious. For \(s < t\), the covariance function satisfies
+	\[
+		\E X_s X_t = \E \frac{W_{as}}{\sqrt{a}} \frac{W_{at}}{\sqrt{a}} = \frac{as}{a} = s,
+	\]
+	and so is the same as for the Wiener process.
+\end{proof}
+
+\begin{lem}{Probability Bound on the Supremum}{ProbabilityBoundSupremum}
+	For a Wiener process \((W_t)\), it holds for every \(\varepsilon > 0\) that
+	\begin{equation*}
+		\Prob \left( \sup_{0 \le t \le 1} |W_t| > \varepsilon \right) \le 2 \e^{-\varepsilon^2/2}.
+	\end{equation*}
+\end{lem}
+
+
+\begin{thm}{Reciprocal Time}{ReciprocalTime}
+	If \((W_t)\) is a Wiener process, then so is \((X_t)\), with \(X_t \coloneqq t W_{1/t}, \, t > 0, \, X_0 \coloneqq 0\).
+\end{thm}
+
+\begin{proof}
+	Evidently, \((X_t, t > 0)\) is a zero-mean Gaussian process with continuous paths and with \(\E X_s X_t = s\) for all \(0 < s < t\). The only thing to check is that \((X_t, t \ge 0)\)—that is, including \(t = 0\)—has the same properties; in particular, that the process is almost surely continuous at \(0\). In other words, we need to show that as \(t \to \infty\),
+	\begin{equation}\label{eq:AlmostSureLimitAtInfinity}
+		\frac{W_t}{t} \cas 0.
+	\end{equation}
+	Take any \(t > 0\) and let \(n \coloneqq [t]\). Then, we can write
+	\[
+		W_t = \sum_{k=1}^n Z_k + (W_t - W_n),
+	\]
+	where the increments \(Z_k \coloneqq W_k - W_{k-1} \simiid \Nor(0, 1)\) are independent of \(W_t - W_n\). This leads to the bound
+	\[
+		\abs[\bigg]{\frac{W_t}{t}}
+		\le \frac{1}{n} \abs[\bigg]{\sum_{k=1}^n Z_k + (W_t - W_n)}
+		\le \abs[\bigg]{\frac{1}{n} \sum_{k=1}^n Z_k} + \frac{1}{n} \sup_{0 \le s \le 1} \abs{\widetilde{W}_s},
+	\]
+	where \(\widetilde{W}_s \coloneqq W_{n+s} - W_n\). By the Strong Law of Large Numbers~\Cref{thm:StrongLawLargeNumbers}, \(\sum_{k=1}^n Z_k/n\) converges almost surely to \(0\). Since \((\widetilde{W}_s, s \ge 0)\) is a Wiener process by~\Cref{thm:TimeReversalTimeShifting}, we have by~\Cref{lem:ProbabilityBoundSupremum} that for any \(\varepsilon > 0\),
+	\[
+		\Prob\left( \frac{1}{n} \sup_{0 \le s \le 1} \abs{\widetilde{W}_s} > \varepsilon \right)
+		\le 2 \e^{-n^2 \varepsilon^2/2}.
+	\]
+	Since \(\sum_n \e^{-n^2 \varepsilon^2/2} < \infty\), it follows that \(\frac{1}{n} \sup_{0 \le s \le 1} \abs{\widetilde{W}_s} \xrightarrow{\mathrm{cpl}} 0\). Hence,~\Cref{thm:ModesOfConvergence} implies that \(\frac{1}{n} \sup_{0 \le s \le 1} \abs{\widetilde{W}_s} \cas 0\) and consequently that~\Cref{eq:AlmostSureLimitAtInfinity} holds.
+\end{proof}
+
+\begin{xtip}{Starting Position}{StartingPosition}
+	Since the Wiener process starts at position \(0\) by definition, it is sometimes useful to consider instead a standard Brownian motion process starting from some arbitrary state \(x\) under a probability measure \(\Prob^x\). The corresponding expectation operator is then denoted by \(\E^x\).
+\end{xtip}
+\subsection{Existence}
+
+\begin{thm}{Existence of the Wiener Process}{}
+	There exists a probability space \((\Omega, \cH, \Prob)\) and a zero-mean Gaussian process \(W \coloneqq (W_t, t \in [0, 1])\) with covariance function \(\E W_s W_t = s \wedge t\) and uniformly continuous sample paths.
+\end{thm}
+
+\subsection{Strong Markov Property}
+
+
+\begin{thm}{Right-continuous Filtration}{}
+	For the Wiener process, the augmentation \((\xbar{\cF}_t)\) of the natural filtration is right-continuous; that is,
+	\begin{equation*}
+		\xbar{\cF}_t = \xbar{\cF}_t^+ \coloneqq \bigcap_{\varepsilon > 0} \xbar{\cF}_{t+\varepsilon}.
+	\end{equation*}
+\end{thm}
+
+\begin{thm}{Wiener Process is Markov w.r.t \(\cF^+\)}{WienerProcessMarkovFPlus}
+	Let \(W\) be a Wiener process. For every \(t \ge 0\), the process \((W_{t+u} - W_t, u \ge 0)\) is independent of \(\cF_t^+\). Consequently, \(W\) is Markovian with respect to \(\cF^+\).
+\end{thm}
+
+\begin{proof}
+    Take a strictly decreasing sequence \(t_n \downarrow t\). By continuity of paths,
+    \[
+        W_{t+u} - W_t = \lim_{n \to \infty} \big(W_{t_n+u} - W_{t_n}\big).
+    \]
+    For any selection \(u_1, \ldots, u_m \ge 0\) and any \(n\), the vector
+    \[
+        \big(W_{t_n+u_1} - W_{t_n}, \ldots, W_{t_n+u_m} - W_{t_n}\big)
+    \]
+    is independent of \(\cF_t^+\), and so is its limit as \(n \to \infty\). Hence, the process \((W_{t+u} - W_t,\, u \ge 0)\) is independent of \(\cF_t^+\).
+\end{proof}
+
+As a matter of fact, in the theorem above, we can replace \(t\) with any (almost surely) finite stopping time \(T\). This is the \textit{strong Markov property} of the Wiener process.
+
+
+\begin{thm}{Strong Markov Property}{StrongMarkovProperty}
+	For any finite stopping time \(T\) with respect to \(\cF^+\), the process \((W_{T+u} - W_T, u \ge 0)\) is a Wiener process independent of \(\cF_T^+\).
+\end{thm}
+
+\begin{thm}{Reflection Principle}{ReflectionPrinciple}
+	Let \(T\) be a stopping time. Then, \((\tilde{W}_t, t \ge 0)\), defined by
+	\begin{equation}
+		\tilde{W}_t \coloneqq W_t \I_{\{t \le T\}} + (2W_T - W_t) \I_{\{t > T\}}, \quad t \ge 0,
+		\label{eq:ReflectionProcess}
+	\end{equation}
+	is a Wiener process.
+\end{thm}
+
+\begin{proof}
+	If \(T < \infty\), then by the strong Markov property~\Cref{thm:StrongMarkovProperty}, \((W_{T+t} - W_T, t \ge 0)\) is a Wiener process, and so is \(-(W_{T+t} - W_T, t \ge 0)\). Moreover, both processes are independent of \(\cF_T^+\). By concatenating \((W_t, t \le T)\) and \(-(W_{T+t} - W_T, t \ge 0)\), we obtain a Wiener process, and this process is \((\tilde{W}_t, t \ge 0)\).
+\end{proof}
+
+
+\begin{thm}{Transition Kernel of the Wiener Process}{}
+	The Wiener process \(W\) admits the transition function
+	\begin{equation*}
+		P_{t,u}(x, A) = \Prob(W_u \in A \mid W_t = x) = \int_A \di y \, p_{u-t}(y \mid x),
+	\end{equation*}
+	where the \textit{transition density} \(p_t(y \mid x)\) is given by
+	\begin{equation}
+		p_t(y \mid x) \coloneqq \frac{1}{\sqrt{2 \pi t}} \e^{-\frac{{(y-x)}^2}{2t}}, \quad t \ge 0, \quad x,y \in \R.
+		\label{eq:WienerTransitionDensity}
+	\end{equation}
+\end{thm}
+
+\begin{thm}{Exponential Martingale}{ExponentialMartingale}
+	A continuous process \(X \coloneqq (X_t, t \ge 0)\) is a Wiener process if and only if for each \(r \in \R\) the process \(S \coloneqq (S_t)\) defined by
+	\begin{equation}
+		S_t \coloneqq \e^{r X_t - \frac{1}{2}r^2 t}, \quad t \ge 0,
+		\label{eq:ExponentialMartingaleProcess}
+	\end{equation}
+	is a martingale.
+\end{thm}
+
+\begin{thm}{Martingales from Functions of a Brownian Motion}{}
+	Let \(f : \R^d \to \R\) be twice continuously differentiable and let \(\vecb{B}\) be \(d\)-dimensional standard Brownian motion. If for all \(t > 0\) and \(\vecb{x} \in \R^d\),
+	\begin{equation*}
+		\E^{\vecb{x}} |f(\vecb{B}_t)| < \infty \quad \text{and} \quad \E^{\vecb{x}} \int_0^t |\Delta f(\vecb{B}_s)| \di s < \infty,
+	\end{equation*}
+	then the process \((X_t, t \ge 0)\) defined by
+	\begin{equation}
+		X_t \coloneqq f(\vecb{B}_t) - \frac{1}{2} \int_0^t \Delta f(\vecb{B}_s) \di s
+		\label{eq:MartingaleFunctionProcess}
+	\end{equation}
+	is a martingale.
+\end{thm}

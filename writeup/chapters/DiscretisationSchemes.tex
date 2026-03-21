@@ -1,0 +1,477 @@
+\begin{comment}
+    Euler-Maruyama, Milstein, Implicit Euler, Runge-Kutta, SDE
+    https://web.mit.edu/10.001/Web/Course_Notes/Differential_Equations_Notes/node5.html
+\end{comment}
+
+\subsection{Stochastic Taylor Expansion}
+\noindent Deterministic Taylor expansions are well known. To begin, we shall consider the solution \(X_t\) of a \(1\)-dimensional ordinary differential equation
+
+\begin{equation}\label{eq:DifferentialEquation}
+    \frac{d}{d t} X_t = a(X_t),
+\end{equation}
+
+\noindent with initial value \(X_{t_0}\), for \(t \in [t_0, T]\) where \(0 \leq t_0 < T\). We can write this in the equivalent integral equation form
+
+\begin{equation}\label{eq:DeterministicIntegralEquation}
+    X_t = X_{t_0} + \int_{t_0}^t a(X_s) \, ds.
+\end{equation}
+
+\noindent To justify the following constructions, we shall require the function \(a\) to satisfy appropriate properties, for example, to be sufficiently smooth and to have a linear growth bound. Let \(f : \mathbb{R} \to \mathbb{R}\) be a continuously differentiable function. Then, by the chain rule, we have
+
+\begin{equation}\label{eq:ChainRule}
+    \frac{d}{d t} f(X_t) = a(X_t) \frac{\partial}{\partial x} f(X_t),
+\end{equation}
+
+\noindent which, using the operator
+
+\begin{equation}\label{eq:OperatorDefinition}
+    L = a \frac{\partial}{\partial x},
+\end{equation}
+
+\noindent we can express as the integral relation
+
+\begin{equation}\label{eq:IntegralRelation}
+    f(X_t) = f(X_{t_0}) + \int_{t_0}^t L f(X_s) \, ds
+\end{equation}
+
+\noindent for all \(t \in [t_0, T]\). When \(f(x) \equiv x\) we have \(Lf = a\), \(L^2 f = La, \dots\) and \eqref{eq:IntegralRelation} reduces to
+
+\begin{equation}\label{eq:ReducedIntegralRelation}
+    X_t = X_{t_0} + \int_{t_0}^t a(X_s) \, ds,
+\end{equation}
+
+\noindent that is to equation \eqref{eq:IntegralEquation}.
+
+If we now apply the relation~\eqref{eq:IntegralRelation} to the function \(f = a\) in the integral in~\eqref{eq:ReducedIntegralRelation}, we obtain
+
+\begin{equation}\label{eq:FirstTaylorExpansion}
+    \begin{split}
+        X_t &= X_{t_0} + \int_{t_0}^t \left( a(X_{t_0}) + \int_{t_0}^s La(X_z) \, dz \right) \, ds \\
+        &= X_{t_0} + a(X_{t_0}) \int_{t_0}^t \, ds + \int_{t_0}^t \int_{t_0}^s La(X_z) \, dz \, ds,
+    \end{split}
+\end{equation}
+
+\noindent which is the simplest nontrivial Taylor expansion for \(X_t\). We can apply \eqref{eq:IntegralRelation} again to the function \(f = La\) in the double integral to derive
+
+\begin{equation}\label{eq:SecondTaylorExpansion}
+    X_t = X_{t_0} + a(X_{t_0}) \int_{t_0}^t \, ds + La(X_{t_0}) \int_{t_0}^t \int_{t_0}^s \, dz \, ds + R_3
+\end{equation}
+
+\noindent with remainder
+
+\begin{equation}\label{eq:RemainderTerm}
+    R_3 = \int_{t_0}^t \int_{t_0}^s \int_{t_0}^z L^2 a(X_u) \, du \, dz \, ds,
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\). For a general \(r+1\) times continuously differentiable function \(f : \mathbb{R} \to \mathbb{R}\) this method gives the classical Taylor formula in integral form:
+
+\begin{equation}\label{eq:GeneralTaylorFormula}
+    \begin{split}
+        f(X_t) &= f(X_{t_0}) + \sum_{l=1}^r \frac{(t-t_0)^l}{l!} L^l f(X_{t_0}) \\
+        &\quad + \int_{t_0}^t \dots \int_{t_0}^{s_2} L^{r+1} f(X_{s_1}) \, ds_1 \dots ds_{r+1}
+    \end{split}
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\) and \(r = 1, 2, 3, \dots\).
+
+The Taylor formula \eqref{eq:GeneralTaylorFormula} has proven to be a very useful tool in both theoretical and practical investigations, particularly in numerical analysis. It allows the approximation of a sufficiently smooth function in a neighbourhood of a given point to any desired order of accuracy. This expansion depends on the values of the function and some of its higher derivatives at the expansion point, weighted by corresponding multiple time integrals. In addition, there is a remainder term which contains the next multiple time integral, but now with a time-dependent integrand.
+
+We shall indicate it here for the solution \(X_t\) of the 1-dimensional Ito stochastic differential equation in integral form
+
+\begin{equation} \label{eq:ItoIntegralForm}
+    X_t = X_{t_0} + \int_{t_0}^t a(X_s) \, ds + \int_{t_0}^t b(X_s) \, dW_s
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\), where the second integral in \eqref{eq:ItoIntegralForm} is an Ito stochastic integral and the coefficients \(a\) and \(b\) are sufficiently smooth real-valued functions satisfying a linear growth bound. Then, for any twice continuously differentiable function \(f : \mathbb{R} \to \mathbb{R}\) the Ito formula \cref{eq:ItoFormulaApplication} gives
+
+\begin{equation} \label{eq:ItoFormulaApplication}
+\begin{split}
+    f(X_t) &= f(X_{t_0}) \\
+    &\quad + \int_{t_0}^t \left( a(X_s)\frac{\partial}{\partial x}f(X_s) + \frac{1}{2}b^2(X_s)\frac{\partial^2}{\partial x^2}f(X_s) \right) \, ds \\
+    &\quad + \int_{t_0}^t b(X_s)\frac{\partial}{\partial x}f(X_s) \, dW_s \\
+    &= f(X_{t_0}) + \int_{t_0}^t L^0 f(X_s) \, ds + \int_{t_0}^t L^1 f(X_s) \, dW_s,
+\end{split}
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\). Here we have introduced the operators
+
+\begin{equation} \label{eq:OperatorL0}
+    L^0 = a \frac{\partial}{\partial x} + \frac{1}{2}b^2 \frac{\partial^2}{\partial x^2}
+\end{equation}
+
+\noindent and
+
+\begin{equation} \label{eq:OperatorL1}
+    L^1 = b \frac{\partial}{\partial x}.
+\end{equation}
+
+\noindent Obviously, for \(f(x) \equiv x\) we have \(L^0 f = a\) and \(L^1 f = b\), in which case \eqref{eq:ItoFormulaApplication} reduces to the original Ito equation for \(X_t\), that is to
+
+\begin{equation} \label{eq:OriginalItoEquation}
+    X_t = X_{t_0} + \int_{t_0}^t a(X_s) \, ds + \int_{t_0}^t b(X_s) \, dW_s.
+\end{equation}
+
+\noindent In analogy with the above deterministic expansions, if we apply the Ito formula \eqref{eq:ItoFormulaApplication} to the functions \(f = a\) and \(f = b\) in \eqref{eq:OriginalItoEquation} we obtain
+
+\begin{equation} \label{eq:ItoCoefficientExpansion}
+\begin{split}
+    X_t &= X_{t_0} \\
+    &\quad + \int_{t_0}^t \left( a(X_{t_0}) + \int_{t_0}^s L^0 a(X_z) \, dz + \int_{t_0}^s L^1 a(X_z) \, dW_z \right) \, ds \\
+    &\quad + \int_{t_0}^t \left( b(X_{t_0}) + \int_{t_0}^s L^0 b(X_z) \, dz + \int_{t_0}^s L^1 b(X_z) \, dW_z \right) \, dW_s \\
+    &= X_{t_0} + a(X_{t_0}) \int_{t_0}^t ds + b(X_{t_0}) \int_{t_0}^t dW_s + R
+\end{split}
+\end{equation}
+
+\noindent with remainder
+
+\begin{equation} \label{eq:FirstRemainder}
+\begin{split}
+    R &= \int_{t_0}^t \int_{t_0}^s L^0 a(X_z) \, dz \, ds + \int_{t_0}^t \int_{t_0}^s L^1 a(X_z) \, dW_z \, ds \\
+    &\quad + \int_{t_0}^t \int_{t_0}^s L^0 b(X_z) \, dz \, dW_s + \int_{t_0}^t \int_{t_0}^s L^1 b(X_z) \, dW_z \, dW_s.
+\end{split}
+\end{equation}
+
+\noindent This is the simplest nontrivial Ito-Taylor expansion. We can continue it, for instance, by applying the Ito formula \eqref{eq:ItoFormulaApplication} to \(f = L^1 b\) in \eqref{eq:ItoCoefficientExpansion}, in which case we get
+
+\begin{equation} \label{eq:HigherOrderExpansion}
+\begin{split}
+    X_t &= X_{t_0} + a(X_{t_0}) \int_{t_0}^t ds + b(X_{t_0}) \int_{t_0}^t dW_s \\
+    &\quad + L^1 b(X_{t_0}) \int_{t_0}^t \int_{t_0}^s dW_z \, dW_s + \bar{R}
+\end{split}
+\end{equation}
+
+\noindent with remainder
+
+\begin{equation} \label{eq:SecondRemainder}
+\begin{split}
+    \bar{R} &= \int_{t_0}^t \int_{t_0}^s L^0 a(X_z) \, dz \, ds + \int_{t_0}^t \int_{t_0}^s L^1 a(X_z) \, dW_z \, ds \\
+    &\quad + \int_{t_0}^t \int_{t_0}^s L^0 b(X_z) \, dz \, dW_s + \int_{t_0}^t \int_{t_0}^s \int_{t_0}^z L^0 L^1 b(X_u) \, du \, dW_z \, dW_s \\
+    &\quad + \int_{t_0}^t \int_{t_0}^s \int_{t_0}^z L^1 L^1 b(X_u) \, dW_u \, dW_z \, dW_s.
+\end{split}
+\end{equation}
+
+\noindent We shall now consider another representation for the increments of a function of an Ito process \(X\), which we shall call the \textit{Stratonovich-Taylor expansion}. For this we start with the \(1\)-dimensional Stratonovich stochastic differential equation in integral form
+
+\begin{equation} \label{eq:StratonovichIntegralForm}
+    X_t = X_{t_0} + \int_{t_0}^t \underline{a}(X_s) \, ds + \int_{t_0}^t b(X_s) \circ dW_s
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\), where the second integral in \eqref{eq:StratonovichIntegralForm} is a Stratonovich stochastic integral and the coefficients \(\underline{a}\) and \(b\) are sufficiently smooth real valued functions satisfying a linear growth bound. Consider that
+
+\begin{equation*}
+    \underline{a} = a - \frac{1}{2} bb'
+\end{equation*}
+
+\noindent the \cref{eq:ItoIntegralForm} and the Stratonovich equation \eqref{eq:StratonovichIntegralForm} are equivalent and have the same solutions. The solution of a Stratonovich SDE transforms according to the deterministic chain rule, so for any twice continuously differentiable function \(f : \mathbb{R} \to \mathbb{R}\) we have
+
+\begin{equation} \label{eq:StratonovichItoFormula}
+\begin{split}
+    f(X_t) &= f(X_{t_0}) + \int_{t_0}^t \underline{a}(X_s)\frac{\partial}{\partial x}f(X_s) \, ds+ \int_{t_0}^t b(X_s)\frac{\partial}{\partial x}f(X_s) \circ dW_s, \\
+    &= f(X_{t_0}) + \int_{t_0}^t \underline{L}^0 f(X_s) \, ds + \int_{t_0}^t \underline{L}^1 f(X_s) \circ dW_s,
+\end{split}
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\), with the operators
+
+\begin{equation} \label{eq:StratonovichOperatorL0}
+    \underline{L}^0 = \underline{a} \frac{\partial}{\partial x}
+\end{equation}
+
+\noindent and
+
+\begin{equation} \label{eq:StratonovichOperatorL1}
+    \underline{L}^1 = b \frac{\partial}{\partial x}.
+\end{equation}
+
+\noindent Obviously, for \(f(x) \equiv x\) we have \(\underline{L}^0 f = \underline{a}\) and \(\underline{L}^1 f = b\), in which case \eqref{eq:StratonovichItoFormula} reduces to the original Stratonovich equation
+
+\begin{equation} \label{eq:StratonovichIdentity}
+    X_t = X_{t_0} + \int_{t_0}^t \underline{a}(X_s) \, ds + \int_{t_0}^t b(X_s) \circ dW_s.
+\end{equation}
+
+\noindent Analogously with the Ito case just considered, we can apply \eqref{eq:StratonovichItoFormula} to the integrand functions \(f = \underline{a}\) and \(f = b\) in \eqref{eq:StratonovichOperatorL0}. This gives
+
+\begin{equation} \label{eq:StratonovichCoefficientExpansion}
+\begin{split}
+    X_t &= X_{t_0} \\
+    &\quad + \int_{t_0}^t \biggl( \underline{a}(X_{t_0}) + \int_{t_0}^s \underline{L}^0 \underline{a}(X_z) \, dz + \int_{t_0}^s \underline{L}^1 \underline{a}(X_z) \circ dW_z \biggr) \, ds \\
+    &\quad + \int_{t_0}^t \biggl( b(X_{t_0}) + \int_{t_0}^s \underline{L}^0 b(X_z) \, dz + \int_{t_0}^s \underline{L}^1 b(X_z) \circ dW_z \biggr) \circ dW_s \\
+    &= X_{t_0} + \underline{a}(X_{t_0}) \int_{t_0}^t ds + b(X_{t_0}) \int_{t_0}^t \circ dW_s + R
+\end{split}
+\end{equation}
+
+\noindent with remainder
+
+\begin{equation} \label{eq:StratonovichRemainderFirst}
+\begin{split}
+    R &= \int_{t_0}^t \int_{t_0}^s \underline{L}^0 \underline{a}(X_z) \, dz \, ds + \int_{t_0}^t \int_{t_0}^s \underline{L}^1 \underline{a}(X_z) \circ dW_z \, ds \\
+    &\quad + \int_{t_0}^t \int_{t_0}^s \underline{L}^0 b(X_z) \, dz \circ dW_s + \int_{t_0}^t \int_{t_0}^s \underline{L}^1 b(X_z) \circ dW_z \circ dW_s.
+\end{split}
+\end{equation}
+
+\noindent This is the simplest nontrivial Stratonovich-Taylor expansion of \(f(X_t)\). We can continue expanding, for instance, by applying \eqref{eq:StratonovichItoFormula} to the integrand \(f = \underline{L}^1 b\) in \eqref{eq:StratonovichCoefficientExpansion} to obtain
+
+\begin{equation} \label{eq:StratonovichNextExpansion}
+\begin{split}
+    X_t &= X_{t_0} + \underline{a}(X_{t_0}) \int_{t_0}^t ds + b(X_{t_0}) \int_{t_0}^t \circ dW_s \\
+    &\quad + \underline{L}^1 b(X_{t_0}) \int_{t_0}^t \int_{t_0}^s \circ dW_z \circ dW_s + \bar{R}
+\end{split}
+\end{equation}
+
+\noindent with remainder
+
+\begin{equation} \label{eq:StratonovichRemainderSecond}
+\begin{split}
+    \bar{R} &= \int_{t_0}^t \int_{t_0}^s \underline{L}^0 \underline{a}(X_z) \, dz \, ds + \int_{t_0}^t \int_{t_0}^s \underline{L}^1 \underline{a}(X_z) \circ dW_z \, ds \\
+    &\quad + \int_{t_0}^t \int_{t_0}^s \underline{L}^0 b(X_z) \, dz \circ dW_s \\
+    &\quad + \int_{t_0}^t \int_{t_0}^s \int_{t_0}^z \underline{L}^0 \underline{L}^1 b(X_u) \, du \circ dW_z \circ dW_s \\
+    &\quad + \int_{t_0}^t \int_{t_0}^s \int_{t_0}^z \underline{L}^1 \underline{L}^1 b(X_u) \circ dW_u \circ dW_z \circ dW_s.
+\end{split}
+\end{equation}
+
+\noindent Similar expansions hold for multi-dimensional Ito processes satisfying nonautonomous stochastic differential equations. We shall refer to the nonautonomous \(d\)-dimensional Ito equation
+
+\begin{equation} \label{eq:MultiDimIto}
+    X_t = X_{t_0} + \int_{t_0}^t a(s, X_s) \, ds + \sum_{j=1}^m \int_{t_0}^t b^j(s, X_s) \, dW^j_s
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\) and the equivalent Stratonovich equation
+
+\begin{equation} \label{eq:MultiDimStratonovich}
+    X_t = X_{t_0} + \int_{t_0}^t \underline{a}(s, X_s) \, ds + \sum_{j=1}^m \int_{t_0}^t b^j(s, X_s) \circ dW^j_s
+\end{equation}
+
+\noindent for \(t \in [t_0, T]\), where
+
+\begin{equation} \label{eq:MultiDimCorrection}
+    \underline{a}^i = a^i - \frac{1}{2} \sum_{j=1}^m \sum_{k=1}^d b^{k,j} \frac{\partial b^{i,j}}{\partial x^k}
+\end{equation}
+
+\noindent for \(i = 1, 2, \dots, d\). In both of these SDEs \(W = \{W_t, t \in [0, T]\}\) is a standard \(m\)-dimensional Wiener process adapted to an increasing family of sub-\(\sigma\)-algebras \(\{\mathcal{A}_t, t \in [0, T]\}\).
+
+\subsection{Strong Convergence Criterion}
+In simulation, filtering, and estimation of \Ito{} processes, the sample paths of the approximation must closely track those of the underlying process. The primary criterion for this proximity is the absolute error at the final time instant \(T\).
+\begin{equation}
+    \epsilon(\delta) = \E(|X_T - Y_N|).
+    \label{eq:StrongConvergenceError}
+\end{equation}
+This error is bounded by the root mean square error via the \textit{Lyapunov inequality}:
+\begin{equation}
+    \epsilon(\delta) = \E(|X_T - Y_N|) \le \sqrt{\E(|X_T - Y_N|^2)}.
+    \label{eq:LyapunovBound}
+\end{equation}
+
+\begin{defn}{Strong Order of Convergence}{StrongOrderOfConvergence}
+An approximating process \(Y\) converges in the \textit{strong sense with order} \(\gamma \in (0, \infty]\) if there exists a finite constant \(K\) and a positive constant \(\delta_0\) such that
+\begin{equation}
+    \E(|X_T - Y_N|) \le K \delta^\gamma
+    \label{eq:StrongConvergenceOrder}
+\end{equation}
+for any time discretization with maximum step size \(\delta \in (0, \delta_0)\).
+\end{defn}
+
+\begin{xtip}
+In the deterministic limit where diffusion vanishes (\(b \equiv 0\)), the strong convergence criterion reduces to the standard error criterion for ordinary differential equations (ODEs). Stochastic schemes generically exhibit lower convergence orders than their deterministic counterparts because the regularity of the Wiener process dictates that increments \(\Delta W_n\) scale as \(\delta^{1/2}\) in the root mean square sense rather than \(\delta\). This intrinsic degradation results in the Euler approximation achieving a strong order of \(\gamma = 0.5\) for SDEs in contrast to the order \(1.0\) obtained for ODEs.
+\end{xtip}
+
+\subsection{Weak Convergence Criterion}
+In many practical scenarios, such as moment estimation or option pricing, a precise pathwise approximation of the \Ito{} process is not required. Instead, the focus is often on the expectation of a function of the process at a final time \(T\), such as the first two moments \(\E(X_T)\) and \(\E((X_T)^2)\), or more generally \(\E(g(X_T))\) for some function \(g\). In these cases, it suffices to approximate the probability distribution of the random variable \(X_T\) rather than the sample paths. This leads to a weaker convergence criterion than the strong sense.
+
+\begin{defn}{Weak Order of Convergence}{WeakOrderOfConvergence}
+A time discrete approximation \(Y\) converges in the \textit{weak sense with order} \(\beta \in (0, \infty]\) if for any polynomial \(g\) there exists a finite constant \(K\) and a positive constant \(\delta_0\) such that
+\begin{equation}
+    |\E(g(X_T)) - \E(g(Y_N))| \le K \delta^\beta
+    \label{eq:WeakConvergenceOrder}
+\end{equation}
+for any time discretization with maximum step size \(\delta \in (0, \delta_0)\).
+\end{defn}
+
+\begin{xtip}
+In the limit of vanishing diffusion where \(b \equiv 0\), the weak convergence criterion with \(g(x) \equiv x\) collapses to the standard deterministic convergence criterion for ordinary differential equations. For stochastic systems, the weak order \(\beta\) frequently diverges from the strong order \(\gamma\), exemplified by the Euler approximation achieving a higher weak order of \(\beta = 1.0\) compared to its strong order of \(\gamma = 0.5\). This distinction becomes critical when the objective involves estimating moments or probability distributions rather than simulating specific sample paths.
+\end{xtip}
+
+\subsection{Euler-Maruyama}
+\begin{comment}
+    \begin{equation}
+    \mathbb{E} [\phi(X)] \simeq \frac{1}{N} \sum_{i=1}^{N} \phi(\hat{X}_i) \notag
+    derivative hedging using reinforcement learning
+    improve basket trading using bayesian optimisation
+    robust portfolio optimisation using SPO
+\end{equation}
+\end{comment}
+To apply the Monte Carlo method in option pricing, we generate a sequence \((Y_1, \dots, Y_N)\) of sample realisations of a random variable, such that the empirical mean
+\begin{equation}
+    \E [\phi(X)] \approx \frac{1}{N} \sum_{i=1}^{N} \phi(Y_i)
+    \label{eq:MonteCarloEstimator}
+\end{equation}
+converges to the expected value \(\E [\phi(X)]\) by the Strong Law of Large Numbers.
+
+Random samples for the solution of a stochastic differential equation defined on the probability space \((\Omega, \scF, \Prob)\) of the form
+\begin{equation}
+    \di X_t = b(t, X_t) \di t + a(t, X_t) \di W_t,
+    \label{eq:SDE}
+\end{equation}
+where \((W_t)_{t\in\mathbb{R}_+}\) is a standard Brownian motion, can be generated by time discretisation on a grid \(\pi_{\delta} = \{0 = t_0 < t_1 < \dots < t_M = T\}\).
+
+More precisely, the Euler-Maruyama discretisation scheme for the stochastic differential equation, \cref{eq:SDE}, is given by the recursive approximation \(Y^\delta\):
+\begin{align}
+    Y_{t_{k+1}}^{\delta} &= Y_{t_{k}}^{\delta} + \int_{t_{k}}^{t_{k+1}} b(t_k, Y^\delta_{t_k}) \di s + \int_{t_{k}}^{t_{k+1}} a(t_k, Y^\delta_{t_k}) \di W_s \notag \\
+    &\approx Y_{t_{k}}^{\delta} + b(t_k, Y_{t_{k}}^{\delta}) (t_{k+1} - t_k) + a(t_k, Y_{t_{k}}^{\delta}) (W_{t_{k+1}} - W_{t_k}),
+    \label{eq:EulerScheme}
+\end{align}
+where the increments satisfy \(W_{t_{k+1}} - W_{t_k} \sim \Nor (0,t_{k+1} - t_{k})\) for \(k = 0,1,\dots,M-1\).
+
+Let \(T > 0\) and consider the stochastic differential equation \cref{eq:SDE} on the time interval \([0, T]\). Suppose that the initial data satisfies
+\begin{align}
+    \E \left(|X_0|^2\right) &< \infty, \label{eq:InitialMoment} \\
+    \E \left(|X_0 - Y^\delta_0|^2\right)^{1/2} &\leq K_1 \delta^{1/2}, \label{eq:InitialApproximationError}
+\end{align}
+and that the coefficients \(a: [0, T] \times \R^d \to \R^{d \times m}\) and \(b: [0, T] \times \R^d \to \R^d\) satisfy the global Lipschitz condition
+\begin{equation}
+    |a(t, x) - a(t, y)| + |b(t, x) - b(t, y)| \leq K_2 |x - y| \label{eq:LipschitzConditionSDENumerics}
+\end{equation}
+and the linear growth condition
+\begin{equation}
+    |a(t, x)| + |b(t, x)| \leq K_3 (1 + |x|) \label{eq:LinearGrowthCondition}
+\end{equation}
+for all \(t \in [0, T]\) and \(x, y \in \R^d\). Furthermore, assume the coefficients satisfy the Hölder continuity condition in time:
+\begin{equation}
+    |a(s, x) - a(t, x)| + |b(s, x) - b(t, x)| \leq K_4 (1 + |x|) |s - t|^{1/2} \label{eq:HolderContinuity}
+\end{equation}
+for all \(s, t \in [0, T]\) and \(x \in \R^d\). The constants \(K_1, \dots, K_4\) must not depend on the discretisation step size \(\delta\).
+
+\begin{thm}{Strong Convergence of the Euler-Maruyama Scheme}{StrongConvergenceEuler}
+    Then, for the Euler-Maruyama approximation \(Y^\delta\) defined on the grid \(\pi_\delta\), the following strong error estimate holds:
+    \begin{equation}
+        \E \left(|X_T - Y^\delta(T)|\right) \leq C \delta^{1/2}, \label{eq:StrongConvergenceBound}
+    \end{equation}
+    where the constant \(C\) depends only on \(K_1, \dots, K_4\) and \(T\), but does not depend on \(\delta\).
+\end{thm}
+
+We illustrate Euler’s method via the geometric Brownian motion SDE
+
+\begin{Pcode}{eulerMaruyama.py}
+    T, N, R = 1.0, 2**8, 4
+    dt = T / N
+    mu, sigma, X0 = 1.0, 0.5, 1.0
+
+    np.random.seed(4)
+    dB = np.sqrt(dt) * np.random.randn(N)
+
+    t = np.linspace(0, T, N + 1)
+    B = np.r_[0, np.cumsum(dB)]
+    Y = X0 * np.exp((mu - 0.5 * sigma**2) * t + sigma * B)
+
+    X = np.r_[X0, X0 * np.cumprod(1 + mu * dt + sigma * dB)]
+
+    dB_c = dB.reshape(-1, R).sum(axis=1)
+    X_c = np.r_[X0, X0 * np.cumprod(1 + mu*dt*R + sigma*dB_c)]
+\end{Pcode}
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/eulerMaruyamaCoarseFineComparison.pgf}
+    \caption{Comparison of Euler-Maruyama approximations against the exact analytical solution for a GBM. The simulation uses a fine grid step size of \(\Delta t = 2^{-8}\) and a coarse grid step size of \(\Delta t_{\text{coarse}} = 4\Delta t\). Parameters: \(\mu=1.0\), \(\sigma=0.5\), \(X_0=1.0\).}
+    \label{fig:eulerMaruyamaCoarseFineComparison}
+\end{figure}
+
+\clearpage
+\subsection{Milstein}
+In the Milstein scheme we use \cref{eq:SDE} to expand \(a(X_s)\) as
+\begin{align*}
+    a(X_s) &\simeq a(X_{t_k}) + a'(X_{t_k}) (X_s - X_{t_k}) \\
+    &\simeq a(X_{t_k}) + a'(X_{t_k})(b(X_{t_k}) (s-t_k) + a(X_{t_k}) (W_s - W_{t_k}),
+\end{align*}
+\(0 \leq t_q \leq s\). As a consequence, we get
+\begin{align*}
+    \hat{X}_{t_{k+1}}^N &= \hat{X}_{t_k}^N + \int_{t_k}^{t_{k+1}} b(X_s) ds + \int_{t_k}^{t_{k+1}} a(X_s) dW_s \\
+    &\simeq \hat{X}_{t_k}^N + \int_{t_k}^{t_{k+1}} b(X_s) ds + a(X_{t_k})(W_{t_{k+1}} - W_{t_k}) \\
+    &+ a'(X_{t_k})b(X_{t_k}) \int_{t_k}^{t_{k+1}} (s - t_k) dW_s \\
+    &+ a'(X_{t_k})a(X_{t_k}) \int_{t_k}^{t_{k+1}} (W_s - W_{t_k}) dW_s \\
+    &\simeq \hat{X}_{t_k}^N + \int_{t_k}^{t_{k+1}} b(X_s) ds + a(X_{t_k})(W_{t_{k+1}} - W_{t_k}) \\
+    &+ a'(X_{t_k})a(X_{t_k}) \int_{t_k}^{t_{k+1}} (W_s - W_{t_k}) dW_s.
+\end{align*}
+Next, using \ Ito's formula, we note that
+\begin{equation*}
+    (W_{t_{k+1}} - W_{t_k})^2 = 2 \int_{t_k}^{t_{k+1}} (W_s - W_k)dW_s + \int_{t_k}^{t_{k+1}} ds,
+\end{equation*}
+hence
+\begin{equation*}
+    \int_{t_k}^{t_{k+1}} (W_s - W_{t_k}) dW_s = \frac{1}{2} ((W_{t_{k+1}}-W_{t_k})^2 - (t_{k+1} - t_k))
+\end{equation*}
+and
+\begin{align*}
+    \hat{X}_{t_{k+1}}^N &\simeq \hat{X}_{t_k}^N + \int_{t_k}^{t_{k+1}} b(X_s) ds + a(X_{t_k})(W_{t_{k+1}} - W_{t_k}) \\
+    &\quad + \frac{1}{2} a'(X_{t_k})a(X_{t_k})((W_{t_{k+1}} - W_{t_k})^2 - (t_{k+1} - t_k)) \\
+    &\simeq \hat{X}_{t_k}^N + b(X_{t_k})(t_{k+1} - t_k) + a(X_{t_k})(W_{t_{k+1}} - W_{t_k}) \\
+    &\quad + \frac{1}{2} a'(X_{t_k})a(X_{t_k})((W_{t_{k+1}} - W_{t_k})^2 - (t_{k+1} - t_k)).
+\end{align*}
+As a consequence, the Milstein scheme is written as
+\begin{align*}
+    \hat{X}_{t_{k+1}}^N &\simeq \hat{X}_{t_k}^N + b(\hat{X}_{t_k}^N)(t_{k+1} - t_k) + a(\hat{X}_{t_k}^N)(W_{t_{k+1}} - W_{t_k}) \\
+    &\quad + \frac{1}{2} a' (\hat{X}_{t_k}^N)a(\hat{X}_{t_k}^N)((W_{t_{k+1}} - W_{t_k})^2 - (t_{k+1} - t_k)),
+\end{align*}
+i.e., in the Milstein scheme, we take into account the "small" difference
+\begin{equation*}
+    (W_{t_{k+1}} - W_{t_k})^2 - (t_{k+1} - t_k)
+\end{equation*}
+existing between \((\Delta W_t)^2\) and \(\Delta t\). Taking \((\Delta W_t)^2\) equal to \(\Delta t\) brings us back to the Euler scheme.
+
+Let \(T > 0\). Suppose that the initial data satisfies
+\begin{align}
+    \E \left(|X_0|^2\right) &< \infty, \label{eq:MilsteinInitialMoment} \\
+    \E \left(|X_0 - Y^\delta_0|^2\right)^{1/2} &\leq K_1 \delta^{1/2}. \label{eq:MilsteinInitialError}
+\end{align}
+We assume higher-order regularity on the coefficients compared to the Euler scheme. Specifically, let the differential operator \(\scL^j\) be defined appropriately for the diffusion terms. Assume the coefficients satisfy the global Lipschitz conditions:
+\begin{align}
+    |b(t, x) - b(t, y)| &\leq K_2 |x - y| \notag \\
+    |a^j(t, x) - a^j(t, y)| &\leq K_2 |x - y| \label{eq:MilsteinLipschitz} \\
+    |\scL^{j_1} a^{j_2}(t, x) - \scL^{j_1} a^{j_2}(t, y)| &\leq K_2 |x - y| \notag
+\end{align}
+and the linear growth conditions:
+\begin{align}
+    |b(t, x)| + |\scL^j b(t, x)| &\leq K_3 (1 + |x|) \notag \\
+    |a^j(t, x)| + |\scL^j a^{j_2}(t, x)| &\leq K_3 (1 + |x|) \label{eq:MilsteinLinearGrowth} \\
+    |\scL^{j_1} \scL^{j_2} a^{j_3}(t, x)| &\leq K_3 (1 + |x|) \notag
+\end{align}
+Finally, assume the coefficients satisfy the H\"older continuity condition in time:
+\begin{align}
+    |b(s, x) - b(t, x)| &\leq K_4 (1 + |x|) |s - t|^{1/2} \notag \\
+    |a^j(s, x) - a^j(t, x)| &\leq K_4 (1 + |x|) |s - t|^{1/2} \label{eq:MilsteinHolder} \\
+    |\scL^{j_1} a^{j_2}(s, x) - \scL^{j_1} a^{j_2}(t, x)| &\leq K_4 (1 + |x|) |s - t|^{1/2} \notag
+\end{align}
+for all \(s, t \in [0, T]\), \(x, y \in \R^d\), and indices \(j, j_1, j_2, j_3 = 1, \dots, m\). The constants \(K_1, \dots, K_4\) must not depend on \(\delta\).
+
+\begin{thm}{Strong Convergence of the Milstein Scheme}{StrongConvergenceMilstein}
+    Under the assumptions above, for the Milstein approximation \(Y^\delta\), the following strong error estimate holds:
+    \begin{equation}
+        \E \left(|X_T - Y^\delta(T)|\right) \leq K_5 \delta, \label{eq:MilsteinConvergenceBound}
+    \end{equation}
+    where the constant \(K_5\) does not depend on \(\delta\).
+\end{thm}
+
+\begin{Pcode}{milstein.py}
+    T, N, R = 1.0, 2**8, 4
+    dt = T / N
+    mu, sigma, X0 = 1.0, 0.5, 1.0
+
+    np.random.seed(4)
+    dB = np.sqrt(dt) * np.random.randn(N)
+
+    t = np.linspace(0, T, N + 1)
+    B = np.r_[0, np.cumsum(dB)]
+    Y = X0 * np.exp((mu - 0.5 * sigma**2) * t + sigma * B)
+
+    X = np.r_[X0, X0 * np.cumprod(1 + mu * dt + sigma * dB + 0.5 * sigma**2 * (dB**2 - dt))]
+
+    dB_c = dB.reshape(-1, R).sum(axis=1)
+    dt_c = dt * R
+    X_c = np.r_[X0, X0 * np.cumprod(1 + mu * dt_c + sigma * dB_c + 0.5 * sigma**2 * (dB_c**2 - dt_c))]
+\end{Pcode}
+
+\begin{figure}[H]
+    \centering
+    \input{plotting/milsteinCoarseFineComparison.pgf}
+    \caption{Comparison of Milstein approximations against the exact analytical solution for a GBM. The simulation uses a fine grid step size of \(\Delta t = 2^{-8}\) and a coarse grid step size of \(\Delta t_{\text{coarse}} = 4\Delta t\). Parameters: \(\mu=1.0\), \(\sigma=0.5\), \(X_0=1.0\).}
+    \label{fig:milsteinCoarseFineComparison}
+\end{figure}
