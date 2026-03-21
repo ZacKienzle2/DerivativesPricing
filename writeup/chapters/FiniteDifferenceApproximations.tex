@@ -1,0 +1,236 @@
+\lettrine[lines=2, lhang=0.1]{C}{onsider} a model that depends on a parameter \(\theta\) ranging over some interval of the real line. Suppose that for each value of \(\theta\) we have a mechanism for generating a random variable \(Y(\theta)\), representing the output of the model at
+parameter \(\theta\). Let
+\begin{equation}
+	\alpha(\theta) = \mathbb{E}[Y(\theta)]
+	\label{eq:ExpectedModelOutput} \nonumber
+\end{equation}
+
+The derivative estimation problem consists of finding a way to estimate \(a'(\theta)\), the derivative of a with respect to \(\theta\).
+
+In the application to option pricing, \(Y(\theta)\) is the discounted payoff of an option, \(\alpha(\theta)\) is its price, and \(\theta\) could be any of the many model or market parameters that influence the price. When \(\theta\) is the initial price of an underlying asset, then \(\alpha'(\theta)\) is the option's delta (with respect to that asset). The second derivative \(\alpha"(\theta)\) is the option's gamma. When \(\theta\) is a volatility parameter, \(\alpha'(\theta)\) is often called "vega." For interest rate derivatives, the sensitivities of prices to the initial term structure (as represented by, e.g., a yield curve or forward curve) are important.
+
+\subsection{Bias and Variance}
+
+An obvious approach to derivative estimation proceeds as follows. Simulate independent replications \(Y_1(\theta),\dots,Y_n(\theta)\) of the model at parameter \(\theta\) and \(n\) additional replications \(Y_1(\theta+h),\dots,Y_n(\theta+h)\) at \(\theta + h\), for some \(h>0\). Average each set of replications to get \(\bar{Y}_n(\theta)\) and \(\bar{Y}_n(\theta + h)\) and form the forward-difference estimator.
+
+\begin{equation}
+	\hat{\Delta}_F = \hat{\Delta}_F(n,h) = \frac{\bar{Y}_n(\theta+h) - \bar{Y}_n(\theta)}{h}
+	\label{eq:ForwardDiffEstimator}
+\end{equation}
+
+This estimator has an expectation.
+
+\begin{equation}
+	\mathbb{E}[\hat{\Delta}_F] = h^{-1}[\alpha(\theta+h) - \alpha(\theta)].
+	\label{eq:ForwardDiffExpectation}
+\end{equation}
+
+We have not specified what relation, if any, holds between the outcomes \(Y_i(\theta)\) and \(Y_i(\theta+h)\); this will be important when we consider variance, but \Cref{eq:ForwardDiffExpectation}
+is purely a property of the marginal distributions of the outcomes at \(\theta\) and \(\theta+h\).
+
+If \(\alpha\) is twice differentiable at \(\theta\), then
+
+\begin{equation*}
+	\alpha(\theta+h) = \alpha(\theta) + \alpha'(\theta)h + \frac{1}{2}\alpha''(\theta)h^2 + \mathcal{O}(h^2).
+\end{equation*}
+
+In this case, it follows from \Cref{eq:ForwardDiffExpectation} that the bias in the forward-difference estimator is
+
+\begin{equation}
+	\text{Bias}(\hat{\Delta}_F) = \mathbb{E}[\hat{\Delta}_F - \alpha'(\theta)] = \frac{1}{2}\alpha''(\theta)h + \mathcal{O}(h).
+	\label{eq:ForwardDiffBias}
+\end{equation}
+
+By simulating at \(\theta - h\) and \(\theta + h\), we can form a central-difference estimator
+
+\begin{equation}
+	\hat{\Delta}_C \equiv \hat{\Delta}_C (n,h) = \frac{\bar{Y}_n(\theta+h) - \bar{Y}_n(\theta-h)}{2h}.
+	\label{eq:CentralDiffEstimator}
+\end{equation}
+
+This estimator is often more costly than the forward-difference estimator in the following sense. If we are ultimately interested in estimating \(\alpha(\theta)\) and \(\alpha'(\theta)\), then we would ordinarily simulate at \(\theta\) to estimate \(\alpha(\theta)\), so the forward-difference estimator requires simulating at just one additional point \(\theta + h\). Conversely, the central-difference estimator requires simulating at two additional points. However, this additional computational effort improves the convergence rate of the bias. If \(\alpha\) is at least twice differentiable in a neighbourhood of \(\theta\), then
+
+\begin{align*}
+	\alpha(\theta + h) & = \alpha(\theta) + \alpha'(\theta) h +\alpha''(\theta)h^2/2 + \mathcal{O}(h^2) \\
+	\alpha(\theta - h) & = \alpha(\theta) - \alpha'(\theta) h +\alpha''(\theta)h^2/2 + \mathcal{O}(h^2)
+\end{align*}
+
+so subtraction eliminates the second-order terms, leading
+
+\begin{equation}
+	\text{Bias} (\hat{\Delta}_C) = \frac{\alpha(\theta+h) - \alpha(\theta-h)}{2h} - \alpha'(\theta) = \mathcal{O}(h),
+	\label{eq:CentralDiffBias}
+\end{equation}
+
+which is of smaller order than \Cref{eq:ForwardDiffBias}. If \(\alpha''\) is itself differentiable at \(\theta\), we can refine \Cref{eq:CentralDiffBias} to
+
+\begin{equation}
+	\text{Bias} (\hat{\Delta}_C) = \frac{1}{6} \alpha'''(\theta)h^2 + \mathcal{O}(h^2).
+	\label{eq:CentralDiffBiasOrder}
+\end{equation}
+
+\paragraph{Variance}
+
+The form of the bias of the forward- and central-difference estimators would lead us to take ever smaller values of \(h\) to improve accuracy, at least if we ignore the limits of machine precision. But the effect of \(h\) on bias must be weighed against its effect on variance.
+
+The variance of the forward-difference estimator \Cref{eq:ForwardDiffEstimator} is
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/finiteDifference.pgf}
+	\caption{Comparison of central-difference approximations (dashed) and forward-difference approximation (dotted) with exact tangent value to the Black-Scholes formula.}
+	\label{fig:finiteDifference}
+\end{figure}
+
+\begin{equation} \label{eq:VarianceOfFiniteDifferenceEstimator}
+	\Var[\hat{\Delta}_F(n,h)] = h^{-2}\Var [\bar{Y}_n(\theta + h) - \bar{Y}_n(\theta)]
+\end{equation}
+
+and a corresponding expression holds for the central-difference estimator \Cref{eq:CentralDiffEstimator}.
+In both cases, the factor \(h^{-2}\) alerts us to possibly disastrous consequences of
+taking \(h\) to be very small. Equation \Cref{eq:VarianceOfFiniteDifferenceEstimator} also makes clear that the dependence
+between values simulated at different values of \(\theta\) affects the variance of a finite-difference
+estimator.
+
+Suppose, for simplicity, that the pairs \((Y(\theta), Y(\theta + h))\) and $(Y_i(\theta), Y_i(\theta +
+	h))\(,\)i = 1, 2, \dots$, are i.i.d. so that
+\[
+	\Var [\bar{Y}_n(\theta + h) - \bar{Y}_n(\theta)] = \frac{1}{n}\Var [Y(\theta + h) - Y(\theta)] \,.
+\]
+How the variance in \Cref{eq:VarianceOfFiniteDifferenceEstimator} changes with \(h\) is determined by the dependence of
+\(\Var[Y(\theta + h) - Y(\theta)]\) on \(h\).
+
+Three cases of primary importance arise in practice:
+\begin{equation} \label{eq:VarianceConvergenceCases}
+	\Var[Y(\theta + h) - Y(\theta)] = \begin{cases}
+		\bigO(1),   & \text{Case (i)}    \\
+		\bigO(h),   & \text{Case (ii)}   \\
+		\bigO(h^2), & \text{Case (iii).}
+	\end{cases}
+\end{equation}
+
+Case (i) applies if we simulate \(Y(\theta)\) and \(Y(\theta + h)\) independently; for in this
+case we have
+\[
+	\Var[Y(\theta + h) - Y(\theta)] = \Var[Y(\theta + h)] + \Var[Y(\theta)] \to 2\Var[Y(\theta)],
+\]
+under the minor assumption that \(\Var[Y(\theta)]\) is continuous in \(\theta\). Case (ii) is the
+typical consequence of simulating \(Y(\theta + h)\) and \(Y(\theta)\) using \emph{common random numbers}; i.e., generating them from the same sequence \(U_1, U_2, \dots\) of \(\text{Unif}[0,1]\)
+random variables. (In practice, this is accomplished by starting the simulations at \(\theta\) and \(\theta + h\) with the same seed for the random number generator). For Case (iii) to hold, we generally need not only that \(Y(\theta)\) and \(Y(\theta + h)\) use the same random numbers, but also that for (almost) all values of the random numbers, the output \(Y(\cdot)\) is continuous in the input \(\theta\).
+
+\subsection{Optimal Mean Square Error}
+Because decreasing \(h\) can increase variance while decreasing bias, minimizing mean square error (MSE) requires balancing these two considerations. Increasing the number of replications \(n\) decreases variance with no effect on bias, whereas \(h\) affects both bias and variance; our objective is to find the optimal relation between the two.
+
+Consider the forward-difference estimator with independent simulation at \(\theta\) and \(\theta + h\). We can reasonably assume that Case (i) of \Cref{eq:VarianceConvergenceCases} applies, and for emphasis we denote this estimator by \(\hat{\Delta}_{F,i} = \hat{\Delta}_{F,i}(n, h)\). Squaring the bias in \Cref{eq:ForwardDiffBias} and adding it to the variance in \Cref{eq:VarianceOfFiniteDifferenceEstimator}, we get
+\[
+	\mathrm{MSE}(\hat{\Delta}_{F,i}(n, h)) = \bigO(h^2) + \bigO(n^{-1}h^{-2}),
+\]
+from which we see that minimal conditions for convergence are \(h \to 0\) and \(nh^2 \to \infty\).
+
+To derive a more precise conclusion, we strengthen Cases (i) and (ii) of \Cref{eq:VarianceConvergenceCases}. We have four estimators to consider: forward-difference and central-difference using independent sampling or common random numbers at different values of \(\theta\). We can give a unified treatment of these cases by considering a generic estimator \(\hat{\Delta} = \hat{\Delta}(n, h)\) for which
+\begin{equation}
+	\label{eq:BiasVarianceTradeoff}
+	\E[\hat{\Delta} - \alpha'(\theta)] = b h^\beta + o(h^\beta), \quad \Var[\hat{\Delta}] = \frac{\sigma^2}{n h^\eta} + o(h^{-\eta}),
+\end{equation}
+for some positive \(\beta, \eta, \sigma\), and some nonzero \(b\). Forward- and central-difference estimators typically have \(\beta = 1\) and \(\beta = 2\); taking \(\eta = 2\) sharpens Case (i) of \Cref{eq:VarianceConvergenceCases} and taking \(\eta = 1\) sharpens Case (ii).
+
+Consider a sequence of estimators \(\hat{\Delta}(n, h_n)\) with
+\begin{equation}
+	\label{eq:BandwidthSequence}
+	h_n = h_* n^{-\gamma}
+\end{equation}
+for some positive \(h_*\) and \(\gamma\). From our assumptions on bias and variance, we get
+\begin{equation}
+	\label{eq:MSEExpansion}
+	\mathrm{MSE}(\hat{\Delta}) = b^2 h_n^{2\beta} + \frac{\sigma^2}{n h_n^\eta},
+\end{equation}
+up to terms that are of higher order in \(h_n\). The value of \(\gamma\) that maximizes the rate of decrease of the MSE is \(\gamma = 1/(2\beta + \eta)\), from which we draw the natural implication that with a smaller bias (larger \(\beta\)), we can use a larger increment \(h\).If we substitute this value of \(\gamma\) into \Cref{eq:MSEExpansion} and take the square
+root, we find that
+\begin{equation} \label{RmseConvergence}
+	\mathrm{RMSE}(\hat{\Delta}) = \bigO \left( n^{-\frac{\beta}{2\beta+\eta}} \right) ,
+\end{equation}
+and this is a reasonable measure of the convergence rate of the estimator.
+
+Taking this analysis one step further, we find that
+\begin{equation} \label{MseLimit}
+	n^{2\beta/(2\beta+\eta)}\mathrm{MSE}(\hat{\Delta}) \to b^2 h_*^{2\beta} + \sigma^2 h_*^{-\eta};
+\end{equation}
+minimizing over \(h_*\) yields an optimal value of
+\begin{equation} \label{OptimalHStar}
+	h_* = \left( \frac{\eta\sigma^2}{2\beta b^2} \right)^{\frac{1}{2\beta+\eta}} .
+\end{equation}
+
+The results of this analysis are summarized in \Cref{tab:ConvergenceRates} for the forward-and central-difference estimators using independent sampling or common random numbers. The variance and bias columns display leading terms only and abbreviate the more complete expressions in \Cref{eq:BiasVarianceTradeoff}. The table should be understood as follows: if the leading terms of the variance and bias are as indicated in the second and third columns, then the conclusions in the last three columns hold. The requirement that \(b\) not equal zero in \Cref{eq:BiasVarianceTradeoff} translates to \(\alpha''(\theta) \neq 0\)
+and \(\alpha'''(\theta) \neq 0\) for the forward and central estimators, respectively. The results in the table indicate that, at least asymptotically, \(\hat{\Delta}_{C,ii}\) dominates the other three estimators because it exhibits the fastest convergence.
+
+\begin{table}[H]
+	\centering
+	\caption{Convergence rates of finite-difference estimators with optimal increment \(h_n\). The estimators use either forward (\(F\)) or central (\(C\)) differences and either independent sampling (\(i\)) or common random numbers (\(ii\)).}
+	\label{tab:ConvergenceRates}
+	\renewcommand{\arraystretch}{2.2}
+	\begin{tabular}{cccccc}
+		\toprule
+		Estimator             & Variance                       & Bias                              & Optimal \(h_n\)     & Convergence       & \(h_*\)                                                             \\
+		\midrule
+		\(\hat{\Delta}_{F,i}\)  & \(\frac{\sigma_{F,i}^2}{n h^2}\) & \(\frac{1}{2}\alpha''(\theta)h\)    & \(\bigO(n^{-1/4})\) & \(\bigO(n^{-1/4})\) & \(\left(\frac{4\sigma_{F,i}^2}{\alpha''(\theta)^2}\right)^{1/4}\)   \\
+		\(\hat{\Delta}_{C,i}\)  & \(\frac{\sigma_{C,i}^2}{n h^2}\) & \(\frac{1}{6}\alpha'''(\theta)h^2\) & \(\bigO(n^{-1/6})\) & \(\bigO(n^{-1/3})\) & \(\left(\frac{18\sigma_{C,i}^2}{\alpha'''(\theta)^2}\right)^{1/6}\) \\
+		\(\hat{\Delta}_{F,ii}\) & \(\frac{\sigma_{F,ii}^2}{n h}\)  & \(\frac{1}{2}\alpha''(\theta)h\)    & \(\bigO(n^{-1/3})\) & \(\bigO(n^{-1/3})\) & \(\left(\frac{2\sigma_{F,ii}^2}{\alpha''(\theta)^2}\right)^{1/3}\)  \\
+		\(\hat{\Delta}_{C,ii}\) & \(\frac{\sigma_{C,ii}^2}{n h}\)  & \(\frac{1}{6}\alpha'''(\theta)h^2\) & \(\bigO(n^{-1/5})\) & \(\bigO(n^{-2/5})\) & \(\left(\frac{9\sigma_{C,ii}^2}{\alpha'''(\theta)^2}\right)^{1/5}\) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Glynn [153] proves a central limit theorem for each of the cases in \Cref{tab:ConvergenceRates}.
+These results take the form
+\begin{equation} \label{CentralLimitTheoremGlynn}
+	n^{\frac{\beta}{2\beta+\eta}} [\hat{\Delta}(n, h_n) - \alpha'(\theta)] \Rightarrow \Nor \left( b h_*^\beta, \frac{\sigma^2}{h_*^\eta} \right)
+\end{equation}
+
+with \(h_n\) as in \Cref{eq:BandwidthSequence} and \(\gamma = 1/(2\beta + \eta)\). The limit holds for any \(h_* > 0\); the
+optimal values of \(h_*\) in \Cref{tab:ConvergenceRates} minimize the second moment of the limiting
+normal random variable.
+
+For the forward-difference estimator with independent samples, the vari-
+ance parameter \(\sigma_{F,i}^2\) is given by
+\begin{equation} \label{VarianceParameterForwardIndependent}
+	\sigma_{F,i}^2 = \lim_{h\to 0} (\Var[Y(\theta + h)] + \Var[Y(\theta)]) = 2\Var[Y(\theta)]
+\end{equation}
+under the minimal assumption of continuity of \(\Var[Y(\theta)]\). Because the central-
+difference estimator has a denominator of \(2h\), \(\sigma_{C,i}^2 = \Var[Y(\theta)]/2\). The para-
+meters \(\sigma_{F,ii}^2\) and \(\sigma_{C,ii}^2\) do not admit a simple description. Their values depend
+on the joint distribution of \((Y(\theta - h), Y(\theta), Y(\theta + h))\), which depends in part
+on the particular algorithm used for simulation --- different algorithms may re-
+spond differently to changes in an input parameter with the random numbers
+held fixed. In contrast, \(\Var[Y(\theta)]\) is determined by the marginal distribution of
+\(Y(\theta)\) so all algorithms that legitimately sample from this distribution produce
+the same variance. The variance of the finite-difference estimators appear in
+the optimal values of \(h_*\); though these are unlikely to be known in advance,
+they can be estimated from preliminary runs and potentially combined with
+rough estimates of the derivatives of \(\alpha\) to approximate \(h_*\).
+
+Case (iii) of \Cref{eq:VarianceConvergenceCases} is not reflected in \Cref{tab:ConvergenceRates}. When it applies, the mean
+square error takes the form
+\begin{equation} \label{MeanSquareErrorCaseThree}
+	\mathrm{MSE}(\hat{\Delta}) = b^2 h_n^{2\beta} + \frac{\sigma^2}{n} ,
+\end{equation}
+and there is no tradeoff between bias and variance. We should take \(h_n\) as
+small as possible, and so long as \(nh_n^{2\beta}\) is bounded, the RMSE is \(\bigO(n^{-1/2})\).
+This dominates all the convergence rates in \Cref{tab:ConvergenceRates}.
+
+The distinction between Cases (ii) and (iii) is illustrated in Figure 7.2. The figure compares RMS relative errors of forward-difference estimators of
+delta for a standard call option paying \((S(T) - K)^+\) and a digital option paying \(\I\{S(T) > K\}\), with model parameters \(K = S(0) = 100\), \(\sigma = 0.30\), $r =
+	0.05\(, and\)T = 0.25$. The forward-difference estimators use common random numbers, which in this example simply means using the same draw from the
+normal distribution to generate \(S(T)\) from both \(S(0)\) and \(S(0) + h\). This
+example is simple enough to allow exact calculation of the RMSE. To simplify comparison, in the figure we divide each RMSE by the true value of delta to
+get a relative error. The figure shows the effect of varying \(h\) with the number of replications \(n\) fixed at 5000.
+
+The standard call option fits in Case (iii) of \Cref{eq:VarianceConvergenceCases}. As expected, its RMS relative error decreases
+with decreasing \(h\). The digital option fits in Case (ii), so its relative error explodes as \(h\) approaches zero. From the figure, we see that the relative error
+for the digital option is minimised at a surprisingly large value of about 4. The figure also shows that the cost of taking \(h\) too large is much smaller than the cost of taking it too small.
+
+\begin{figure}[H]
+	\centering
+	\input{plotting/RMSErrorComparison.pgf}
+	\caption{RMS relative errors in forward-difference delta estimates for a standard call and a digital option as a function of the increment h, with n = 5000}
+	\label{fig:RMSErrorComparison}
+\end{figure}

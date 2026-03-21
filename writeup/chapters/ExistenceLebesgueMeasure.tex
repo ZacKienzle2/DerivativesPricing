@@ -1,0 +1,253 @@
+We first show the countable additivity of the Lebesgue pre-measure on \(E \idef \lparen 0, 1 \rbrack\). Denote by \(I\) the set of subintervals of \(E\) of the form \(\lparen c, d \rbrack\), and let \(\cE_0\) be the algebra of sets that are finite unions of intervals in \(I\).
+
+Recall that an \textit{algebra} \(\cE_0\) on \(E\) is a collection of subsets of \(E\) that contains \(E\) itself, and that is closed under complements and \textit{finite unions}. Recall also that a \textit{pre-measure} is a set function \(\lambda : \cE_0 \to [0, \infty]\), with \(\lambda(\emptyset) = 0\) that satisfies the \textit{countable additivity property}:
+\begin{equation}
+	\lambda\left(\bigcup_{k=1}^\infty A_k\right) = \sum_{k=1}^\infty \lambda(A_k)
+	\label{eq:PreMeasureAdditivity}
+\end{equation}
+for every sequence \(A_1, A_2, \dots\) of \textit{disjoint sets} in \(\cE_0\) with \(\cup_n A_n \in \cE_0\).
+
+Define on \(\cE_0\) the natural ``length'' pre-measure \(\lambda\). When \(\lambda\) is applied to intervals, we use the notation \(\abs{\cdot}\) instead. Thus, for disjoint intervals \(\{\lparen a_k, b_k \rbrack\}\):
+\begin{equation*}
+	\lambda\left(\bigcup_{k=1}^n \lparen a_k, b_k \rbrack\right) = \abs{\bigcup_{k=1}^n \lparen a_k, b_k \rbrack} = \sum_{k=1}^n (b_k - a_k).
+\end{equation*}
+
+We want to show that this pre-measure is countably additive. We do this in two steps. First, we prove it for intervals, and then for general sets in \(\cE_0\). Below, \(I = \lparen a, b \rbrack\) and \(I_k = \lparen a_k, b_k \rbrack\) are bounded intervals of lengths \(\abs{I} = b - a\) and \(\abs{I_k} = b_k - a_k\).
+
+\begin{prop}{Countable Additivity for Intervals}{CountableAdditivityIntervals}
+	If \(I = \cup_{k=1}^\infty I_k\) and the \(\{I_k\}\) are disjoint, then \(\abs{I} = \sum_{k=1}^\infty \abs{I_k}\).
+\end{prop}
+
+\begin{proof}
+	We are going to prove the theorem by showing:
+	\begin{enumerate}
+		\item If \(\cup_{k=1}^\infty I_k \subseteq I\), and the \(\{I_k\}\) are \textit{disjoint}, then
+		      \begin{equation}
+			      \sum_{k=1}^\infty \abs{I_k} \le \abs{I}.
+			      \label{eq:IntervalSub}
+		      \end{equation}
+		\item If \(\cup_{k=1}^\infty I_k \supseteq I\) (the \(\{I_k\}\) need not be disjoint), then
+		      \begin{equation}
+			      \sum_{k=1}^\infty \abs{I_k} \ge \abs{I}.
+			      \label{eq:IntervalSuper}
+		      \end{equation}
+	\end{enumerate}
+
+	We first show \Cref{eq:IntervalSub} for finite sums (that is, \(\sum_{k=1}^n \abs{I_k} \le \abs{I}\)), using induction. The statement is obviously true for \(n=1\). Suppose it is true for \(n-1\). Without loss of generality, we may assume \(a_n\) is the largest among \(a_1, \dots, a_n\). Then, \(\cup_{k=1}^{n-1} \lparen a_k, b_k \rbrack \subseteq \lparen a, a_n \rbrack\), so that, by the induction hypothesis, \(\sum_{k=1}^{n-1} (b_k - a_k) \le a_n - a\), and hence:
+	\begin{equation}
+		\sum_{k=1}^n (b_k - a_k) \le a_n - a + b_n - a_n \le b - a.
+		\label{eq:FiniteSumBound}
+	\end{equation}
+	The infinite sum case follows directly from this. Namely, from the finite sum case, we have that \Cref{eq:FiniteSumBound} holds for \textit{every} \(n \ge 1\). But this can only be the case if
+	\begin{equation*}
+		\sum_{k=1}^\infty (b_k - a_k) \le b - a.
+	\end{equation*}
+
+	To prove \Cref{eq:IntervalSuper}, we again consider first the finite sum and then the infinite sum case. We use again induction to show \(\abs{I} \le \sum_{k=1}^n \abs{I_k}\), which is true for \(n=1\). Suppose it is true for \(n-1\). Without loss of generality, we may assume \(a_n < b \le b_n\). If \(a_n \le a\), the result is obvious. If \(a_n > a\), then (draw a picture) \(\lparen a, a_n \rbrack \subseteq \cup_{i=1}^{n-1} \lparen a_k, b_k \rbrack\), so that \(\sum_{k=1}^{n-1} (b_k - a_k) \ge a_n - a\) by the induction hypothesis, and hence:
+	\begin{equation*}
+		\sum_{k=1}^n (b_k - a_k) \ge (a_n - a) + (b_n - a_n) \ge b - a.
+	\end{equation*}
+	For the infinite sum case, suppose that \(\lparen a, b \rbrack \subseteq \cup_{k=1}^\infty \lparen a_k, b_k \rbrack\). If \(0 < \varepsilon < b - a\), the open intervals \(\{\lparen a_k, b_k + \varepsilon 2^{-k} \rbrack\}\) cover the closed interval \(\left[a + \varepsilon, b\right]\). The \textit{Heine-Borel property} of the real-number system states that bounded closed intervals are \textit{compact}; that is, every (infinite) cover of such a set has a finite subcover; see also Example B.6. Thus,
+	\begin{equation*}
+		\left[a + \varepsilon, b\right] \subseteq \bigcup_{k=1}^n \lparen a_k, b_k + \varepsilon 2^{-k} \rbrack
+	\end{equation*}
+	for some \(n\). But then
+	\begin{equation*}
+		\lparen a + \varepsilon, b \rbrack \subseteq \bigcup_{k=1}^n \lparen a_k, b_k + \varepsilon 2^{-k} \rbrack.
+	\end{equation*}
+	Consequently, using the finite case,
+	\begin{equation*}
+		b - (a + \varepsilon) \le \sum_{k=1}^n (b_k + \varepsilon 2^{-k} - a_k) \le \sum_{k=1}^\infty (b_k - a_k) + \varepsilon.
+	\end{equation*}
+	Since \(\varepsilon > 0\) was arbitrary, we have
+	\begin{equation*}
+		b - a \le \sum_{k=1}^\infty (b_k - a_k).
+	\end{equation*}
+	This completes the proof for intervals.
+\end{proof}
+
+Next, we prove the countable additivity for arbitrary sets in \(\cE_0\). Recall that we used the notation \(\lambda(A) = \abs{A}\) if \(A\) is an interval.
+
+\begin{thm}{Countable Additivity for Sets}{CountableAdditivitySets}
+	Let \(A \in \cE_0\) be of the form \(A = \cup_{k=1}^\infty A_k\), where the \(\{A_k\}\) are disjoint and in \(\cE_0\). Then,
+	\begin{equation*}
+		\lambda(A) = \sum_{k=1}^\infty \lambda(A_k).
+	\end{equation*}
+\end{thm}
+
+\begin{proof}
+	We can write (for certain intervals \(\{I_i\}\) and \(\{J_{kj}\}\)):
+	\begin{equation*}
+		A = \bigcup_{i=1}^n I_i \quad \text{and} \quad A_k = \bigcup_{j=1}^{m_k} J_{kj}.
+	\end{equation*}
+	It follows that
+	\begin{equation*}
+		A = \bigcup_{i=1}^n \bigcup_{k=1}^\infty \bigcup_{j=1}^{m_k} (I_i \cap J_{kj}).
+	\end{equation*}
+	Note that the \(\{I_i \cap J_{kj}\}\) are disjoint and lie in \(I\). Moreover,
+	\begin{equation*}
+		\bigcup_{i=1}^n (I_i \cap J_{kj}) = \bigcup_{i=1}^n I_i \cap J_{kj} = \underbrace{A \cap J_{kj}}_{J_{kj}} = J_{kj},
+	\end{equation*}
+	as \(J_{kj} \subseteq A\). Thus, we have, by the countable additivity for intervals:
+	\begin{equation*}
+		\lambda(A) = \sum_{i=1}^n \abs{I_i} = \sum_{i=1}^n \sum_{k=1}^\infty \sum_{j=1}^{m_k} \abs{I_i \cap J_{kj}} = \sum_{k=1}^\infty \sum_{j=1}^{m_k} \abs{J_{kj}} = \sum_{k=1}^\infty \lambda(A_k).
+	\end{equation*}
+\end{proof}
+
+If in \Cref{prop:CountableAdditivityIntervals} the \(\{A_k\}\) are not disjoint, we still have countable subadditivity:
+\begin{equation}
+	\lambda(A) \le \sum_{k=1}^\infty \lambda(A_k).
+	\label{eq:IntervalSubadditivity}
+\end{equation}
+The proof is exactly the same as in Proposition 1.42.
+
+We next show the existence of the Lebesgue measure on \((E, \cE)\) for \(E \idef \lparen 0, 1 \rbrack\) and \(\cE \idef \cB_{\lparen 0,1 \rbrack}\). Recall that \(\cE_0\) is the algebra of sets that are finite unions of disjoint intervals of the form \(\lparen c, d \rbrack\), and that \(\lambda\) is the pre-measure on \(\cE_0\), which we have just shown to be countably additive. The proof of existence relies on the definition of two objects: \(\xbar{\lambda}\) and \(\cM\).
+
+\begin{defn}{Outer Measure \(\xbar{\lambda}\)}{OuterMeasure}
+	The \textit{outer measure} of \(\lambda\) is the set function \(\xbar{\lambda}\) that assigns to each \(A \in 2^E\) (that is, for each \(A \subseteq E\)) the value
+	\begin{equation}
+		\xbar{\lambda}(A) \idef \inf \sum_n \lambda(A_n),
+		\label{eq:OuterMeasureDef}
+	\end{equation}
+	where the infimum is over all sequences \(A_1, A_2, \dots\) of \(\cE_0\)-sets satisfying \(A \subseteq \cup_n A_n\).
+\end{defn}
+
+Note that \(\xbar{\lambda}\) is not actually a measure, as the set \(2^E\) is simply too big for it to be countably additive. We can also define an \textit{inner measure}, \(\underline{\lambda}(A) \idef 1 - \xbar{\lambda}(A^c)\), \(A \in 2^E\).
+
+The outer measure \(\xbar{\lambda}\) has properties reminiscent of those of a measure, such as positivity \(\xbar{\lambda}(A) \ge 0\) and monotonicity \(\xbar{\lambda}(A) \le \xbar{\lambda}(B)\), when \(A \subseteq B\). Also, \(\xbar{\lambda}(\emptyset) = 0\). The following \textit{countable subadditivity} property is important as well:
+
+\begin{lem}{The Outer Measure \(\xbar{\lambda}\) is Countably Subadditive}{OuterMeasureSubadditive}
+	For any collection of sets in \(E\) (not necessarily disjoint), it holds that
+	\begin{equation}
+		\xbar{\lambda}\left(\bigcup_{n=1}^\infty A_n\right) \le \sum_{n=1}^\infty \xbar{\lambda}(A_n).
+		\label{eq:OuterMeasureSubadditivity}
+	\end{equation}
+\end{lem}
+
+\begin{proof}
+	Take \(\varepsilon > 0\) and choose \(B_{nk} \in \cE_0\) such that \(A_n \subseteq \cup_k B_{nk}\) and \(\sum_k \lambda(B_{nk}) < \xbar{\lambda}(A_n) + \varepsilon 2^{-n}\). Because \(\cup_n A_n \subseteq \cup_{n,k} B_{nk}\), it follows that
+	\begin{equation*}
+		\xbar{\lambda}\left(\bigcup_{n=1}^\infty A_n\right) \le \sum_{n,k} \lambda(B_{nk}) < \sum_{n=1}^\infty \xbar{\lambda}(A_n) + \varepsilon,
+	\end{equation*}
+	showing \Cref{eq:OuterMeasureSubadditivity}, as \(\varepsilon\) is arbitrary.
+\end{proof}
+
+\begin{defn}{The Collection \(\cM\)}{CollectionM}
+	The collection \(\cM\) consists of all sets \(A \in 2^E\) for which
+	\begin{equation}
+		\xbar{\lambda}(A \cap C) + \xbar{\lambda}(A^c \cap C) = \xbar{\lambda}(C) \quad \text{for every } C \in 2^E.
+		\label{eq:CaratheodoryCondition}
+	\end{equation}
+\end{defn}
+
+Taking \(C=E\), this implies that \(\xbar{\lambda}(A) = \underline{\lambda}(A)\) for every \(A \in \cM\). The following lemma shows that \(\cM\) is an algebra. Later on we will show that it is in fact a \(\sigma\)-algebra.
+
+\begin{lem}{The Collection \(\cM\) is an Algebra}{MIsAlgebra}
+	The collection \(\cM\) contains \(E\) and is closed under complements and finite unions. Hence, it is an algebra on \(E\).
+\end{lem}
+
+\begin{proof}
+	The collection \(\cM\) is obviously closed under complements and contains \(E\). To show that it is closed under finite unions, we need to show that \(A \cup B \in \cM\) for any \(A, B \in \cM\). Take any \(C \in 2^E\). By the countable (and hence finite) subadditivity of \(\xbar{\lambda}\) in \Cref{eq:OuterMeasureSubadditivity}, we have
+	\begin{equation}
+		\xbar{\lambda}(C) \le \xbar{\lambda}((A \cap B) \cap C) + \xbar{\lambda}({(A \cap B)}^c \cap C).
+		\label{eq:AlgebraInequality}
+	\end{equation}
+	Since the reverse inequality also holds:
+	\begin{align*}
+		\xbar{\lambda}(C) & = \xbar{\lambda}(B \cap C) + \xbar{\lambda}(B^c \cap C)                                                                                         \\
+		                  & = \xbar{\lambda}(A \cap B \cap C) + \xbar{\lambda}(A^c \cap B \cap C) + \xbar{\lambda}(A \cap B^c \cap C) + \xbar{\lambda}(A^c \cap B^c \cap C) \\
+		                  & \ge \xbar{\lambda}(A \cap B \cap C) + \xbar{\lambda}((A^c \cap B \cap C) \cup (A \cap B^c \cap C) \cup (A^c \cap B^c \cap C))                   \\
+		                  & = \xbar{\lambda}((A \cap B) \cap C) + \xbar{\lambda}({(A \cap B)}^c \cap C),
+	\end{align*}
+	we have in fact equality in \Cref{eq:AlgebraInequality}, which shows that \(A \cup B \in \cM\), by \Cref{defn:CollectionM}.
+\end{proof}
+
+When the outer measure \(\xbar{\lambda}\) is restricted to \(\cM\), we have the following form of countable additivity. Take \(C=E\) to get the usual countable additivity.
+
+\begin{lem}{The Outer Measure \(\xbar{\lambda}\) Restricted to \(\cM\) is Countably Additive}{OuterMeasureRestrictedAdditive}
+	If \(\{A_k\} \in \cM\) are disjoint, then for any \(C \in 2^E\):
+	\begin{equation}
+		\xbar{\lambda}((\cup_k A_k) \cap C) = \sum_k \xbar{\lambda}(A_k \cap C).
+		\label{eq:RestrictedAdditivity}
+	\end{equation}
+\end{lem}
+
+\begin{proof}
+	We first prove the case for a \textit{finite} collection \(A_1, \dots, A_n\) by induction, starting with \(n=2\). In that case, if \(A_1 \cup A_2 = E\), then the statement follows from the definition of \(\cM\) in \Cref{eq:CaratheodoryCondition}. If \(A_1 \cup A_2\) is smaller than \(E\), take \(C \idef (A_1 \cup A_2) \cap D\) and \(A \idef A_1\) in \Cref{eq:CaratheodoryCondition} and use the disjointness of \(A_1\) and \(A_2\) to conclude that
+	\begin{equation*}
+		\xbar{\lambda}(A_1 \cap D) + \xbar{\lambda}(A_2 \cap D) = \xbar{\lambda}((A_1 \cup A_2) \cap D),
+	\end{equation*}
+	showing that the induction statement holds for \(n=2\). Suppose that \Cref{eq:RestrictedAdditivity} holds for \(n-1\) disjoint sets \(A_1, \dots, A_{n-1}\) in \(\cM\). Then, by the induction hypothesis and the case \(n=2\), we have for any \(C\),
+	\begin{equation*}
+		\xbar{\lambda}((\cup_{k=1}^n A_k) \cap C) = \xbar{\lambda}((\cup_{k=1}^{n-1} A_k) \cap C) + \xbar{\lambda}(A_n \cap C) = \sum_{k=1}^n \xbar{\lambda}(A_k \cap C),
+	\end{equation*}
+	completing the induction step. For an \textit{infinite} sequence \(A_1, A_2, \dots\) of disjoint sets, we have, by the monotonicity of \(\xbar{\lambda}\):
+	\begin{equation*}
+		\xbar{\lambda}((\cup_{k=1}^\infty A_k) \cap C) \ge \xbar{\lambda}((\cup_{k=1}^n A_k) \cap C) = \sum_{k=1}^n \xbar{\lambda}(A_k \cap C)
+	\end{equation*}
+	for all \(n\), so that
+	\begin{equation*}
+		\xbar{\lambda}((\cup_{k=1}^\infty A_k) \cap C) \ge \sum_{k=1}^\infty \xbar{\lambda}(A_k \cap C).
+	\end{equation*}
+	The proof is completed by observing that the reverse inequality also holds, by the countable subadditivity of \(\xbar{\lambda}\) in \Cref{eq:OuterMeasureSubadditivity}.
+\end{proof}
+
+The following proposition contains all the ingredients needed for the existence proof:
+
+\begin{prop}{Four Main Properties of \(\xbar{\lambda}\) and \(\cM\)}{FourProperties}
+	\begin{enumerate}
+		\item \(\cM\) is a \(\sigma\)-algebra.
+		\item \(\xbar{\lambda}\) \textit{restricted to} \(\cM\) is countably additive.
+		\item \(\cE_0 \subset \cM\).
+		\item For \(A \in \cE_0\), we have
+		      \begin{equation}
+			      \xbar{\lambda}(A) = \lambda(A) = \abs{A}.
+			      \label{eq:ExtensionConsistency}
+		      \end{equation}
+	\end{enumerate}
+\end{prop}
+
+\begin{proof}
+	\begin{enumerate}
+		\item We have already proved that \(\cM\) is an algebra in \Cref{lem:MIsAlgebra}. To show that it is a \(\sigma\)-algebra, let \(A_1, A_2, \dots\) be in \(\cM\) and \(B_1 \idef A_1\) and \(B_n \idef A_n \setminus A_{n-1}, n=2, 3, \dots\). The \(\{B_k\}\) are disjoint and in \(\cM\). By the countable additivity of \(\xbar{\lambda}\) on \(\cM\) (see \Cref{lem:OuterMeasureRestrictedAdditive}), we have for any \(C \in 2^E\):
+		      \begin{equation*}
+			      \xbar{\lambda}(\cup_k B_k \cap C) + \xbar{\lambda}({(\cup_k B_k)}^c \cap C) = \xbar{\lambda}(C).
+		      \end{equation*}
+		      Thus, \Cref{eq:CaratheodoryCondition} holds for the set \(\cup_k B_k\) and the latter therefore lies in \(\cM\). But since \(\cup_{k=1}^n B_k = A_n\) and \(\cup_{k=1}^\infty B_k = \cup_{k=1}^\infty A_k\), the latter also lies in \(\cM\). In other words, \(\cM\) is closed under countable unions.
+
+		\item We have already proved this in \Cref{lem:OuterMeasureRestrictedAdditive}.
+
+		\item We need to show that for any \(A \in \cE_0\) it holds that
+		      \begin{equation*}
+			      \xbar{\lambda}(A \cap C) + \xbar{\lambda}(A^c \cap C) = \xbar{\lambda}(C) \quad \text{for all } C \in 2^E.
+		      \end{equation*}
+		      Similar to the proof of \Cref{lem:OuterMeasureSubadditive}, take \(\varepsilon > 0\) and choose sets \(\{A_n\}\) in \(\cE_0\) such that \(C \subseteq \cup_n A_n\) and \(\sum_n \lambda(A_n) \le \xbar{\lambda}(C) + \varepsilon\). This can always be done, by the way \(\xbar{\lambda}\) is defined. Define sets \(F_n \idef A_n \cap A\) and \(G_n = A_n \cap A^c, n=1, 2, \dots\). These sets lie in \(\cM\) as it is an algebra. Note that \(\cup_n F_n\) contains \(C \cap A\) and \(\cup_n G_n\) contains \(C \cap A^c\). Thus, by the definition of \(\xbar{\lambda}\) and the finite additivity of \(\lambda\), we have
+		      \begin{equation*}
+			      \xbar{\lambda}(A \cap C) + \xbar{\lambda}(A^c \cap C) \le \sum_n \lambda(F_n) + \sum_n \lambda(G_n) = \sum_n \lambda(A_n) \le \xbar{\lambda}(C) + \varepsilon.
+		      \end{equation*}
+		      Since \(\varepsilon\) is arbitrary, this shows that \(\xbar{\lambda}(A \cap C) + \xbar{\lambda}(A^c \cap C) \le \xbar{\lambda}(C)\). The reverse inequality holds also, by the countable subadditivity of \(\xbar{\lambda}\) in \Cref{lem:OuterMeasureSubadditive}.
+
+		\item From the definition of the outer measure (\Cref{eq:OuterMeasureDef}) it is clear that \(\xbar{\lambda}(A) \le \lambda(A)\) for all \(A \in \cE_0\). To show that also \(\lambda(A) \le \xbar{\lambda}(A)\), we use the countable additivity of \(\lambda\) proved in \Cref{thm:CountableAdditivitySets}. In particular, let \(A \subseteq \cup_n A_n\), where \(A\) and \(A_n, n=1, 2, \dots\) are in \(\cE_0\). Then,
+		      \begin{equation}
+			      \lambda(A) \le \lambda\left(\bigcup_{n=1}^\infty (A \cap A_n)\right) \le \sum_{n=1}^\infty \lambda(A \cap A_n) \le \sum_{n=1}^\infty \lambda(A_n).
+			      \label{eq:MeasureComparison}
+		      \end{equation}
+		      The second inequality follows from the countable subadditivity of the pre-measure \(\lambda\), which can be proved in exactly the same way as for proper measures. As \Cref{eq:MeasureComparison} holds for any choice of \(\{A_n\}\), it must hold that \(\lambda(A) \le \inf \sum_n \lambda(A_n) = \xbar{\lambda}(A)\).
+	\end{enumerate}
+\end{proof}
+
+Using \Cref{prop:FourProperties}, the existence of the Lebesgue measure can now be proved with a few brush strokes.
+
+\begin{thm}{Existence of the Lebesgue Measure}{ExistenceLebesgue}
+	The outer measure \(\xbar{\lambda}\) restricted to \(\cB_{\lparen 0,1 \rbrack}\) is a probability measure that extends the pre-measure \(\lambda\).
+\end{thm}
+
+\begin{proof}
+	From \Cref{prop:FourProperties}, the outer measure \(\xbar{\lambda}\) restricted to \(\cM\) is a proper measure on \((E, \cM)\), as it is countably additive and \(\cM\) is a \(\sigma\)-algebra. Also, we have
+	\begin{equation*}
+		\cE_0 \subset \sigma(\cE_0) \subset \cM \subset 2^E.
+	\end{equation*}
+	So, \(\xbar{\lambda}\) is also a measure on \((E, \sigma(\cE_0))\), where \(\sigma(\cE_0) = \cB_{\lparen 0,1 \rbrack}\). That \(\xbar{\lambda}\) is an extension of \(\lambda\) follows from \Cref{eq:ExtensionConsistency}. Finally, the fact that \(\xbar{\lambda}(E) = \lambda(E) = 1\) shows that it is a probability measure.
+\end{proof}
+
+Note that the proofs above hold verbatim for any probability pre-measure \(\lambda\) on \((E, \cE_0)\); that is, \(\lambda\) is \(\sigma\)-additive and \(\lambda(E) = 1\). A standard uniqueness theorem for finite measures then guarantees that \(\lambda\) can be uniquely extended to a measure on \((E, \sigma(\cE_0))\).

@@ -1,0 +1,6 @@
+{
+  "texlab.rootDirectory": "writeup",
+  "texlab.chktex.additionalArgs": [
+    "-n21"
+  ]
+}
