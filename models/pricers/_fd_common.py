@@ -353,18 +353,75 @@ def _solve_cn_jit(
     return vals_next
 
 
-def _grid(opt: BaseOption, n_steps: int, n_points: int) -> Tuple[
-    float, npt.NDArray[np.float64], npt.NDArray[np.float64], float
-]:
-    """Builds the asset-price grid and timestep."""
+def _grid(
+    opt: BaseOption,
+    n_steps: int,
+    n_points: int,
+    cluster_density: float = 0.0,
+) -> Tuple[float, npt.NDArray[np.float64], float]:
+    """Builds the asset-price grid and timestep.
+
+    With `cluster_density > 0` the grid is sinh-stretched (Tavella-Randall)
+    and concentrated around the strike: spacing near `K` shrinks while the
+    far field stays coarse. `cluster_density` is the half-width of the
+    cluster relative to `K` (e.g. `0.1` clusters within `K +/- 0.1 K`).
+    """
     s_max = max(
         2.0 * opt.K,
         opt.K * np.exp(opt.r * opt.T + 4.0 * opt.sigma * np.sqrt(opt.T)),
     )
     dt = opt.T / n_steps
-    vs = np.linspace(0.0, s_max, n_points + 1)
-    vi = np.arange(0, n_points + 1, dtype=np.float64)
-    return s_max, vs, vi, dt
+    if cluster_density > 0.0:
+        d = max(1e-6, cluster_density * opt.K)
+        c1 = np.arcsinh(-opt.K / d)
+        c2 = np.arcsinh((s_max - opt.K) / d)
+        xi = np.linspace(0.0, 1.0, n_points + 1)
+        vs = opt.K + d * np.sinh(c1 + (c2 - c1) * xi)
+        vs[0] = 0.0
+        vs[-1] = s_max
+    else:
+        vs = np.linspace(0.0, s_max, n_points + 1)
+    return s_max, vs, dt
+
+
+def _continuous_operator(
+    vs: npt.NDArray[np.float64],
+    sigma: float,
+    r: float,
+    q: float,
+) -> Tuple[
+    npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]
+]:
+    """Builds non-uniform Black-Scholes operator coefficients.
+
+    Returns `(L_a, L_b, L_c)` such that the spatial operator
+    `L V[i] = L_a[i] V[i-1] + L_b[i] V[i] + L_c[i] V[i+1]`
+    discretises `0.5 sigma^2 S^2 V_SS + (r-q) S V_S - r V` on the
+    (possibly non-uniform) grid `vs`. Boundary slots `L[0]` and `L[N]` are
+    left at zero; the solver applies Dirichlet BCs separately.
+    """
+    n = vs.size
+    la = np.zeros(n)
+    lb = np.zeros(n)
+    lc = np.zeros(n)
+    sig2 = sigma * sigma
+    for i in range(1, n - 1):
+        s_i = vs[i]
+        d_m = vs[i] - vs[i - 1]
+        d_p = vs[i + 1] - vs[i]
+        sum_d = d_m + d_p
+        a_diff = 2.0 / (d_m * sum_d)
+        b_diff = -2.0 / (d_m * d_p)
+        c_diff = 2.0 / (d_p * sum_d)
+        a_drift = -d_p / (d_m * sum_d)
+        b_drift = (d_p - d_m) / (d_m * d_p)
+        c_drift = d_m / (d_p * sum_d)
+        sig2_s2 = 0.5 * sig2 * s_i * s_i
+        rqS = (r - q) * s_i
+        la[i] = sig2_s2 * a_diff + rqS * a_drift
+        lb[i] = sig2_s2 * b_diff + rqS * b_drift - r
+        lc[i] = sig2_s2 * c_diff + rqS * c_drift
+    return la, lb, lc
 
 
 def _boundary_values(
@@ -389,6 +446,7 @@ def solve_fd(
     scheme: str,
     american_method: str = "project",
     rannacher_steps: int = 2,
+    cluster_density: float = 0.0,
 ) -> float:
     """Runs a backward-time FD solve and interpolates the price at S0.
 
@@ -401,6 +459,10 @@ def solve_fd(
             `"psor"` (LCP-correct projected SOR).
         rannacher_steps: Leading implicit steps inside CN to damp payoff-kink
             oscillation. Ignored for non-CN schemes.
+        cluster_density: When `> 0`, switches to a Tavella-Randall sinh-
+            stretched grid clustered near `option.K`. Value is the relative
+            cluster half-width; `0.1` is a sane default. `0` keeps the
+            uniform grid.
 
     Returns:
         Theoretical price at `option.S` from linear interpolation.
@@ -410,7 +472,7 @@ def solve_fd(
     k, r, q, sigma = option.K, option.r, option.q, option.sigma
     method_code = _AM_PSOR if american_method == "psor" else _AM_PROJECT
 
-    s_max, vs, vi, dt = _grid(option, n_steps, n_points)
+    s_max, vs, dt = _grid(option, n_steps, n_points, cluster_density)
     lower_bc, upper_bc = _boundary_values(s_max, k, r, dt, n_steps, is_call)
 
     if is_american:
@@ -421,39 +483,35 @@ def solve_fd(
     else:
         exercise = np.empty(0)
 
-    sig2 = sigma * sigma
-    vi2 = vi * vi
+    la, lb, lc = _continuous_operator(vs, sigma, r, q)
 
     if scheme == "explicit":
-        a = 0.5 * dt * (sig2 * vi2 - (r - q) * vi)
-        b = 1.0 - dt * (sig2 * vi2 + r)
-        c = 0.5 * dt * (sig2 * vi2 + (r - q) * vi)
+        a = dt * la
+        b = 1.0 + dt * lb
+        c = dt * lc
         result = _solve_explicit_jit(
             vs, a, b, c, lower_bc, upper_bc, exercise, is_american, is_call, k
         )
 
     elif scheme == "implicit":
-        a = 0.5 * dt * ((r - q) * vi - sig2 * vi2)
-        b = 1.0 + dt * (sig2 * vi2 + r)
-        c = 0.5 * dt * (-(r - q) * vi - sig2 * vi2)
+        a = -dt * la
+        b = 1.0 - dt * lb
+        c = -dt * lc
         result = _solve_implicit_jit(
             vs, a, b, c, lower_bc, upper_bc,
             exercise, is_american, is_call, k, method_code,
         )
 
     elif scheme == "crank_nicolson":
-        a_h = 0.25 * dt * (sig2 * vi2 - (r - q) * vi)
-        b_h = -0.5 * dt * (sig2 * vi2 + r)
-        c_h = 0.25 * dt * (sig2 * vi2 + (r - q) * vi)
-        a_l = -a_h
-        b_l = 1.0 - b_h
-        c_l = -c_h
-        a_r = a_h
-        b_r = 1.0 + b_h
-        c_r = c_h
-        a_imp = 0.5 * dt * ((r - q) * vi - sig2 * vi2)
-        b_imp = 1.0 + dt * (sig2 * vi2 + r)
-        c_imp = 0.5 * dt * (-(r - q) * vi - sig2 * vi2)
+        a_l = -0.5 * dt * la
+        b_l = 1.0 - 0.5 * dt * lb
+        c_l = -0.5 * dt * lc
+        a_r = 0.5 * dt * la
+        b_r = 1.0 + 0.5 * dt * lb
+        c_r = 0.5 * dt * lc
+        a_imp = -dt * la
+        b_imp = 1.0 - dt * lb
+        c_imp = -dt * lc
         result = _solve_cn_jit(
             vs,
             a_l, b_l, c_l,
