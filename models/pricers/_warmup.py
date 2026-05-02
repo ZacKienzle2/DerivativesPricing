@@ -18,8 +18,11 @@ def _warmup() -> None:
     if os.environ.get("DERIVATIVES_PRICING_NO_WARMUP") == "1":
         return
 
+    from ..processes.heston import _heston_qe_jit
+    from ..processes.sabr import _sabr_euler_jit, hagan_lognormal_vol_jit, sabr_price_jit
     from ..simulation import generate_paths_jit
     from ._analytic_kernels import (
+        bs_full_greeks_jit,
         bs_price_jit,
         discrete_geom_asian_price_jit,
         kemna_vorst_price_jit,
@@ -88,3 +91,14 @@ def _warmup() -> None:
 
     left, right, bridge = _build_bb_tree(2)
     _brownian_bridge_jit(z, 0.5, left, right, bridge)
+
+    bs_full_greeks_jit(100.0, 100.0, 1.0, 0.05, 0.0, 0.2, True)
+
+    z3_heston = np.zeros((2, 2, 2), dtype=np.float64)
+    _heston_qe_jit(
+        100.0, 0.04, 0.05, 0.0, 2.0, 0.04, 0.3, -0.5, 1.0, 2, z3_heston
+    )
+
+    hagan_lognormal_vol_jit(100.0, 100.0, 1.0, 0.2, 0.5, -0.3, 0.4)
+    sabr_price_jit(100.0, 100.0, 1.0, 0.95, 0.2, 0.5, -0.3, 0.4, True)
+    _sabr_euler_jit(100.0, 0.2, 0.5, -0.3, 0.4, 1.0, 2, z3_heston)
