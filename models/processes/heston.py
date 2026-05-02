@@ -185,3 +185,21 @@ class HestonProcess(BaseProcess):
             self._s0, self._v0, self._r, self._q,
             self._kappa, self._theta, self._eta, self._rho,
         )
+
+    @property
+    def supports_analytic_european(self) -> bool:
+        return True
+
+    def analytic_european_price(
+        self, k: float, t: float, is_call: bool
+    ) -> float:
+        """COS Fourier-pricer European price under Heston."""
+        from ..pricers.cos_pricer import cos_heston_price_jit
+
+        return float(
+            cos_heston_price_jit(
+                self._s0, k, t, self._r, self._q,
+                self._kappa, self._theta, self._eta, self._rho, self._v0,
+                is_call, 256, 12.0,
+            )
+        )
