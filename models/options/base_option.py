@@ -11,7 +11,13 @@ class BaseOption(ABC):
     This class acts as a data container, initializing and validating
     the core parameters shared by all option types. It does not
     contain any pricing logic itself.
+
+    Uses `__slots__` to suppress the per-instance `__dict__`. Smaller memory
+    footprint and faster attribute access; subclasses must declare their own
+    `__slots__` for additional fields.
     """
+
+    __slots__ = ("S", "K", "T", "r", "sigma", "option_type", "q")
 
     def __init__(
         self,
