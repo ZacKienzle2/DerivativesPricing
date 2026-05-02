@@ -1,3 +1,5 @@
+"""Greek calculator factory dispatching on pricer type."""
+
 from __future__ import annotations
 
 from models.pricers import (

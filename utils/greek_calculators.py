@@ -1,7 +1,11 @@
+"""Greek calculators across analytic, lattice and Monte Carlo pricers."""
+
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Tuple
+from typing import Any, Dict, Tuple
 import concurrent.futures
+
 import numpy as np
 import numpy.typing as npt
 from numba import jit

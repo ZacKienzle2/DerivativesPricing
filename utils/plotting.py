@@ -1,8 +1,7 @@
-# utils/plotting.py
-# Contains helper functions for creating visualisations.
+"""Plotly figure helpers used by the Streamlit dashboard."""
 
-import plotly.graph_objects as go
 import numpy as np
+import plotly.graph_objects as go
 import numpy.typing as npt
 from typing import Dict, List, Any
 

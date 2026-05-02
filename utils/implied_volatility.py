@@ -1,4 +1,4 @@
-# utils/implied_volatility.py
+"""Black-Scholes implied vol fitter and Yahoo option chain loader."""
 
 import numpy as np
 import pandas as pd

@@ -1,4 +1,5 @@
-# utils/__init__.py
-# Makes the 'utils' directory a Python package.
+"""Cross-cutting helpers: plotting, Greeks, sensitivities, quotes."""
 
 from .plotting import plot_mc_convergence
+
+__all__ = ["plot_mc_convergence"]
