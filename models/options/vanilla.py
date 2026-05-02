@@ -12,6 +12,8 @@ class VanillaOption(BaseOption):
     and can only be exercised at expiration.
     """
 
+    __slots__ = ()
+
     def __init__(
         self,
         s: float,
