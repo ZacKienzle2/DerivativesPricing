@@ -25,7 +25,7 @@ def _warmup() -> None:
     from ..processes.sabr import _sabr_euler_jit, hagan_lognormal_vol_jit, sabr_price_jit
     from ..simulation import generate_paths_jit
     try:
-        from utils.adjoint_greeks import (
+        from utils.greeks.pathwise import (
             _asian_pathwise_greeks_jit,
             _vanilla_pathwise_greeks_jit,
         )
