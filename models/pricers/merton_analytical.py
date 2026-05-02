@@ -4,7 +4,7 @@ import math
 from typing import Any, Dict, Tuple
 
 import numpy as np
-from scipy.stats import norm
+from scipy.special import ndtr as norm_cdf
 
 from ..options import BaseOption, VanillaOption
 from .base_pricer import BasePricer
@@ -45,9 +45,9 @@ class MertonAnalyticalPricer(BasePricer):
         d2 = d1 - sigma * np.sqrt(t)
 
         if self.option.option_type == "call":
-            return s * np.exp(-q * t) * norm.cdf(d1) - k * np.exp(-r * t) * norm.cdf(d2)
+            return s * np.exp(-q * t) * norm_cdf(d1) - k * np.exp(-r * t) * norm_cdf(d2)
         else:
-            return k * np.exp(-r * t) * norm.cdf(-d2) - s * np.exp(-q * t) * norm.cdf(
+            return k * np.exp(-r * t) * norm_cdf(-d2) - s * np.exp(-q * t) * norm_cdf(
                 -d1
             )
 

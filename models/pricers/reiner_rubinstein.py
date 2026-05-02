@@ -3,7 +3,7 @@
 from typing import Tuple
 
 import numpy as np
-from scipy.stats import norm
+from scipy.special import ndtr as norm_cdf
 
 from ..options import BarrierOption, VanillaOption
 from .base_pricer import BasePricer
@@ -75,23 +75,23 @@ class ReinerRubinsteinPricer(BasePricer):
         d2 = self.d2
 
         # Common building block terms used across all barrier types
-        term1 = s * np.exp(-q * t) * norm.cdf(phi * d1) - k * np.exp(-r * t) * norm.cdf(
+        term1 = s * np.exp(-q * t) * norm_cdf(phi * d1) - k * np.exp(-r * t) * norm_cdf(
             phi * d2
         )
 
-        term2 = s * np.exp(-q * t) * norm.cdf(phi * self.x1) - k * np.exp(
+        term2 = s * np.exp(-q * t) * norm_cdf(phi * self.x1) - k * np.exp(
             -r * t
-        ) * norm.cdf(phi * self.x1 - phi * sigma * np.sqrt(t))
+        ) * norm_cdf(phi * self.x1 - phi * sigma * np.sqrt(t))
 
-        term3 = s * np.exp(-q * t) * (h / s) ** (2 * self.lambda_) * norm.cdf(
+        term3 = s * np.exp(-q * t) * (h / s) ** (2 * self.lambda_) * norm_cdf(
             eta * self.y1
-        ) - k * np.exp(-r * t) * (h / s) ** (2 * self.lambda_ - 2) * norm.cdf(
+        ) - k * np.exp(-r * t) * (h / s) ** (2 * self.lambda_ - 2) * norm_cdf(
             eta * self.y1 - eta * sigma * np.sqrt(t)
         )
 
-        term4 = s * np.exp(-q * t) * (h / s) ** (2 * self.lambda_) * norm.cdf(
+        term4 = s * np.exp(-q * t) * (h / s) ** (2 * self.lambda_) * norm_cdf(
             eta * self.z
-        ) - k * np.exp(-r * t) * (h / s) ** (2 * self.lambda_ - 2) * norm.cdf(
+        ) - k * np.exp(-r * t) * (h / s) ** (2 * self.lambda_ - 2) * norm_cdf(
             eta * self.z - eta * sigma * np.sqrt(t)
         )
 

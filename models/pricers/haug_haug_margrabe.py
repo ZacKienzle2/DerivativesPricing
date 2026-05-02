@@ -3,7 +3,7 @@
 from typing import Tuple
 
 import numpy as np
-from scipy.stats import norm
+from scipy.special import ndtr as norm_cdf
 
 from models.options import AsianOption
 from .base_pricer import BasePricer
@@ -70,8 +70,8 @@ class HaugHaugMargrabePricer(BasePricer):
         d2 = d1 - sigma_approx * np.sqrt(t)
 
         if self.option.option_type == "call":
-            price = np.exp(-r * t) * (m1 * norm.cdf(d1) - k * norm.cdf(d2))
+            price = np.exp(-r * t) * (m1 * norm_cdf(d1) - k * norm_cdf(d2))
         else:
-            price = np.exp(-r * t) * (k * norm.cdf(-d2) - m1 * norm.cdf(-d1))
+            price = np.exp(-r * t) * (k * norm_cdf(-d2) - m1 * norm_cdf(-d1))
 
         return float(price), 0.0

@@ -3,7 +3,7 @@
 from typing import Tuple
 
 import numpy as np
-from scipy.stats import norm  # type: ignore
+from scipy.special import ndtr as norm_cdf  # type: ignore
 
 from models.options import AsianOption
 from .base_pricer import BasePricer
@@ -76,10 +76,10 @@ class LevyPricer(BasePricer):
         d2 = d1 - sigma_approx * np.sqrt(t)
         if self.option.option_type == "call":
             price = np.exp(-r * t) * (
-                m1 * float(norm.cdf(d1)) - k * float(norm.cdf(d2))
+                m1 * float(norm_cdf(d1)) - k * float(norm_cdf(d2))
             )
         else:
             price = np.exp(-r * t) * (
-                k * float(norm.cdf(-d2)) - m1 * float(norm.cdf(-d1))
+                k * float(norm_cdf(-d2)) - m1 * float(norm_cdf(-d1))
             )
         return float(price), 0.0
