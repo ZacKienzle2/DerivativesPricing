@@ -154,18 +154,28 @@ class PricingService:
 
 def _register_defaults() -> None:
     """Wires the default pricer set."""
+    from .haug_haug_margrabe import HaugHaugMargrabePricer
+    from .lattice_pricer import LatticePricer
+    from .levy_pricer import LevyPricer
+    from .reiner_rubinstein import ReinerRubinsteinPricer
+    from .turnbull_wakeman import TurnbullWakemanPricer
+
     PricerRegistry.register(VanillaOption, "default", BlackScholesPricer)
     PricerRegistry.register(VanillaOption, "black_scholes", BlackScholesPricer)
     PricerRegistry.register(VanillaOption, "monte_carlo", MonteCarloPricer)
     PricerRegistry.register(VanillaOption, "binomial", BinomialTreePricer)
+    PricerRegistry.register(VanillaOption, "lattice", LatticePricer)
     PricerRegistry.register(VanillaOption, "implicit_fd", ImplicitFDPricer)
     PricerRegistry.register(VanillaOption, "crank_nicolson", CrankNicolsonPricer)
     PricerRegistry.register(VanillaOption, "explicit_fd", ExplicitFDPricer)
 
     PricerRegistry.register(AmericanOption, "default", CrankNicolsonPricer)
     PricerRegistry.register(AmericanOption, "binomial", BinomialTreePricer)
+    PricerRegistry.register(AmericanOption, "lattice", LatticePricer)
     PricerRegistry.register(AmericanOption, "lsm", LongstaffSchwartzPricer)
-    PricerRegistry.register(AmericanOption, "longstaff_schwartz", LongstaffSchwartzPricer)
+    PricerRegistry.register(
+        AmericanOption, "longstaff_schwartz", LongstaffSchwartzPricer
+    )
     PricerRegistry.register(AmericanOption, "implicit_fd", ImplicitFDPricer)
     PricerRegistry.register(AmericanOption, "crank_nicolson", CrankNicolsonPricer)
     PricerRegistry.register(AmericanOption, "explicit_fd", ExplicitFDPricer)
@@ -173,10 +183,16 @@ def _register_defaults() -> None:
     PricerRegistry.register(AsianOption, "default", MonteCarloPricer)
     PricerRegistry.register(AsianOption, "monte_carlo", MonteCarloPricer)
     PricerRegistry.register(AsianOption, "binomial", BinomialTreePricer)
+    PricerRegistry.register(AsianOption, "lattice", LatticePricer)
     PricerRegistry.register(AsianOption, "kemna_vorst", KemnaVorstPricer)
+    PricerRegistry.register(AsianOption, "levy", LevyPricer)
+    PricerRegistry.register(AsianOption, "turnbull_wakeman", TurnbullWakemanPricer)
+    PricerRegistry.register(AsianOption, "haug_haug_margrabe", HaugHaugMargrabePricer)
 
-    PricerRegistry.register(BarrierOption, "default", MonteCarloPricer)
+    PricerRegistry.register(BarrierOption, "default", ReinerRubinsteinPricer)
+    PricerRegistry.register(BarrierOption, "reiner_rubinstein", ReinerRubinsteinPricer)
     PricerRegistry.register(BarrierOption, "monte_carlo", MonteCarloPricer)
+    PricerRegistry.register(BarrierOption, "lattice", LatticePricer)
 
     PricerRegistry.register(BasketOption, "default", MonteCarloPricer)
     PricerRegistry.register(BasketOption, "monte_carlo", MonteCarloPricer)
