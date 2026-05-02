@@ -66,8 +66,8 @@ def render_hero() -> None:
     st.markdown(
         '<h1 class="hero-title">Derivatives Pricer</h1>'
         '<div class="hero-subtitle">'
-        'Analytic, lattice, finite-difference and Monte Carlo pricing &mdash; '
-        'with stochastic-vol processes, COS Fourier and full Greek vectors.'
+        'Analytic, lattice, finite difference and Monte Carlo pricing across '
+        'six stochastic process families.'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -314,8 +314,8 @@ def render_iv_surface_tab() -> None:
     """Tab 5: SVI implied-volatility slice fitter."""
     section_header(
         "Implied Volatility Surface",
-        "Fit Gatheral raw-SVI to a market vol slice. Stable across strikes and "
-        "arbitrage-aware.",
+        "Fit Gatheral raw SVI to a market vol slice. Stable across strikes "
+        "with arbitrage checks.",
     )
     col_in, col_plot = st.columns([1, 2], gap="medium")
 
@@ -357,10 +357,14 @@ def render_iv_surface_tab() -> None:
             st.info("Enter a market slice and click *Fit SVI* to start.")
             return
 
+        from models.calibration import SVICalibrator
+
         market_ks = fit["strikes"]
         market_ivs = fit["market_iv"]
         eval_ks = np.linspace(market_ks.min(), market_ks.max(), 200)
-        _, model_ivs = fit["evaluator"](eval_ks)
+        _, model_ivs = SVICalibrator.evaluate(
+            fit["params"], eval_ks, fit["f0"], fit["t"]
+        )
 
         fig = go.Figure()
         fig.add_trace(
@@ -409,8 +413,7 @@ def render_process_lab_tab() -> None:
     """Tab 6: pick a process, simulate paths, plot path samples + density."""
     section_header(
         "Process Lab",
-        "Sample paths under any built-in stochastic process. Useful for "
-        "visualising vol clustering, jumps and roughness.",
+        "Sample paths under any built in stochastic process.",
     )
     presets = {
         "GBM": {"s0": 100.0, "r": 0.05, "q": 0.0, "sigma": 0.2},
@@ -570,8 +573,8 @@ def render_heston_calibration_tab() -> None:
     """
     section_header(
         "Heston Calibration",
-        "Build synthetic quotes under any Heston or Bates truth, perturb with a "
-        "bid/ask spread, then recover via COS-driven weighted least squares.",
+        "Build synthetic quotes under Heston or Bates truth, perturb with a "
+        "bid ask spread, recover via COS weighted least squares.",
     )
     col_in, col_plot = st.columns([1, 2], gap="medium")
     with col_in:
@@ -842,8 +845,7 @@ def render_risk_dashboard_tab() -> None:
     """Tab 8: portfolio of vanilla options, aggregate Greeks."""
     section_header(
         "Risk Dashboard",
-        "Aggregate Greeks across a vanilla option portfolio. Edit positions "
-        "inline; cards refresh on change.",
+        "Aggregate Greeks across a vanilla option portfolio.",
     )
     import pandas as pd
 
