@@ -13,6 +13,14 @@ class BasketOption(BaseOption):
     This implementation uses NumPy for efficient numerical operations.
     """
 
+    __slots__ = (
+        "num_assets",
+        "initial_prices",
+        "volatilities",
+        "weights",
+        "corr_matrix",
+    )
+
     def __init__(
         self,
         initial_prices: Union[List[float], npt.NDArray[np.float64]],
