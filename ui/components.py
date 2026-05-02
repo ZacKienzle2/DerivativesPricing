@@ -22,12 +22,12 @@ def _format(value: Any, fmt: str = "{:,.4f}") -> str:
 
 
 def section_header(title: str, subtitle: Optional[str] = None) -> None:
-    """Renders a centred section header with optional subtitle."""
+    """Renders a left aligned section heading with optional subtitle."""
     sub = (
-        f'<div class="hero-subtitle">{subtitle}</div>' if subtitle else ""
+        f'<div class="section-sub">{subtitle}</div>' if subtitle else ""
     )
     st.markdown(
-        f'<h2 class="hero-title" style="font-size: 1.7rem;">{title}</h2>{sub}',
+        f'<h2 class="section-title">{title}</h2>{sub}',
         unsafe_allow_html=True,
     )
 
