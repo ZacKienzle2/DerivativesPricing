@@ -1,13 +1,33 @@
 """SABR calibrator fitting Hagan implied vols to a single-maturity slice."""
 
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import numpy.typing as npt
 from scipy.optimize import least_squares
 
+from ..pricers._analytic_kernels import bs_full_greeks_jit
 from ..processes.sabr import SABRProcess, hagan_lognormal_vol_jit
 from .base import BaseCalibrator, CalibrationResult
+
+
+def _vega_weights(
+    f0: float, strikes: npt.NDArray, t: float, ivs: npt.NDArray
+) -> npt.NDArray:
+    """BS vega per strike at the supplied IVs (no discount factor)."""
+    out = np.empty_like(ivs)
+    for i in range(strikes.size):
+        _, _, _, vega, _, _ = bs_full_greeks_jit(
+            f0, float(strikes[i]), t, 0.0, 0.0, float(ivs[i]), True
+        )
+        out[i] = vega
+    return out
+
+
+def _spread_weights(bids: npt.NDArray, asks: npt.NDArray) -> npt.NDArray:
+    """Inverse-spread weights, clamped to a tiny floor for tight quotes."""
+    spread = np.maximum(np.asarray(asks) - np.asarray(bids), 1e-6)
+    return 1.0 / spread
 
 
 class SABRCalibrator(BaseCalibrator):
@@ -29,7 +49,9 @@ class SABRCalibrator(BaseCalibrator):
         market: npt.NDArray,
         f0: Optional[float] = None,
         t: Optional[float] = None,
-        weights: Optional[npt.NDArray] = None,
+        weights: Optional[Union[npt.NDArray, str]] = None,
+        bids: Optional[npt.NDArray] = None,
+        asks: Optional[npt.NDArray] = None,
         x0: Optional[npt.NDArray] = None,
         **kwargs,
     ) -> CalibrationResult:
@@ -40,7 +62,13 @@ class SABRCalibrator(BaseCalibrator):
             market: Market implied vols at each strike, shape `(M,)`.
             f0: Forward price.
             t: Maturity in years.
-            weights: Optional weights, shape `(M,)`. Defaults to uniform.
+            weights: Per-strike weights, an explicit array or the string
+                `"vega"` to weight by Black vega at the market IV, the string
+                `"spread"` to weight by inverse `ask - bid` (requires `bids`
+                and `asks`), `"vega_spread"` to combine the two, or `None`
+                for uniform.
+            bids, asks: Bid/ask quote arrays, required for the `"spread"`
+                or `"vega_spread"` modes.
             x0: Optional initial guess `[alpha, rho, nu]`.
 
         Returns:
@@ -52,11 +80,25 @@ class SABRCalibrator(BaseCalibrator):
         ivs = np.asarray(market, dtype=np.float64)
         if ks.shape != ivs.shape:
             raise ValueError("strikes and market must have the same shape.")
-        w = (
-            np.ones_like(ivs)
-            if weights is None
-            else np.asarray(weights, dtype=np.float64)
-        )
+
+        if isinstance(weights, str):
+            if weights in ("vega", "vega_spread"):
+                w = _vega_weights(f0, ks, t, ivs)
+            else:
+                w = np.ones_like(ivs)
+            if weights in ("spread", "vega_spread"):
+                if bids is None or asks is None:
+                    raise ValueError(
+                        f"weights={weights!r} requires bids and asks arrays."
+                    )
+                w = w * _spread_weights(np.asarray(bids), np.asarray(asks))
+            w_sum = w.sum()
+            if w_sum > 0.0:
+                w = w * (w.size / w_sum)
+        elif weights is None:
+            w = np.ones_like(ivs)
+        else:
+            w = np.asarray(weights, dtype=np.float64)
 
         beta = self.beta
 
