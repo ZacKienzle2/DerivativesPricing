@@ -11,7 +11,7 @@ from models.options import AmericanOption, AsianOption, BaseOption
 from .base_pricer import BasePricer
 
 
-@njit(fastmath=True, cache=True)
+@njit(fastmath=True, cache=True, boundscheck=False)
 def _european_american_jit(
     s: float,
     k: float,
@@ -72,7 +72,7 @@ def _european_american_jit(
     return values[0]
 
 
-@njit(fastmath=True, parallel=True, cache=True)
+@njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
 def _asian_hull_white_jit(
     s: float,
     k: float,
@@ -174,7 +174,13 @@ class BinomialTreePricer(BasePricer):
     and to a Hull-White interpolation solver for Asian options.
     """
 
-    def __init__(self, option: BaseOption, num_steps: int, num_avgs: int = 50):
+    def __init__(
+        self,
+        option: BaseOption,
+        num_steps: int,
+        num_avgs: int = 50,
+        richardson: bool = False,
+    ):
         super().__init__(option)
         if not isinstance(num_steps, int) or num_steps <= 0:
             raise ValueError("Number of steps must be a positive integer.")
@@ -182,38 +188,42 @@ class BinomialTreePricer(BasePricer):
             raise ValueError("num_avgs must be an integer >= 2.")
         self.num_steps = num_steps
         self.num_avgs = num_avgs
+        self.richardson = richardson
 
     def get_params(self) -> Dict[str, Any]:
         """Returns the configuration of this pricer."""
-        return {"num_steps": self.num_steps, "num_avgs": self.num_avgs}
+        return {
+            "num_steps": self.num_steps,
+            "num_avgs": self.num_avgs,
+            "richardson": self.richardson,
+        }
 
-    def price(self) -> Tuple[float, float]:
-        """Dispatches to the appropriate pricing kernel."""
+    def _price_at(self, n_steps: int) -> float:
         opt = self.option
         is_call = opt.option_type == "call"
         if isinstance(opt, AsianOption):
-            value = _asian_hull_white_jit(
-                opt.S,
-                opt.K,
-                opt.T,
-                opt.r,
-                opt.sigma,
-                opt.q,
-                self.num_steps,
-                is_call,
-                self.num_avgs,
+            return float(
+                _asian_hull_white_jit(
+                    opt.S, opt.K, opt.T, opt.r, opt.sigma, opt.q,
+                    n_steps, is_call, self.num_avgs,
+                )
             )
-            return float(value), 0.0
-
-        value = _european_american_jit(
-            opt.S,
-            opt.K,
-            opt.T,
-            opt.r,
-            opt.sigma,
-            opt.q,
-            self.num_steps,
-            is_call,
-            isinstance(opt, AmericanOption),
+        return float(
+            _european_american_jit(
+                opt.S, opt.K, opt.T, opt.r, opt.sigma, opt.q,
+                n_steps, is_call, isinstance(opt, AmericanOption),
+            )
         )
-        return float(value), 0.0
+
+    def price(self) -> Tuple[float, float]:
+        """Returns `(price, 0.0)`.
+
+        With `richardson=True`, prices `(n)` and `(n+1)` step trees and
+        returns `0.5 * (P_n + P_{n+1})` so the leading O(1/n) error term
+        cancels — quadratic CRR convergence at 2x compute cost.
+        """
+        v_n = self._price_at(self.num_steps)
+        if not self.richardson:
+            return v_n, 0.0
+        v_np1 = self._price_at(self.num_steps + 1)
+        return 0.5 * (v_n + v_np1), 0.0
