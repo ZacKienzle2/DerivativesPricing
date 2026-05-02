@@ -34,7 +34,7 @@ dev = ["pytest>=8", "ruff>=0.4", "black>=24", "mypy>=1.8"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["models*", "utils*", "ui*"]
+include = ["models*", "utils*", "ui*", "services*"]
 exclude = ["tests*", "writeup*", "static*"]
 
 [tool.ruff]
