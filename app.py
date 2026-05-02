@@ -64,11 +64,7 @@ for key, default in (
 def render_hero() -> None:
     """Top banner."""
     st.markdown(
-        '<h1 class="hero-title">Derivatives Pricer</h1>'
-        '<div class="hero-subtitle">'
-        'Analytic, lattice, finite difference and Monte Carlo pricing across '
-        'six stochastic process families.'
-        '</div>',
+        '<h1 class="hero-title">Derivatives Pricer</h1>',
         unsafe_allow_html=True,
     )
 
@@ -78,7 +74,7 @@ def render_point_pricing_tab(inputs: Dict[str, Any]) -> None:
     section_header("Contract Pricing & Greeks")
     metrics = get_point_pricing_context(inputs)
     if not metrics:
-        st.warning("Could not compute metrics. Please check parameters.")
+        st.warning("Check parameters")
         return
 
     st.session_state.call_pricer = metrics.get("call", {}).get("pricer")
@@ -87,7 +83,7 @@ def render_point_pricing_tab(inputs: Dict[str, Any]) -> None:
     inputs_summary = {
         "Spot": inputs["contract_params"].get("s"),
         "Strike": inputs["contract_params"].get("k"),
-        "Maturity (yrs)": inputs["contract_params"].get("t"),
+        "Maturity": inputs["contract_params"].get("t"),
         "Vol": inputs["contract_params"].get("sigma"),
         "Rate": inputs["contract_params"].get("r"),
     }
@@ -123,7 +119,7 @@ def render_surface_tab(inputs: Dict[str, Any]) -> None:
         "Y-Axis Variable", list(axis_map.keys()), 3, key="surface_y"
     )
     if x_key == y_key:
-        st.error("X and Y axes must be different.")
+        st.error("Pick different axes")
         return
 
     ranges = {}
@@ -202,7 +198,7 @@ def render_convergence_tab(inputs: Dict[str, Any]) -> None:
     section_header("Model Convergence Analysis")
     pricer_type = inputs["pricer_type"]
     if pricer_type not in ["Monte Carlo", "Longstaff-Schwartz"]:
-        st.info("Convergence plots are only for numerical methods.")
+        st.info("Numerical methods only")
         return
 
     with st.container(border=True):
@@ -281,7 +277,7 @@ def render_strategy_tab() -> None:
     with col2:
         with st.container(border=True):
             if not st.session_state.strategy:
-                st.info("Add an instrument to begin building a strategy.")
+                st.info("Add an instrument")
                 return
             try:
                 prices = [
@@ -307,16 +303,12 @@ def render_strategy_tab() -> None:
                 )
             except Exception as e:
                 st.error(f"Error calculating payoffs: {e}")
-                st.info("Please check your position parameters.")
+                st.info("Check position parameters")
 
 
 def render_iv_surface_tab() -> None:
     """Tab 5: SVI implied-volatility slice fitter."""
-    section_header(
-        "Implied Volatility Surface",
-        "Fit Gatheral raw SVI to a market vol slice. Stable across strikes "
-        "with arbitrage checks.",
-    )
+    section_header("Implied Volatility")
     col_in, col_plot = st.columns([1, 2], gap="medium")
 
     with col_in:
@@ -354,7 +346,7 @@ def render_iv_surface_tab() -> None:
     with col_plot:
         fit = st.session_state.get("svi_fit")
         if fit is None:
-            st.info("Enter a market slice and click *Fit SVI* to start.")
+            st.info("Enter a slice and fit")
             return
 
         from models.calibration import SVICalibrator
@@ -411,10 +403,7 @@ def render_iv_surface_tab() -> None:
 
 def render_process_lab_tab() -> None:
     """Tab 6: pick a process, simulate paths, plot path samples + density."""
-    section_header(
-        "Process Lab",
-        "Sample paths under any built in stochastic process.",
-    )
+    section_header("Process Lab")
     presets = {
         "GBM": {"s0": 100.0, "r": 0.05, "q": 0.0, "sigma": 0.2},
         "Heston": {
@@ -460,7 +449,7 @@ def render_process_lab_tab() -> None:
     data = st.session_state.get("proc_lab_data")
     with col_plot:
         if data is None:
-            st.info("Configure a process and click *Simulate paths* to begin.")
+            st.info("Configure and simulate")
             return
         with st.container(border=True):
             paths = data["paths"]
@@ -571,11 +560,7 @@ def render_heston_calibration_tab() -> None:
     user-supplied strike / maturity vector. Quotes are perturbed with a
     bid/ask half-spread before the calibrator recovers Heston parameters.
     """
-    section_header(
-        "Heston Calibration",
-        "Build synthetic quotes under Heston or Bates truth, perturb with a "
-        "bid ask spread, recover via COS weighted least squares.",
-    )
+    section_header("Heston Calibration")
     col_in, col_plot = st.columns([1, 2], gap="medium")
     with col_in:
         with st.container(border=True):
@@ -744,7 +729,7 @@ def render_heston_calibration_tab() -> None:
     bundle = st.session_state.get("hcal_data")
     with col_plot:
         if bundle is None:
-            st.info("Configure truth parameters and click *Generate & Calibrate*.")
+            st.info("Configure truth and calibrate")
             return
         quotes = bundle["quotes"]
         fit = bundle["fit"]
@@ -843,10 +828,7 @@ def render_heston_calibration_tab() -> None:
 
 def render_risk_dashboard_tab() -> None:
     """Tab 8: portfolio of vanilla options, aggregate Greeks."""
-    section_header(
-        "Risk Dashboard",
-        "Aggregate Greeks across a vanilla option portfolio.",
-    )
+    section_header("Risk Dashboard")
     import pandas as pd
 
     default = pd.DataFrame(
@@ -893,7 +875,7 @@ def render_risk_dashboard_tab() -> None:
         if pd.notna(row["S"])
     ]
     if not positions:
-        st.info("Add at least one position to see aggregate risk.")
+        st.info("Add a position")
         return
     agg = aggregate_portfolio_greeks(positions)
     stat_strip({k.title(): v for k, v in agg.items()}, fmt="{:,.4f}")
@@ -933,15 +915,15 @@ render_hero()
 inputs = get_sidebar_inputs()
 
 tab_names = [
-    "Point Pricing",
-    "Price Surface",
+    "Pricing",
+    "Surface",
     "Greeks",
     "Convergence",
     "Strategy",
-    "IV Surface",
-    "Process Lab",
-    "Heston Calibration",
-    "Risk Dashboard",
+    "IV",
+    "Process",
+    "Calibration",
+    "Risk",
 ]
 tabs = st.tabs(tab_names)
 
@@ -949,12 +931,12 @@ with tabs[0]:
     render_point_pricing_tab(inputs)
 with tabs[1]:
     if inputs.get("option_type") in ["Basket", "Asian"]:
-        st.info("Price surface analysis is not applicable for this option type.")
+        st.info("Surface not available for this option")
     else:
         render_surface_tab(inputs)
 with tabs[2]:
     if inputs.get("option_type") in ["Basket", "Asian"]:
-        st.info("Greek sensitivity is not applicable for this option type.")
+        st.info("Greeks not available for this option")
     else:
         render_greeks_tab(inputs)
 with tabs[3]:
