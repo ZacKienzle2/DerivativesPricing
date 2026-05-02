@@ -1,2 +1,1 @@
-# models/__init__.py
-# Makes the 'models' directory a Python package
+"""Domain models, pricers, processes and calibration."""

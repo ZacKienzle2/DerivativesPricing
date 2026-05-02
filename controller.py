@@ -1,3 +1,5 @@
+"""Service layer between the Streamlit dashboard and the pricing core."""
+
 import streamlit as st
 from typing import Dict, Any, Tuple, Optional, List, Type
 import numpy as np

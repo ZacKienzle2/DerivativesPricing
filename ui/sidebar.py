@@ -1,7 +1,10 @@
-from typing import Dict, Any, List
-import streamlit as st
-import pandas as pd
+"""Sidebar configuration form for the dashboard."""
+
+from typing import Any, Dict, List
+
 import numpy as np
+import pandas as pd
+import streamlit as st
 
 
 def _get_model_params(pricer_type: str) -> Dict[str, Any]:
