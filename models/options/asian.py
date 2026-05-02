@@ -9,6 +9,8 @@ class AsianOption(BaseOption):
     price of the underlying asset over a specified period.
     """
 
+    __slots__ = ("avg_type",)
+
     def __init__(
         self,
         s: float,
