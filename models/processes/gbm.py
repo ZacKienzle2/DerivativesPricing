@@ -6,6 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ..options import BaseOption
+from ..pricers._analytic_kernels import bs_price_jit
 from ..simulation import generate_paths_jit
 from .base import BaseProcess
 
@@ -63,3 +64,15 @@ class GBMProcess(BaseProcess):
     @property
     def signature(self) -> Tuple:
         return (type(self).__name__, self._s0, self._r, self._q, self._sigma)
+
+    @property
+    def supports_analytic_european(self) -> bool:
+        return True
+
+    def analytic_european_price(
+        self, k: float, t: float, is_call: bool
+    ) -> float:
+        """Black-Scholes European price under GBM."""
+        return float(
+            bs_price_jit(self._s0, k, t, self._r, self._q, self._sigma, is_call)
+        )
