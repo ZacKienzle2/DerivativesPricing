@@ -1,5 +1,4 @@
-# ui/__init__.py
-# Makes the 'ui' directory a Python package.
+"""Streamlit UI helpers."""
 
 from .sidebar import get_sidebar_inputs
 
