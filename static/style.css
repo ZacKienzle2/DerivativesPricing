@@ -202,6 +202,12 @@ html, body, [class*="css"] {
 .metric-card-call h1 { color: var(--accent); }
 .metric-card-put  h1 { color: var(--loss); }
 
+.metric-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .metric-card .std-err {
     margin-top: 0.35rem;
     color: var(--text-muted);

@@ -36,8 +36,8 @@ def stat_strip(stats: Dict[str, Any], fmt: str = "{:,.4f}") -> None:
     """Renders a horizontal strip of `(label, value)` stat cells."""
     cells = "".join(
         f'<div class="stat-cell">'
-        f'  <div class="stat-label">{label}</div>'
-        f'  <div class="stat-value">{_format(value, fmt)}</div>'
+        f'<div class="stat-label">{label}</div>'
+        f'<div class="stat-value">{_format(value, fmt)}</div>'
         f'</div>'
         for label, value in stats.items()
     )
@@ -50,8 +50,8 @@ def greek_pills(greeks: Dict[str, Any]) -> str:
         return ""
     pills = "".join(
         f'<div class="greek-pill">'
-        f'  <span class="greek-label">{name}</span>'
-        f'  <span class="greek-value">{_format(value, "{:,.4f}")}</span>'
+        f'<span class="greek-label">{name}</span>'
+        f'<span class="greek-value">{_format(value, "{:,.4f}")}</span>'
         f'</div>'
         for name, value in greeks.items()
         if name not in ("info",)
@@ -94,20 +94,13 @@ def display_metrics_card(
         else '<span class="tag tag-warn">numerical</span>'
     )
 
-    st.markdown(
-        f"""
-        <div class="metric-card metric-card-{flavour}">
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-                <h3>{title} Price</h3>
-                {method_tag}
-            </div>
-            <h1>{price_html}</h1>
-            {se_html}
-            {greeks_html}
-        </div>
-        """,
-        unsafe_allow_html=True,
+    html = (
+        f'<div class="metric-card metric-card-{flavour}">'
+        f'<div class="metric-head"><h3>{title} Price</h3>{method_tag}</div>'
+        f'<h1>{price_html}</h1>{se_html}{greeks_html}'
+        f'</div>'
     )
+    st.markdown(html, unsafe_allow_html=True)
 
     extras = metrics.get("extras")
     if extras:
