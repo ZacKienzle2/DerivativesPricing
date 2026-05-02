@@ -1,4 +1,4 @@
-# models/pricers/__init__.py
+"""Pricer surface and registry for the derivatives library."""
 
 from .base_pricer import BasePricer
 from .black_scholes import BlackScholesPricer

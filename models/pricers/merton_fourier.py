@@ -1,9 +1,12 @@
+"""Merton jump-diffusion Fourier pricer via FFT inversion."""
+
 from typing import Any, Dict, Tuple
 
 import numpy as np
 from scipy.interpolate import interp1d
-from .base_pricer import BasePricer
+
 from ..options import BaseOption, VanillaOption
+from .base_pricer import BasePricer
 
 
 class MertonFourierPricer(BasePricer):

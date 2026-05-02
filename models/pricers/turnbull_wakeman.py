@@ -1,6 +1,7 @@
-# models/pricers/turnbull_wakeman.py
+"""Turnbull-Wakeman 1991 moment-matched arithmetic Asian pricer."""
 
 from typing import Tuple
+
 import numpy as np
 from scipy.stats import norm
 

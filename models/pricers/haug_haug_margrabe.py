@@ -1,5 +1,7 @@
-# models/pricers/haug_haug_margrabe.py
+"""Haug-Haug-Margrabe approximation for arithmetic Asian options."""
+
 from typing import Tuple
+
 import numpy as np
 from scipy.stats import norm
 
