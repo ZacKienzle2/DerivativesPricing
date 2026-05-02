@@ -1,16 +1,19 @@
-# models/pricers/kemna_vorst.py
+"""Kemna-Vorst closed-form geometric Asian pricer."""
+
 from typing import Tuple
-import numpy as np
-from scipy.stats import norm
 
 from models.options import AsianOption
+
+from ._analytic_kernels import kemna_vorst_price_jit
 from .base_pricer import BasePricer
 
 
 class KemnaVorstPricer(BasePricer):
-    """
-    Prices European Asian options on the GEOMETRIC average using the
-    Kemna-Vorst (1990) exact closed-form solution.
+    """Prices continuously-averaged geometric Asian options.
+
+    Wraps the JIT kernel `kemna_vorst_price_jit` so the same numerical core
+    can be reused as a control variate inside Monte Carlo pricing of
+    arithmetic-average Asians.
     """
 
     def __init__(self, option: AsianOption):
@@ -19,31 +22,17 @@ class KemnaVorstPricer(BasePricer):
         super().__init__(option)
 
     def price(self) -> Tuple[float, float]:
-        """Calculates the price using the Kemna-Vorst formula."""
-        s, k, t, r, q, sigma = (
-            self.option.S,
-            self.option.K,
-            self.option.T,
-            self.option.r,
-            self.option.q,
-            self.option.sigma,
+        """Returns `(price, 0.0)` from the Kemna-Vorst formula."""
+        opt = self.option
+        return (
+            kemna_vorst_price_jit(
+                opt.S,
+                opt.K,
+                opt.T,
+                opt.r,
+                opt.q,
+                opt.sigma,
+                opt.option_type == "call",
+            ),
+            0.0,
         )
-        is_call = self.option.option_type == "call"
-
-        sigma_a = sigma / np.sqrt(3)
-        mu_a = (r - q - 0.5 * sigma**2) / 2
-        b_a = mu_a + r - q
-
-        d1 = (np.log(s / k) + (b_a + 0.5 * sigma_a**2) * t) / (sigma_a * np.sqrt(t))
-        d2 = d1 - sigma_a * np.sqrt(t)
-
-        if is_call:
-            price = s * np.exp((b_a - r) * t) * norm.cdf(d1) - k * np.exp(
-                -r * t
-            ) * norm.cdf(d2)
-        else:
-            price = k * np.exp(-r * t) * norm.cdf(-d2) - s * np.exp(
-                (b_a - r) * t
-            ) * norm.cdf(-d1)
-
-        return float(price), 0.0
