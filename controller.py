@@ -201,6 +201,43 @@ def get_surface_data(
     return np.nan_to_num(surface_c), np.nan_to_num(surface_p)
 
 
+@st.cache_data(show_spinner=False)
+def fit_svi_slice(
+    strikes: np.ndarray, ivs: np.ndarray, f0: float, t: float
+) -> Dict[str, Any]:
+    """Fits raw SVI to a market IV slice and returns a UI-ready bundle.
+
+    Args:
+        strikes: Strike grid.
+        ivs: Market implied vols.
+        f0: Forward.
+        t: Maturity.
+
+    Returns:
+        Dict with `strikes`, `market_iv`, `params`, `residual_norm`,
+        `evaluator` (callable) and `t` for downstream rendering.
+    """
+    from models.calibration import SVICalibrator
+
+    calibrator = SVICalibrator()
+    result = calibrator.calibrate(strikes, ivs, f0=f0, t=t)
+    params = result.params
+
+    def evaluator(ks: np.ndarray):
+        return SVICalibrator.evaluate(params, np.asarray(ks), f0, t)
+
+    return {
+        "strikes": np.asarray(strikes, dtype=float),
+        "market_iv": np.asarray(ivs, dtype=float),
+        "params": params,
+        "residual_norm": float(result.residual_norm),
+        "evaluator": evaluator,
+        "t": float(t),
+        "f0": float(f0),
+        "converged": bool(result.converged),
+    }
+
+
 @st.cache_data
 def get_greek_data(
     inputs: Dict[str, Any], s_range: np.ndarray
