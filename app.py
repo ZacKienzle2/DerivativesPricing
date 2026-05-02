@@ -523,45 +523,220 @@ def render_process_lab_tab() -> None:
             )
 
 
+_HESTON_PRESETS = {
+    "Equity index (skew)": {
+        "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.7, "v0": 0.04,
+    },
+    "FX (mild smile)": {
+        "kappa": 1.5, "theta": 0.02, "eta": 0.4, "rho": -0.1, "v0": 0.025,
+    },
+    "Crypto (high vol-of-vol)": {
+        "kappa": 3.0, "theta": 0.40, "eta": 1.2, "rho": -0.4, "v0": 0.45,
+    },
+    "Calm market": {
+        "kappa": 1.0, "theta": 0.02, "eta": 0.15, "rho": -0.3, "v0": 0.02,
+    },
+    "Stress (high skew)": {
+        "kappa": 4.0, "theta": 0.10, "eta": 0.8, "rho": -0.85, "v0": 0.12,
+    },
+}
+
+_BATES_PRESETS = {
+    "Light jumps": {
+        "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.5, "v0": 0.04,
+        "lam": 0.3, "mu_j": -0.04, "sigma_j": 0.10,
+    },
+    "Crash-prone": {
+        "kappa": 2.5, "theta": 0.05, "eta": 0.4, "rho": -0.6, "v0": 0.05,
+        "lam": 0.8, "mu_j": -0.10, "sigma_j": 0.20,
+    },
+}
+
+
+def _parse_grid_csv(text: str) -> np.ndarray:
+    """Parses a CSV-or-newline-separated number list."""
+    cleaned = text.replace("\n", ",").replace(";", ",")
+    parts = [p.strip() for p in cleaned.split(",") if p.strip()]
+    return np.array([float(p) for p in parts], dtype=float)
+
+
 def render_heston_calibration_tab() -> None:
-    """Tab 7: synthetic Heston quote generator + COS calibrator."""
+    """Tab 7: synthetic quote generator + Heston COS calibrator.
+
+    Lets the user pick the truth model (Heston or Bates), tune any preset
+    or hand-set every parameter, and specify either an auto-generated or
+    user-supplied strike / maturity vector. Quotes are perturbed with a
+    bid/ask half-spread before the calibrator recovers Heston parameters.
+    """
     section_header(
         "Heston Calibration",
-        "Generate synthetic quotes under known Heston parameters, perturb with a "
-        "bid/ask spread, then recover via COS-driven least squares.",
+        "Build synthetic quotes under any Heston or Bates truth, perturb with a "
+        "bid/ask spread, then recover via COS-driven weighted least squares.",
     )
     col_in, col_plot = st.columns([1, 2], gap="medium")
     with col_in:
         with st.container(border=True):
-            st.markdown("##### Truth Parameters")
+            st.markdown("##### Truth Model")
+            truth_model = st.radio(
+                "Dynamics",
+                ["Heston", "Bates"],
+                horizontal=True,
+                key="hcal_truth_model",
+            )
+            preset_map = (
+                _HESTON_PRESETS if truth_model == "Heston" else _BATES_PRESETS
+            )
+            preset_name = st.selectbox(
+                "Preset",
+                list(preset_map.keys()) + ["Custom"],
+                key="hcal_preset",
+            )
+            if preset_name != "Custom":
+                base = dict(preset_map[preset_name])
+            else:
+                base = dict(next(iter(preset_map.values())))
+
             s0 = st.number_input("Spot", value=100.0, key="hcal_s0")
             r = st.number_input("Rate", value=0.05, step=0.01, key="hcal_r")
-            kappa = st.number_input("kappa", value=2.0, key="hcal_kappa")
-            theta = st.number_input("theta", value=0.04, key="hcal_theta")
-            eta = st.number_input("eta", value=0.3, key="hcal_eta")
-            rho = st.slider("rho", -0.99, 0.99, -0.5, 0.01, key="hcal_rho")
-            v0 = st.number_input("v0", value=0.04, key="hcal_v0")
+            q = st.number_input("Dividend yield", value=0.0, step=0.005, key="hcal_q")
+            kappa = st.number_input(
+                "kappa (mean reversion)",
+                value=float(base["kappa"]),
+                step=0.1,
+                key="hcal_kappa",
+            )
+            theta = st.number_input(
+                "theta (long-run var)",
+                value=float(base["theta"]),
+                step=0.005,
+                format="%.4f",
+                key="hcal_theta",
+            )
+            eta = st.number_input(
+                "eta (vol of vol)",
+                value=float(base["eta"]),
+                step=0.05,
+                key="hcal_eta",
+            )
+            rho = st.slider(
+                "rho (corr)", -0.99, 0.99, float(base["rho"]), 0.01, key="hcal_rho"
+            )
+            v0 = st.number_input(
+                "v0 (initial var)",
+                value=float(base["v0"]),
+                step=0.005,
+                format="%.4f",
+                key="hcal_v0",
+            )
+            if truth_model == "Bates":
+                lam = st.number_input(
+                    "lambda (jump intensity)",
+                    value=float(base.get("lam", 0.3)),
+                    step=0.1,
+                    key="hcal_lam",
+                )
+                mu_j = st.number_input(
+                    "mu_J (jump mean)",
+                    value=float(base.get("mu_j", -0.05)),
+                    step=0.01,
+                    format="%.3f",
+                    key="hcal_muj",
+                )
+                sigma_j = st.number_input(
+                    "sigma_J (jump std)",
+                    value=float(base.get("sigma_j", 0.15)),
+                    step=0.01,
+                    format="%.3f",
+                    key="hcal_sigj",
+                )
+
         with st.container(border=True):
-            st.markdown("##### Quote Grid")
-            n_strikes = st.slider("Strike count", 5, 25, 9)
-            n_mats = st.slider("Maturity count", 2, 8, 4)
-            spread_bps = st.slider("Bid/ask half-spread (bps)", 0, 200, 40)
+            st.markdown("##### Strike & Maturity Grid")
+            grid_mode = st.radio(
+                "Grid mode",
+                ["Auto", "Custom"],
+                horizontal=True,
+                key="hcal_grid_mode",
+            )
+            if grid_mode == "Auto":
+                n_strikes = st.slider("Strike count", 5, 30, 9, key="hcal_nk")
+                strike_pct = st.slider(
+                    "Strike width (% spot)", 5, 80, 30, step=5, key="hcal_kpct"
+                )
+                n_mats = st.slider("Maturity count", 2, 12, 4, key="hcal_nt")
+                mat_lo, mat_hi = st.slider(
+                    "Maturity range (years)",
+                    0.05, 5.0, (0.25, 2.0),
+                    key="hcal_trange",
+                )
+                strikes = np.linspace(
+                    s0 * (1.0 - strike_pct / 100.0),
+                    s0 * (1.0 + strike_pct / 100.0),
+                    int(n_strikes),
+                )
+                maturities = np.linspace(float(mat_lo), float(mat_hi), int(n_mats))
+            else:
+                k_text = st.text_area(
+                    "Strikes (CSV / newline)",
+                    "70, 80, 90, 95, 100, 105, 110, 120, 130",
+                    key="hcal_kcsv",
+                    height=80,
+                )
+                t_text = st.text_area(
+                    "Maturities in years (CSV / newline)",
+                    "0.25, 0.5, 1.0, 2.0",
+                    key="hcal_tcsv",
+                    height=80,
+                )
+                try:
+                    strikes = _parse_grid_csv(k_text)
+                    maturities = _parse_grid_csv(t_text)
+                except ValueError as exc:
+                    st.error(f"Failed to parse grid: {exc}")
+                    return
+
+            spread_bps = st.slider(
+                "Bid/ask half-spread (bps)", 0, 300, 40, key="hcal_spread"
+            )
+            weights_mode = st.selectbox(
+                "Calibrator weights",
+                ["vega_spread", "vega", "spread", "uniform"],
+                key="hcal_weights",
+            )
             seed = st.number_input("Seed", value=7, step=1, key="hcal_seed")
             run = st.button("Generate & Calibrate", use_container_width=True)
 
     if run:
-        strikes = np.linspace(s0 * 0.7, s0 * 1.3, int(n_strikes))
-        maturities = np.linspace(0.25, 2.0, int(n_mats))
         truth = {
-            "s0": s0, "v0": v0, "r": r, "q": 0.0,
+            "s0": s0, "v0": v0, "r": r, "q": q,
             "kappa": kappa, "theta": theta, "eta": eta, "rho": rho,
         }
-        quotes = generate_synthetic_quotes(
-            "Heston", truth, strikes, maturities,
-            spread_bps=float(spread_bps), seed=int(seed),
-        )
-        fit = fit_heston_to_quotes(quotes, s0, r=r, q=0.0, weights_mode="vega_spread")
-        st.session_state["hcal_data"] = {"quotes": quotes, "fit": fit, "truth": truth}
+        if truth_model == "Bates":
+            truth.update({"lam": lam, "mu_j": mu_j, "sigma_j": sigma_j})
+        try:
+            quotes = generate_synthetic_quotes(
+                truth_model, truth, strikes, maturities,
+                spread_bps=float(spread_bps), seed=int(seed),
+            )
+        except Exception as exc:
+            st.error(f"Quote generation failed: {exc}")
+            return
+        try:
+            mode = (
+                None
+                if weights_mode == "uniform"
+                else weights_mode
+            )
+            fit = fit_heston_to_quotes(
+                quotes, s0, r=r, q=q,
+                weights_mode=mode if mode else "vega_spread",
+            )
+        except Exception as exc:
+            st.error(f"Calibration failed: {exc}")
+            return
+        st.session_state["hcal_data"] = {
+            "quotes": quotes, "fit": fit, "truth": truth, "model": truth_model,
+        }
 
     bundle = st.session_state.get("hcal_data")
     with col_plot:
@@ -571,53 +746,94 @@ def render_heston_calibration_tab() -> None:
         quotes = bundle["quotes"]
         fit = bundle["fit"]
         truth = bundle["truth"]
+        truth_model = bundle.get("model", "Heston")
+        view = st.radio(
+            "View",
+            ["Prices", "Implied Vols", "Residuals"],
+            horizontal=True,
+            key="hcal_view",
+        )
         with st.container(border=True):
-            heatmap_market = go.Figure(
+            if view == "Prices":
+                z = quotes["prices"]
+                title = f"{truth_model} synthetic market prices"
+                colorscale = "Viridis"
+                colorbar_title = "Price"
+                zmid = None
+            elif view == "Implied Vols":
+                z = quotes["ivs"]
+                title = f"{truth_model} synthetic IV surface"
+                colorscale = "Plasma"
+                colorbar_title = "IV"
+                zmid = None
+            else:
+                z = fit["model_prices"] - quotes["prices"]
+                title = "Calibration residuals (model minus market)"
+                colorscale = "RdBu"
+                colorbar_title = "Δ"
+                zmid = 0
+
+            heatmap = go.Figure(
                 data=go.Heatmap(
-                    z=quotes["prices"],
+                    z=z,
                     x=quotes["maturities"],
                     y=quotes["strikes"],
-                    colorscale="Viridis",
-                    colorbar={"title": "Price"},
+                    colorscale=colorscale,
+                    zmid=zmid,
+                    colorbar={"title": colorbar_title},
                 )
             )
-            heatmap_market.update_layout(
-                title="Synthetic market prices",
-                xaxis_title="Maturity",
+            heatmap.update_layout(
+                title=title,
+                xaxis_title="Maturity (years)",
                 yaxis_title="Strike",
                 template="plotly_dark",
                 margin={"l": 40, "r": 20, "t": 60, "b": 40},
             )
-            st.plotly_chart(heatmap_market, use_container_width=True)
+            st.plotly_chart(heatmap, use_container_width=True)
 
-            heatmap_resid = go.Figure(
-                data=go.Heatmap(
-                    z=fit["model_prices"] - quotes["prices"],
-                    x=quotes["maturities"],
-                    y=quotes["strikes"],
-                    colorscale="RdBu",
-                    zmid=0,
-                    colorbar={"title": "Model - Market"},
+            iv_curves = go.Figure()
+            for j, t_val in enumerate(quotes["maturities"]):
+                iv_curves.add_trace(
+                    go.Scatter(
+                        x=quotes["strikes"],
+                        y=quotes["ivs"][:, j],
+                        mode="lines+markers",
+                        name=f"T = {t_val:.2f}",
+                    )
                 )
-            )
-            heatmap_resid.update_layout(
-                title="Calibration residuals",
-                xaxis_title="Maturity",
-                yaxis_title="Strike",
+            iv_curves.update_layout(
+                title="IV smiles by maturity",
+                xaxis_title="Strike",
+                yaxis_title="Implied vol",
                 template="plotly_dark",
                 margin={"l": 40, "r": 20, "t": 60, "b": 40},
+                legend={"orientation": "h", "y": -0.2},
             )
-            st.plotly_chart(heatmap_resid, use_container_width=True)
+            st.plotly_chart(iv_curves, use_container_width=True)
 
+            comparison_rows = []
+            for key in ("kappa", "theta", "eta", "rho", "v0"):
+                comparison_rows.append(
+                    (
+                        key,
+                        f"{fit['params'][key]:.4f}",
+                        f"{truth.get(key, 0.0):.4f}",
+                        f"{(fit['params'][key] - truth.get(key, 0.0)):+.4e}",
+                    )
+                )
+            import pandas as pd
+
+            df = pd.DataFrame(
+                comparison_rows, columns=["Param", "Fit", "Truth", "Δ"]
+            )
+            st.dataframe(df, use_container_width=True, hide_index=True)
             stat_strip(
                 {
-                    "kappa (fit / truth)": f"{fit['params']['kappa']:.4f} / {truth['kappa']:.4f}",
-                    "theta": f"{fit['params']['theta']:.4f} / {truth['theta']:.4f}",
-                    "eta": f"{fit['params']['eta']:.4f} / {truth['eta']:.4f}",
-                    "rho": f"{fit['params']['rho']:.4f} / {truth['rho']:.4f}",
-                    "v0": f"{fit['params']['v0']:.4f} / {truth['v0']:.4f}",
                     "Residual": f"{fit['residual_norm']:.2e}",
                     "Iterations": str(fit["n_iter"]),
+                    "Converged": "yes" if fit["converged"] else "no",
+                    "Quotes fit": str(quotes["prices"].size),
                 }
             )
 
