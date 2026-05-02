@@ -440,17 +440,11 @@ def fit_svi_slice(
 
     calibrator = SVICalibrator()
     result = calibrator.calibrate(strikes, ivs, f0=f0, t=t)
-    params = result.params
-
-    def evaluator(ks: np.ndarray):
-        return SVICalibrator.evaluate(params, np.asarray(ks), f0, t)
-
     return {
         "strikes": np.asarray(strikes, dtype=float),
         "market_iv": np.asarray(ivs, dtype=float),
-        "params": params,
+        "params": result.params,
         "residual_norm": float(result.residual_norm),
-        "evaluator": evaluator,
         "t": float(t),
         "f0": float(f0),
         "converged": bool(result.converged),
