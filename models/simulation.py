@@ -1,11 +1,17 @@
-# models/simulation.py
+"""Geometric Brownian Motion path generation kernels.
+
+Provides JIT-compiled, thread-parallel path generators and a vectorised
+terminal-price routine. Loop invariants are hoisted out of the inner step
+loop and arithmetic is performed in log-space to avoid repeated `exp` round
+trips.
+"""
 
 import numpy as np
 import numpy.typing as npt
-from numba import prange
+from numba import njit, prange
 
 
-@njit(nopython=True, fastmath=True, parallel=True)
+@njit(fastmath=True, parallel=True, cache=True)
 def generate_paths_jit(
     s0: float,
     t: float,
@@ -15,42 +21,40 @@ def generate_paths_jit(
     num_steps: int,
     z_matrix: npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    """Generates Geometric Brownian Motion asset price paths.
+    """Simulates Geometric Brownian Motion asset paths.
 
-    Simulates `num_sims` asset price paths over `num_steps` using the
-    exact log-space discretization of the GBM SDE:
-    S_{t+dt} = S_t * exp((r - q - 0.5*sigma^2)dt + sigma*sqrt(dt)*Z)
-    where Z is a standard normal random variable.
+    Uses the exact log-space discretisation
+    `S_{t+dt} = S_t * exp((r - q - 0.5*sigma^2)dt + sigma*sqrt(dt)*Z)`,
+    accumulating in log-space within each path so the per-step cost is one
+    add and one exp. Outer simulation dimension is parallelised via `prange`.
 
     Args:
-        s0 (float): Initial asset price at t=0.
-        t (float): Total time to maturity, in annualized years.
-        r (float): Annualized risk-free interest rate.
-        q (float): Annualized continuous dividend yield.
-        sigma (float): Annualized asset volatility.
-        num_steps (int): Number of discrete time steps for the simulation.
-        z_matrix (npt.NDArray[np.float64]): Pre-generated standard normal
-            random variables, shape (num_sims, num_steps).
+        s0: Initial asset price at t=0.
+        t: Total time to maturity (annualised years).
+        r: Annualised risk-free rate.
+        q: Annualised continuous dividend yield.
+        sigma: Annualised volatility.
+        num_steps: Number of discrete time steps.
+        z_matrix: Pre-generated standard normals, shape (num_sims, num_steps).
 
     Returns:
-        npt.NDArray[np.float64]: A 2D array of simulated asset paths,
-            shape (num_sims, num_steps + 1), including s0.
+        2D array of paths, shape (num_sims, num_steps + 1), including s0.
     """
     num_sims = z_matrix.shape[0]
     dt = t / num_steps
-    paths = np.zeros((num_sims, num_steps + 1))
-    paths[:, 0] = s0
+    drift = (r - q - 0.5 * sigma * sigma) * dt
+    vol = sigma * np.sqrt(dt)
+    log_s0 = np.log(s0)
+    paths = np.empty((num_sims, num_steps + 1))
     for i in prange(num_sims):
-        s_t = s0
+        paths[i, 0] = s0
+        log_s = log_s0
         for j in range(num_steps):
-            drift = (r - q - 0.5 * sigma**2) * dt
-            diffusion = sigma * np.sqrt(dt) * z_matrix[i, j]
-            s_t *= np.exp(drift + diffusion)
-            paths[i, j + 1] = s_t
+            log_s += drift + vol * z_matrix[i, j]
+            paths[i, j + 1] = np.exp(log_s)
     return paths
 
 
-@njit(nopython=True, fastmath=True, parallel=True)
 def generate_final_prices_jit(
     s0: float,
     t: float,
@@ -60,34 +64,25 @@ def generate_final_prices_jit(
     num_steps: int,
     z_matrix: npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    """Simulates the terminal asset prices for a Geometric Brownian Motion.
+    """Simulates terminal asset prices for Geometric Brownian Motion.
 
-    Calculates the asset price at time `t` for `num_sims` paths by
-    discretizing the GBM SDE over `num_steps` intervals. This function
-    only returns the final price for each path, not the full path history.
+    Uses the closed-form sum of log-increments
+    `S_T = S_0 * exp(num_steps*drift + sigma*sqrt(dt) * sum_j Z_{ij})`.
+    Single BLAS-vectorised reduction; no Python loop, no JIT compile cost.
 
     Args:
-        s0 (float): Initial asset price at t=0.
-        t (float): Total time to maturity, in annualized years.
-        r (float): Annualized risk-free interest rate.
-        q (float): Annualized continuous dividend yield.
-        sigma (float): Annualized asset volatility.
-        num_steps (int): Number of discrete time steps for the simulation.
-        z_matrix (npt.NDArray[np.float64]): Pre-generated standard normal
-            random variables, shape (num_sims, num_steps).
+        s0: Initial asset price at t=0.
+        t: Total time to maturity (annualised years).
+        r: Annualised risk-free rate.
+        q: Annualised continuous dividend yield.
+        sigma: Annualised volatility.
+        num_steps: Number of discrete time steps.
+        z_matrix: Pre-generated standard normals, shape (num_sims, num_steps).
 
     Returns:
-        npt.NDArray[np.float64]: A 1D array of simulated terminal asset prices
-            at time `t`, shape (num_sims,).
+        1D array of terminal prices at time `t`, shape (num_sims,).
     """
-    num_sims = z_matrix.shape[0]
     dt = t / num_steps
-    final_prices = np.zeros(num_sims)
-    for i in prange(num_sims):
-        s_t = s0
-        for j in range(num_steps):
-            drift = (r - q - 0.5 * sigma**2) * dt
-            diffusion = sigma * np.sqrt(dt) * z_matrix[i, j]
-            s_t *= np.exp(drift + diffusion)
-        final_prices[i] = s_t
-    return final_prices
+    drift_total = (r - q - 0.5 * sigma * sigma) * t
+    vol = sigma * np.sqrt(dt)
+    return s0 * np.exp(drift_total + vol * z_matrix.sum(axis=1))
