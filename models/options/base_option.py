@@ -1,5 +1,4 @@
-# models/options/base_option.py
-# Abstract Base Class for all option contracts.
+"""Abstract base class for option contracts."""
 
 from abc import ABC
 

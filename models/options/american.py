@@ -1,5 +1,4 @@
-# models/options/american.py
-# Defines an American-style option contract.
+"""American-style option contract."""
 
 from .base_option import BaseOption
 

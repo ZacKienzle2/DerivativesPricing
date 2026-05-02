@@ -1,5 +1,4 @@
-# models/options/barrier.py
-# Defines a barrier option contract.
+"""Barrier option contract."""
 
 from .base_option import BaseOption
 
