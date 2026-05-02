@@ -21,8 +21,17 @@ def _warmup() -> None:
     from ..processes.bates import _bates_qe_jit
     from ..processes.heston import _heston_qe_jit
     from ..processes.local_vol import _bilinear_lookup, _local_vol_jit
+    from ..processes.rbergomi import _rbergomi_jit
     from ..processes.sabr import _sabr_euler_jit, hagan_lognormal_vol_jit, sabr_price_jit
     from ..simulation import generate_paths_jit
+    try:
+        from utils.adjoint_greeks import (
+            _asian_pathwise_greeks_jit,
+            _vanilla_pathwise_greeks_jit,
+        )
+    except ImportError:
+        _asian_pathwise_greeks_jit = None
+        _vanilla_pathwise_greeks_jit = None
     from ._analytic_kernels import (
         bs_full_greeks_jit,
         bs_price_jit,
@@ -135,3 +144,20 @@ def _warmup() -> None:
     crr_batched_jit(
         100.0, np.array([90.0, 100.0, 110.0]), 1.0, 0.05, 0.0, 0.2, 4, True, False,
     )
+
+    chol_rb = np.eye(2, dtype=np.float64) * 0.5
+    z_rb = np.zeros((2, 2, 2), dtype=np.float64)
+    _rbergomi_jit(
+        100.0, 0.05, 0.0, 0.04, 1.0, -0.5, 0.1, 1.0, 2, chol_rb, z_rb,
+    )
+
+    if _vanilla_pathwise_greeks_jit is not None:
+        zg = np.zeros(2, dtype=np.float64)
+        _vanilla_pathwise_greeks_jit(
+            100.0, 100.0, 0.05, 0.0, 0.2, 1.0, zg, True
+        )
+    if _asian_pathwise_greeks_jit is not None:
+        zga = np.zeros((2, 2), dtype=np.float64)
+        _asian_pathwise_greeks_jit(
+            100.0, 100.0, 0.05, 0.0, 0.2, 1.0, zga, True
+        )
