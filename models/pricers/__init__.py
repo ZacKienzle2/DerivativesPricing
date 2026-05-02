@@ -10,3 +10,6 @@ from .levy_pricer import LevyPricer
 from .turnbull_wakeman import TurnbullWakemanPricer
 from .haug_haug_margrabe import HaugHaugMargrabePricer
 from .reiner_rubinstein import ReinerRubinsteinPricer
+from ._warmup import _warmup as _warmup
+
+_warmup()
