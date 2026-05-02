@@ -14,7 +14,7 @@ import streamlit as st
 def _format(value: Any, fmt: str = "{:,.4f}") -> str:
     """Formats numeric values, falling back gracefully on non-numerics."""
     if value is None:
-        return "—"
+        return "n/a"
     try:
         return fmt.format(float(value))
     except (TypeError, ValueError):
