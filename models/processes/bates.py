@@ -218,3 +218,22 @@ class BatesProcess(BaseProcess):
             self._kappa, self._theta, self._eta, self._rho,
             self._lam, self._mu_j, self._sigma_j,
         )
+
+    @property
+    def supports_analytic_european(self) -> bool:
+        return True
+
+    def analytic_european_price(
+        self, k: float, t: float, is_call: bool
+    ) -> float:
+        """COS Fourier-pricer European price under Bates."""
+        from ..pricers.cos_pricer import cos_bates_price_jit
+
+        return float(
+            cos_bates_price_jit(
+                self._s0, k, t, self._r, self._q,
+                self._kappa, self._theta, self._eta, self._rho, self._v0,
+                self._lam, self._mu_j, self._sigma_j,
+                is_call, 256, 12.0,
+            )
+        )
