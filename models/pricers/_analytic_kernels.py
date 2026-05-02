@@ -6,6 +6,7 @@ variate routines) without object-mode fallback.
 """
 
 import math
+from typing import Tuple
 
 from numba import njit
 
@@ -87,6 +88,68 @@ def discrete_geom_asian_price_jit(
     if is_call:
         return forward * norm_cdf(d1) - k * disc * norm_cdf(d2)
     return k * disc * norm_cdf(-d2) - forward * norm_cdf(-d1)
+
+
+@njit(cache=True, fastmath=True)
+def bs_full_greeks_jit(
+    s: float,
+    k: float,
+    t: float,
+    r: float,
+    q: float,
+    sigma: float,
+    is_call: bool,
+) -> Tuple[float, float, float, float, float, float]:
+    """Computes BS price plus the standard 5-Greek vector in one pass.
+
+    Returns:
+        Tuple `(price, delta, gamma, vega, theta, rho)`.
+        Vega is per unit of `sigma` (not per percent).
+        Theta is per year (not per day).
+        Rho is per unit of `r`.
+    """
+    if t <= 0.0 or sigma <= 0.0:
+        intrinsic = (s - k) if is_call else (k - s)
+        return (
+            intrinsic if intrinsic > 0.0 else 0.0,
+            1.0 if (is_call and s > k) else (-1.0 if (not is_call and s < k) else 0.0),
+            0.0, 0.0, 0.0, 0.0,
+        )
+    sqrt_t = math.sqrt(t)
+    sigma_sqrt_t = sigma * sqrt_t
+    d1 = (math.log(s / k) + (r - q + 0.5 * sigma * sigma) * t) / sigma_sqrt_t
+    d2 = d1 - sigma_sqrt_t
+    disc_q = math.exp(-q * t)
+    disc_r = math.exp(-r * t)
+    n_d1 = norm_cdf(d1)
+    n_d2 = norm_cdf(d2)
+    pdf_d1 = math.exp(-0.5 * d1 * d1) * 0.39894228040143270  # 1/sqrt(2*pi)
+
+    gamma = disc_q * pdf_d1 / (s * sigma_sqrt_t)
+    vega = s * disc_q * pdf_d1 * sqrt_t
+
+    if is_call:
+        price = s * disc_q * n_d1 - k * disc_r * n_d2
+        delta = disc_q * n_d1
+        theta = (
+            -s * disc_q * pdf_d1 * sigma / (2.0 * sqrt_t)
+            - r * k * disc_r * n_d2
+            + q * s * disc_q * n_d1
+        )
+        rho = k * t * disc_r * n_d2
+    else:
+        n_md1 = 1.0 - n_d1
+        n_md2 = 1.0 - n_d2
+        price = k * disc_r * n_md2 - s * disc_q * n_md1
+        delta = -disc_q * n_md1
+        theta = (
+            -s * disc_q * pdf_d1 * sigma / (2.0 * sqrt_t)
+            + r * k * disc_r * n_md2
+            - q * s * disc_q * n_md1
+        )
+        rho = -k * t * disc_r * n_md2
+
+    return price, delta, gamma, vega, theta, rho
 
 
 @njit(cache=True, fastmath=True)
