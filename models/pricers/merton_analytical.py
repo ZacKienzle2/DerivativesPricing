@@ -1,10 +1,13 @@
+"""Merton 1976 analytical jump-diffusion pricer."""
+
 import math
 from typing import Any, Dict, Tuple
 
 import numpy as np
 from scipy.stats import norm
-from .base_pricer import BasePricer
+
 from ..options import BaseOption, VanillaOption
+from .base_pricer import BasePricer
 
 
 class MertonAnalyticalPricer(BasePricer):

@@ -1,5 +1,7 @@
-# models/pricers/levy_pricer.py
+"""Levy 1992 closed-form continuous-arithmetic Asian pricer."""
+
 from typing import Tuple
+
 import numpy as np
 from scipy.stats import norm  # type: ignore
 

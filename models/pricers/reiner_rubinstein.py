@@ -1,8 +1,9 @@
-# models/pricers/reiner_rubinstein.py
+"""Reiner-Rubinstein 1991 closed-form barrier option pricer."""
+
+from typing import Tuple
 
 import numpy as np
 from scipy.stats import norm
-from typing import Tuple
 
 from ..options import BarrierOption, VanillaOption
 from .base_pricer import BasePricer

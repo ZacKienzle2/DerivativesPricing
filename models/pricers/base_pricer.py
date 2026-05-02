@@ -1,7 +1,8 @@
-# models/pricers/base_pricer.py
+"""Abstract base class for option pricers."""
 
 from abc import ABC, abstractmethod
 from typing import Tuple
+
 from models.options import BaseOption
 
 

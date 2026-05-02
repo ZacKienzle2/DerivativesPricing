@@ -1,8 +1,11 @@
-from typing import Dict, Any, Tuple
+"""Generic CRR or Boyle trinomial lattice pricer."""
+
+from typing import Any, Dict, Tuple
+
 import numpy as np
 from numba import jit
 
-from models.options import BaseOption, AmericanOption, BarrierOption, VanillaOption
+from models.options import AmericanOption, BarrierOption, BaseOption, VanillaOption
 from .base_pricer import BasePricer
 
 
