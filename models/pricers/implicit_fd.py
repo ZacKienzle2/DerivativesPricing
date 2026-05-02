@@ -23,11 +23,13 @@ class ImplicitFDPricer(BasePricer):
         num_steps: int,
         num_points: int,
         american_method: str = "project",
+        cluster_density: float = 0.0,
     ):
         super().__init__(option)
         self.n_steps = num_steps
         self.n_points = num_points
         self.american_method = american_method
+        self.cluster_density = cluster_density
 
     def get_params(self) -> Dict[str, Any]:
         """Returns the pricer configuration."""
@@ -35,6 +37,7 @@ class ImplicitFDPricer(BasePricer):
             "num_steps": self.n_steps,
             "num_points": self.n_points,
             "american_method": self.american_method,
+            "cluster_density": self.cluster_density,
         }
 
     def price(self) -> Tuple[float, float]:
@@ -46,6 +49,7 @@ class ImplicitFDPricer(BasePricer):
                 self.n_points,
                 "implicit",
                 american_method=self.american_method,
+                cluster_density=self.cluster_density,
             ),
             0.0,
         )

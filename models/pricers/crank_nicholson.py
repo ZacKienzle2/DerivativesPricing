@@ -25,12 +25,14 @@ class CrankNicolsonPricer(BasePricer):
         num_points: int,
         american_method: str = "project",
         rannacher_steps: int = 2,
+        cluster_density: float = 0.0,
     ):
         super().__init__(option)
         self.n_steps = num_steps
         self.n_points = num_points
         self.american_method = american_method
         self.rannacher_steps = rannacher_steps
+        self.cluster_density = cluster_density
 
     def get_params(self) -> Dict[str, Any]:
         """Returns the pricer configuration."""
@@ -39,6 +41,7 @@ class CrankNicolsonPricer(BasePricer):
             "num_points": self.n_points,
             "american_method": self.american_method,
             "rannacher_steps": self.rannacher_steps,
+            "cluster_density": self.cluster_density,
         }
 
     def price(self) -> Tuple[float, float]:
@@ -51,6 +54,7 @@ class CrankNicolsonPricer(BasePricer):
                 "crank_nicolson",
                 american_method=self.american_method,
                 rannacher_steps=self.rannacher_steps,
+                cluster_density=self.cluster_density,
             ),
             0.0,
         )
