@@ -16,7 +16,7 @@ from ..options import (
     VanillaOption,
 )
 from ..processes import BaseProcess, GBMProcess
-from ..simulation import generate_final_prices_jit, generate_paths_jit
+from ..simulation import generate_final_prices_jit
 from ._analytic_kernels import discrete_geom_asian_price_jit
 from .base_pricer import BasePricer
 
@@ -426,13 +426,28 @@ class MonteCarloPricer(BasePricer):
         opt = self.option
         is_call = opt.option_type == "call"
         paths = self._generate_paths()
-        return _calculate_barrier_payoffs_jit(
+        barrier_payoff = _calculate_barrier_payoffs_jit(
             paths,
             opt.K,
             opt.barrier_level,
             _BARRIER_CODES[opt.barrier_type],
             is_call,
         )
+        if "control_variate" not in self.variance_reduction:
+            return barrier_payoff
+        process = self._process_for()
+        if not process.supports_analytic_european:
+            return barrier_payoff
+        terminal = paths[:, -1]
+        euro_payoff = (
+            np.maximum(terminal - opt.K, 0.0)
+            if is_call
+            else np.maximum(opt.K - terminal, 0.0)
+        )
+        analytic = process.analytic_european_price(opt.K, opt.T, is_call)
+        df = np.exp(-process.r * opt.T)
+        beta = _ols_beta(barrier_payoff, euro_payoff)
+        return barrier_payoff - beta * (euro_payoff - analytic / df)
 
     def _payoff_asian(self) -> npt.NDArray[np.float64]:
         opt = self.option
@@ -457,6 +472,21 @@ class MonteCarloPricer(BasePricer):
 
         if "control_variate" not in self.variance_reduction:
             return arith_payoff
+
+        process = self._process_for()
+        is_default_gbm = self._uses_default_process
+
+        if not is_default_gbm and process.supports_analytic_european:
+            terminal = paths[:, -1]
+            euro_payoff = (
+                np.maximum(terminal - opt.K, 0.0)
+                if is_call
+                else np.maximum(opt.K - terminal, 0.0)
+            )
+            analytic = process.analytic_european_price(opt.K, opt.T, is_call)
+            df = np.exp(-process.r * opt.T)
+            beta = _ols_beta(arith_payoff, euro_payoff)
+            return arith_payoff - beta * (euro_payoff - analytic / df)
 
         geom_payoff = (
             np.maximum(geom - opt.K, 0.0)
