@@ -1,14 +1,39 @@
 """Heston calibrator fitting COS-priced calls to market quotes."""
 
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import numpy.typing as npt
 from scipy.optimize import least_squares
 
+from ..pricers._analytic_kernels import bs_full_greeks_jit
 from ..pricers.cos_pricer import cos_heston_price_jit
 from ..processes.heston import HestonProcess
 from .base import BaseCalibrator, CalibrationResult
+
+
+def _spread_weights(bids: npt.NDArray, asks: npt.NDArray) -> npt.NDArray:
+    """Inverse bid-ask spread weights, clamped to a tiny floor."""
+    spread = np.maximum(np.asarray(asks) - np.asarray(bids), 1e-6)
+    return 1.0 / spread
+
+
+def _vega_weights_from_iv(
+    s0: float,
+    strikes: npt.NDArray,
+    ts: npt.NDArray,
+    market_iv: npt.NDArray,
+    r: float,
+    q: float,
+) -> npt.NDArray:
+    """BS vega per quote, evaluated at the supplied market IVs."""
+    out = np.empty_like(market_iv)
+    for i in range(strikes.size):
+        _, _, _, vega, _, _ = bs_full_greeks_jit(
+            s0, float(strikes[i]), float(ts[i]), r, q, float(market_iv[i]), True
+        )
+        out[i] = vega
+    return out
 
 
 class HestonCalibrator(BaseCalibrator):
@@ -40,7 +65,10 @@ class HestonCalibrator(BaseCalibrator):
         market: npt.NDArray,
         maturities: Optional[npt.NDArray] = None,
         is_call: Optional[npt.NDArray] = None,
-        weights: Optional[npt.NDArray] = None,
+        weights: Optional[Union[npt.NDArray, str]] = None,
+        bids: Optional[npt.NDArray] = None,
+        asks: Optional[npt.NDArray] = None,
+        market_iv: Optional[npt.NDArray] = None,
         x0: Optional[npt.NDArray] = None,
         **kwargs,
     ) -> CalibrationResult:
@@ -68,11 +96,32 @@ class HestonCalibrator(BaseCalibrator):
             calls = np.asarray(is_call, dtype=np.bool_)
         if not (ks.shape == prices.shape == ts.shape == calls.shape):
             raise ValueError("strikes, prices, maturities, is_call shape mismatch.")
-        w = (
-            np.ones_like(prices)
-            if weights is None
-            else np.asarray(weights, dtype=np.float64)
-        )
+
+        if isinstance(weights, str):
+            if weights in ("vega", "vega_spread"):
+                if market_iv is None:
+                    raise ValueError(
+                        "weights='vega' requires market_iv array."
+                    )
+                w = _vega_weights_from_iv(
+                    self.s0, ks, ts, np.asarray(market_iv, dtype=np.float64),
+                    self.r, self.q,
+                )
+            else:
+                w = np.ones_like(prices)
+            if weights in ("spread", "vega_spread"):
+                if bids is None or asks is None:
+                    raise ValueError(
+                        f"weights={weights!r} requires bids and asks arrays."
+                    )
+                w = w * _spread_weights(np.asarray(bids), np.asarray(asks))
+            w_sum = w.sum()
+            if w_sum > 0.0:
+                w = w * (w.size / w_sum)
+        elif weights is None:
+            w = np.ones_like(prices)
+        else:
+            w = np.asarray(weights, dtype=np.float64)
 
         s0, r, q = self.s0, self.r, self.q
         n_terms = self.n_terms
