@@ -15,6 +15,7 @@ from ..options import (
     BasketOption,
     VanillaOption,
 )
+from ..processes import BaseProcess, GBMProcess
 from ..simulation import generate_final_prices_jit, generate_paths_jit
 from ._analytic_kernels import discrete_geom_asian_price_jit
 from .base_pricer import BasePricer
@@ -270,6 +271,7 @@ class MonteCarloPricer(BasePricer):
         variance_reduction: Optional[List[str]] = None,
         use_crn: bool = True,
         seed: Optional[int] = None,
+        process: Optional[BaseProcess] = None,
         **kwargs: Any,
     ):
         super().__init__(option)
@@ -284,6 +286,8 @@ class MonteCarloPricer(BasePricer):
         self.convergence_data: Optional[npt.NDArray[np.float64]] = None
         self.discounted_payoffs: Optional[npt.NDArray[np.float64]] = None
         self._rng = np.random.default_rng(seed)
+        self._process = process
+        self._uses_default_process = process is None
 
         self._payoff_handlers: Dict[type, Callable[[], npt.NDArray[np.float64]]] = {
             VanillaOption: self._payoff_vanilla,
@@ -337,14 +341,37 @@ class MonteCarloPricer(BasePricer):
             self.z_matrix = self._generate_z_matrix()
         return self.z_matrix
 
+    def _multi_dim_z(self, noise_dim: int) -> npt.NDArray[np.float64]:
+        """Draws driver normals for a multi-noise process.
+
+        QMC and Brownian Bridge are 1D-only for now; multi-noise processes
+        fall back to direct PCG64 normals with optional antithetic.
+        """
+        use_antithetic = "antithetic" in self.variance_reduction
+        base = self.num_sims // 2 if use_antithetic else self.num_sims
+        z = self._rng.standard_normal((base, self.num_steps, noise_dim))
+        if use_antithetic:
+            z = np.concatenate([z, -z], axis=0)
+        return z
+
+    def _process_for(self) -> BaseProcess:
+        """Returns the active process, defaulting to a GBM built from the option."""
+        if self._process is not None:
+            return self._process
+        opt = self.option
+        return GBMProcess(opt.S, opt.r, opt.q, opt.sigma)
+
     def _generate_paths(self) -> npt.NDArray[np.float64]:
         """Returns simulated paths for path-dependent payoffs."""
-        if isinstance(self.option, BasketOption):
+        if isinstance(self.option, BasketOption) and self._process is None:
             return self._generate_correlated_paths()
-        z = self._ensure_z()
-        opt = self.option
-        return generate_paths_jit(
-            opt.S, opt.T, opt.r, opt.q, opt.sigma, self.num_steps, z
+        process = self._process_for()
+        if process.noise_dim == 1:
+            z = self._ensure_z()
+        else:
+            z = self._multi_dim_z(process.noise_dim)
+        return process.simulate_paths(
+            self.num_sims, self.num_steps, self.option.T, z
         )
 
     def _generate_correlated_paths(self) -> npt.NDArray[np.float64]:
@@ -369,10 +396,14 @@ class MonteCarloPricer(BasePricer):
     def _payoff_vanilla(self) -> npt.NDArray[np.float64]:
         opt = self.option
         is_call = opt.option_type == "call"
-        z = self._ensure_z()
-        final = generate_final_prices_jit(
-            opt.S, opt.T, opt.r, opt.q, opt.sigma, self.num_steps, z
-        )
+        if self._uses_default_process:
+            z = self._ensure_z()
+            final = generate_final_prices_jit(
+                opt.S, opt.T, opt.r, opt.q, opt.sigma, self.num_steps, z
+            )
+        else:
+            paths = self._generate_paths()
+            final = paths[:, -1]
         return (
             np.maximum(final - opt.K, 0.0)
             if is_call
@@ -452,7 +483,8 @@ class MonteCarloPricer(BasePricer):
             raise TypeError(f"MC pricer not implemented for {type(opt).__name__}")
 
         payoffs = handler()
-        df = np.exp(-opt.r * opt.T)
+        rate = self._process.r if self._process is not None else opt.r
+        df = np.exp(-rate * opt.T)
         discounted = payoffs * df
         self.discounted_payoffs = discounted
         price = float(discounted.mean())
