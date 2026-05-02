@@ -1,0 +1,83 @@
+"""Eager JIT compilation of every numba kernel.
+
+Called once on package import. Touches every cached kernel with the smallest
+viable input so that first-user-call latency is amortised here. Pickled
+caches (`cache=True`) make subsequent imports cheap.
+
+If `DERIVATIVES_PRICING_NO_WARMUP=1` is in the environment the warmup is
+skipped; useful in tight CI contexts where pricers will not be invoked.
+"""
+
+import os
+
+import numpy as np
+
+
+def _warmup() -> None:
+    """Forces compilation of every JIT kernel."""
+    if os.environ.get("DERIVATIVES_PRICING_NO_WARMUP") == "1":
+        return
+
+    from ..simulation import generate_paths_jit
+    from ._analytic_kernels import (
+        bs_price_jit,
+        discrete_geom_asian_price_jit,
+        kemna_vorst_price_jit,
+    )
+    from ._fd_common import _solve_cn_jit, _solve_explicit_jit, _solve_implicit_jit
+    from .binomial_tree import _asian_hull_white_jit, _european_american_jit
+    from .lattice_pricer import _lattice_pricer_jit
+    from .longstaff_schwartz import _backward_induction_jit
+    from .monte_carlo import (
+        _asian_dual_average_jit,
+        _calculate_barrier_payoffs_jit,
+        _generate_correlated_paths_jit,
+    )
+
+    z = np.zeros((2, 2), dtype=np.float64)
+    paths_2d = generate_paths_jit(100.0, 1.0, 0.05, 0.0, 0.2, 2, z)
+
+    bs_price_jit(100.0, 100.0, 1.0, 0.05, 0.0, 0.2, True)
+    kemna_vorst_price_jit(100.0, 100.0, 1.0, 0.05, 0.0, 0.2, True)
+    discrete_geom_asian_price_jit(100.0, 100.0, 1.0, 0.05, 0.0, 0.2, 2, True)
+
+    _backward_induction_jit(paths_2d, 100.0, 0.05, 0.5, True, 2)
+
+    _calculate_barrier_payoffs_jit(paths_2d, 100.0, 110.0, 0, True)
+    _asian_dual_average_jit(paths_2d)
+
+    chol = np.eye(2, dtype=np.float64)
+    z3 = np.zeros((2, 2, 2), dtype=np.float64)
+    _generate_correlated_paths_jit(
+        np.array([100.0, 100.0]),
+        np.array([0.2, 0.2]),
+        0.05,
+        1.0,
+        2,
+        chol,
+        z3,
+    )
+
+    _european_american_jit(100.0, 100.0, 1.0, 0.05, 0.2, 0.0, 2, True, False)
+    _asian_hull_white_jit(100.0, 100.0, 1.0, 0.05, 0.2, 0.0, 2, True, 2)
+
+    vs = np.linspace(0.0, 200.0, 5)
+    a = np.full(5, -0.1)
+    b = np.full(5, 1.0)
+    c = np.full(5, -0.1)
+    bcs = np.zeros(3)
+    _solve_explicit_jit(
+        vs, a, b, c, bcs, bcs, np.empty(0), False, True, 100.0
+    )
+    _solve_implicit_jit(
+        vs, a, b, c, bcs, bcs, np.empty(0), False, True, 100.0
+    )
+    _solve_cn_jit(
+        vs,
+        a, b, c,
+        a, b, c,
+        bcs, bcs,
+        np.empty(0), False, True, 100.0,
+    )
+
+    _lattice_pricer_jit(100.0, 100.0, 1.0, 0.05, 0.0, 0.2, 2, 0, 1, 0, 0, 0.0)
