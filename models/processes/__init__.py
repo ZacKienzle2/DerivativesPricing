@@ -7,8 +7,17 @@ logic from underlying-asset modelling.
 """
 
 from .base import BaseProcess
+from .bates import BatesProcess
 from .gbm import GBMProcess
 from .heston import HestonProcess
+from .local_vol import LocalVolProcess
 from .sabr import SABRProcess
 
-__all__ = ["BaseProcess", "GBMProcess", "HestonProcess", "SABRProcess"]
+__all__ = [
+    "BaseProcess",
+    "BatesProcess",
+    "GBMProcess",
+    "HestonProcess",
+    "LocalVolProcess",
+    "SABRProcess",
+]
