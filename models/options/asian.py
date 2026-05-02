@@ -1,5 +1,7 @@
-# models/options/asian.py
+"""Asian (average-price) option contract."""
+
 from typing import Literal
+
 from .base_option import BaseOption
 
 

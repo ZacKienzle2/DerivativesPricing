@@ -1,10 +1,11 @@
-# models/options/basket.py
-# Defines a basket option contract on a portfolio of assets.
+"""Basket option contract on a portfolio of assets."""
+
+from typing import List, Union
 
 import numpy as np
 import numpy.typing as npt
+
 from .base_option import BaseOption
-from typing import Union, List
 
 
 class BasketOption(BaseOption):

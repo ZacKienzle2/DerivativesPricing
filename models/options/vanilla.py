@@ -1,5 +1,4 @@
-# models/options/vanilla.py
-# Defines a standard European-style option contract.
+"""European vanilla option contract."""
 
 from .base_option import BaseOption
 
