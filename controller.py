@@ -202,6 +202,225 @@ def get_surface_data(
 
 
 @st.cache_data(show_spinner=False)
+def simulate_process_paths(
+    process_name: str,
+    params: Dict[str, Any],
+    num_paths: int = 64,
+    num_steps: int = 252,
+    t: float = 1.0,
+    seed: int = 42,
+) -> Dict[str, np.ndarray]:
+    """Simulates a small batch of paths from any registered process.
+
+    Args:
+        process_name: One of `"GBM"`, `"Heston"`, `"Bates"`, `"SABR"`,
+            `"LocalVol"`, `"RBergomi"`.
+        params: Per-process keyword arguments.
+        num_paths: Number of paths to simulate.
+        num_steps: Discretisation steps.
+        t: Total horizon.
+        seed: PCG64 seed.
+
+    Returns:
+        Dict with `times`, `paths`, `terminal`. Empty `paths` on error.
+    """
+    from models.processes import (
+        BatesProcess,
+        GBMProcess,
+        HestonProcess,
+        LocalVolProcess,
+        RBergomiProcess,
+        SABRProcess,
+    )
+
+    rng = np.random.default_rng(seed)
+    factories = {
+        "GBM": (GBMProcess, 1),
+        "Heston": (HestonProcess, 2),
+        "Bates": (BatesProcess, 3),
+        "SABR": (SABRProcess, 2),
+        "LocalVol": (LocalVolProcess, 1),
+        "RBergomi": (RBergomiProcess, 2),
+    }
+    if process_name not in factories:
+        raise ValueError(f"Unknown process: {process_name!r}")
+    cls, noise_dim = factories[process_name]
+    process = cls(**params)
+
+    if noise_dim == 1:
+        z = rng.standard_normal((num_paths, num_steps))
+    else:
+        z = rng.standard_normal((num_paths, num_steps, noise_dim))
+    paths = process.simulate_paths(num_paths, num_steps, t, z)
+    times = np.linspace(0.0, t, num_steps + 1)
+    terminal = paths[:, -1] if paths.ndim == 2 else paths[0, :, -1]
+    return {"times": times, "paths": paths, "terminal": terminal}
+
+
+@st.cache_data(show_spinner=False)
+def generate_synthetic_quotes(
+    process_name: str,
+    params: Dict[str, Any],
+    strikes: np.ndarray,
+    maturities: np.ndarray,
+    spread_bps: float = 25.0,
+    seed: int = 42,
+) -> Dict[str, np.ndarray]:
+    """Builds synthetic call quotes from a chosen process and parameter set."""
+    from models.processes import BatesProcess, HestonProcess
+    from utils.synthetic_quotes import synthetic_call_quotes
+
+    factories = {"Heston": HestonProcess, "Bates": BatesProcess}
+    if process_name not in factories:
+        raise ValueError(f"Synthetic quotes: process {process_name!r} not supported.")
+    process = factories[process_name](**params)
+    quotes = synthetic_call_quotes(
+        process, strikes, maturities, spread_bps=spread_bps, seed=seed
+    )
+    return {
+        "strikes": quotes.strikes,
+        "maturities": quotes.maturities,
+        "prices": quotes.prices,
+        "bids": quotes.bids,
+        "asks": quotes.asks,
+        "ivs": quotes.ivs,
+    }
+
+
+@st.cache_data(show_spinner=False)
+def fit_heston_to_quotes(
+    quotes: Dict[str, np.ndarray],
+    s0: float,
+    r: float = 0.0,
+    q: float = 0.0,
+    weights_mode: str = "vega",
+    x0: Optional[Tuple[float, ...]] = None,
+) -> Dict[str, Any]:
+    """Calibrates Heston to a synthetic / market quote bundle."""
+    from models.calibration import HestonCalibrator
+    from models.pricers.cos_pricer import cos_heston_price_jit
+
+    n_k, n_t = quotes["prices"].shape
+    k_grid, t_grid = np.meshgrid(
+        quotes["strikes"], quotes["maturities"], indexing="ij"
+    )
+    flat_k = k_grid.reshape(-1)
+    flat_t = t_grid.reshape(-1)
+    flat_prices = quotes["prices"].reshape(-1)
+    flat_bids = quotes["bids"].reshape(-1)
+    flat_asks = quotes["asks"].reshape(-1)
+    flat_ivs = quotes["ivs"].reshape(-1)
+
+    calibrator = HestonCalibrator(s0=s0, r=r, q=q)
+    init = (
+        np.array(x0, dtype=float)
+        if x0 is not None
+        else np.array([1.5, 0.05, 0.4, -0.3, 0.05])
+    )
+    result = calibrator.calibrate(
+        flat_k,
+        flat_prices,
+        maturities=flat_t,
+        weights=weights_mode,
+        bids=flat_bids,
+        asks=flat_asks,
+        market_iv=flat_ivs,
+        x0=init,
+    )
+
+    fitted = result.params
+    model_prices = np.empty((n_k, n_t))
+    for i in range(n_k):
+        for j in range(n_t):
+            model_prices[i, j] = cos_heston_price_jit(
+                s0,
+                float(quotes["strikes"][i]),
+                float(quotes["maturities"][j]),
+                r,
+                q,
+                fitted["kappa"],
+                fitted["theta"],
+                fitted["eta"],
+                fitted["rho"],
+                fitted["v0"],
+                True,
+                256,
+                12.0,
+            )
+    return {
+        "params": fitted,
+        "residual_norm": float(result.residual_norm),
+        "n_iter": int(result.n_iter),
+        "converged": bool(result.converged),
+        "model_prices": model_prices,
+    }
+
+
+@st.cache_data(show_spinner=False)
+def compute_greek_surface(
+    s_range: np.ndarray,
+    t_range: np.ndarray,
+    k: float,
+    r: float,
+    q: float,
+    sigma: float,
+    is_call: bool,
+    greek: str,
+) -> np.ndarray:
+    """Computes a 2D `(S, T)` surface for a single BS Greek."""
+    from models.pricers._analytic_kernels import bs_full_greeks_jit
+
+    out = np.empty((s_range.size, t_range.size))
+    idx = {"price": 0, "delta": 1, "gamma": 2, "vega": 3, "theta": 4, "rho": 5}
+    if greek not in idx:
+        raise ValueError(f"Unknown greek: {greek!r}")
+    pos = idx[greek]
+    for i in range(s_range.size):
+        for j in range(t_range.size):
+            tup = bs_full_greeks_jit(
+                float(s_range[i]),
+                k,
+                float(t_range[j]),
+                r,
+                q,
+                sigma,
+                is_call,
+            )
+            out[i, j] = tup[pos]
+    return out
+
+
+@st.cache_data(show_spinner=False)
+def aggregate_portfolio_greeks(
+    positions: List[Dict[str, Any]],
+) -> Dict[str, float]:
+    """Sums BS Greeks across a list of vanilla option positions.
+
+    Each position dict carries: `s`, `k`, `t`, `r`, `q`, `sigma`,
+    `option_type` (`"call"` / `"put"`) and `quantity`.
+    """
+    from models.pricers._analytic_kernels import bs_full_greeks_jit
+
+    keys = ("price", "delta", "gamma", "vega", "theta", "rho")
+    agg = {k: 0.0 for k in keys}
+    for pos in positions:
+        is_call = pos.get("option_type", "call") == "call"
+        qty = float(pos.get("quantity", 1))
+        tup = bs_full_greeks_jit(
+            float(pos["s"]),
+            float(pos["k"]),
+            float(pos["t"]),
+            float(pos["r"]),
+            float(pos.get("q", 0.0)),
+            float(pos["sigma"]),
+            is_call,
+        )
+        for key, val in zip(keys, tup):
+            agg[key] += qty * val
+    return agg
+
+
+@st.cache_data(show_spinner=False)
 def fit_svi_slice(
     strikes: np.ndarray, ivs: np.ndarray, f0: float, t: float
 ) -> Dict[str, Any]:
