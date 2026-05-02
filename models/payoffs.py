@@ -1,5 +1,4 @@
-# models/payoffs.py
-# Payoff functions for financial instruments at expiration.
+"""Payoff functions for financial instruments at expiration."""
 
 import numpy as np
 import numpy.typing as npt
