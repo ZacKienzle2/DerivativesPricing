@@ -229,3 +229,13 @@ class SABRProcess(BaseProcess):
             type(self).__name__,
             self._f0, self._alpha, self._beta, self._rho, self._nu, self._r,
         )
+
+    @property
+    def supports_analytic_european(self) -> bool:
+        return True
+
+    def analytic_european_price(
+        self, k: float, t: float, is_call: bool
+    ) -> float:
+        """Hagan-fed Black 1976 European price under SABR."""
+        return self.european_price(k, t, is_call, discount=math.exp(-self._r * t))
