@@ -11,6 +11,7 @@ from .bates import BatesProcess
 from .gbm import GBMProcess
 from .heston import HestonProcess
 from .local_vol import LocalVolProcess
+from .rbergomi import RBergomiProcess
 from .sabr import SABRProcess
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "GBMProcess",
     "HestonProcess",
     "LocalVolProcess",
+    "RBergomiProcess",
     "SABRProcess",
 ]
