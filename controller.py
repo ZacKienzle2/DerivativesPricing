@@ -4,11 +4,10 @@ import streamlit as st
 from typing import Dict, Any, Tuple, Optional, List, Type
 import numpy as np
 import numpy.typing as npt
-import dask
 
 from models.options import BaseOption
 from models.pricers import BasePricer
-from utils.greek_engine import GreekEngine
+from utils.greeks import GreekEngine
 from models.options import (
     VanillaOption,
     AmericanOption,
@@ -133,17 +132,16 @@ def get_point_pricing_context(inputs: Dict[str, Any]) -> Dict[str, Any]:
     return results
 
 
-# --- Dask helper function for parallel pricing ---
-@dask.delayed
-def price_single_point(
+def _price_single_point(
     base_inputs: Dict[str, Any],
     axis_map: Dict[str, str],
     x_axis_key: str,
     y_axis_key: str,
     x_value: float,
     y_value: float,
-    shared_z_matrix: npt.NDArray[np.float64] | None,
+    shared_z_matrix: Optional[npt.NDArray[np.float64]],
 ) -> Tuple[float, float]:
+    """Prices a single (x, y) grid point under the configured option."""
     try:
         local_inputs = base_inputs.copy()
         local_inputs["contract_params"] = base_inputs["contract_params"].copy()
@@ -152,20 +150,16 @@ def price_single_point(
 
         _, pricer_call = get_option_and_pricer(local_inputs, "call")
         _, pricer_put = get_option_and_pricer(local_inputs, "put")
-
         if shared_z_matrix is not None:
-            # Use is not None for clarity with NumPy arrays
             if hasattr(pricer_call, "z_matrix"):
                 pricer_call.z_matrix = shared_z_matrix
             if hasattr(pricer_put, "z_matrix"):
                 pricer_put.z_matrix = shared_z_matrix
-
         price_call, _ = pricer_call.price()
         price_put, _ = pricer_put.price()
         return float(price_call), float(price_put)
-    except Exception as e:
-        print(f"Error pricing point ({x_value}, {y_value}): {e}")
-        return np.nan, np.nan
+    except Exception:
+        return float("nan"), float("nan")
 
 
 @st.cache_data
@@ -176,9 +170,9 @@ def get_surface_data(
     y_key: str,
     ranges: Dict[str, np.ndarray],
 ) -> Tuple[np.ndarray, np.ndarray]:
-    x_range = ranges[x_key]
-    y_range = ranges[y_key]
-    grid_x, grid_y = np.meshgrid(x_range, y_range)
+    """Builds call and put price surfaces over a 2D parameter grid."""
+    grid_x, grid_y = np.meshgrid(ranges[x_key], ranges[y_key])
+    shape = grid_x.shape
 
     shared_z_matrix = None
     if inputs["pricer_type"] in ["Monte Carlo", "Longstaff-Schwartz"]:
@@ -187,19 +181,15 @@ def get_surface_data(
         num_steps = model_params.get("num_steps", 100)
         shared_z_matrix = np.random.standard_normal((num_sims, num_steps))
 
-    lazy_results = []
-    for i, j in np.ndindex(grid_x.shape):
-        task = price_single_point(
-            inputs, axis_map, x_key, y_key, grid_x[i, j], grid_y[i, j], shared_z_matrix
+    surface_c = np.empty(shape)
+    surface_p = np.empty(shape)
+    for i, j in np.ndindex(shape):
+        c, p = _price_single_point(
+            inputs, axis_map, x_key, y_key,
+            grid_x[i, j], grid_y[i, j], shared_z_matrix,
         )
-        lazy_results.append(task)
-
-    results = dask.compute(*lazy_results)
-
-    results_array = np.array(results)
-    surface_c = results_array[:, 0].reshape(grid_x.shape)
-    surface_p = results_array[:, 1].reshape(grid_x.shape)
-
+        surface_c[i, j] = c
+        surface_p[i, j] = p
     return np.nan_to_num(surface_c), np.nan_to_num(surface_p)
 
 
