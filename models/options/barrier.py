@@ -12,6 +12,8 @@ class BarrierOption(BaseOption):
     asset price crosses a predetermined barrier level.
     """
 
+    __slots__ = ("barrier_level", "barrier_type")
+
     _valid_barrier_types = {"down-and-in", "up-and-in", "down-and-out", "up-and-out"}
 
     def __init__(
