@@ -56,3 +56,21 @@ class BaseProcess(ABC):
     def signature(self) -> Tuple:
         """Hashable identifier for caching purposes."""
         return (type(self).__name__, self.s0, self.r)
+
+    @property
+    def supports_analytic_european(self) -> bool:
+        """Whether `analytic_european_price` is implemented."""
+        return False
+
+    def analytic_european_price(
+        self, k: float, t: float, is_call: bool
+    ) -> float:
+        """Closed-form European price under this process, if available.
+
+        Used as a control variate baseline by Monte Carlo pricers handling
+        path-dependent payoffs. Default raises so processes without a
+        closed form opt out cleanly.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} has no analytic European pricer."
+        )
