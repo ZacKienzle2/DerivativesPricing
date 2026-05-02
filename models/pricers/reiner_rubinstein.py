@@ -29,11 +29,15 @@ class ReinerRubinsteinPricer(BasePricer):
         s, k, h = opt.S, opt.K, opt.barrier_level
         t, r, q, sigma = opt.T, opt.r, opt.q, opt.sigma
 
-        # Instantiate a vanilla pricer to reuse its logic
         vanilla_equivalent = VanillaOption(s, k, t, r, sigma, opt.option_type, q)
         self.vanilla_pricer = BlackScholesPricer(vanilla_equivalent)
 
-        # Common barrier-specific parameters from the model
+        sigma_sqrt_t = max(sigma * np.sqrt(t), 1e-12)
+        self.d1 = (
+            np.log(s / k) + (r - q + 0.5 * sigma * sigma) * t
+        ) / sigma_sqrt_t
+        self.d2 = self.d1 - sigma_sqrt_t
+
         self.mu = (r - q) - (sigma**2) / 2
         self.lambda_ = 1 + self.mu / (sigma**2)
 
@@ -66,9 +70,8 @@ class ReinerRubinsteinPricer(BasePricer):
         # Set +1 for down barriers, -1 for up barriers
         eta = 1.0 if "down" in self.option.barrier_type else -1.0
 
-        # Pre-calculated standard normal terms
-        d1 = self.vanilla_pricer.d1
-        d2 = self.vanilla_pricer.d2
+        d1 = self.d1
+        d2 = self.d2
 
         # Common building block terms used across all barrier types
         term1 = s * np.exp(-q * t) * norm.cdf(phi * d1) - k * np.exp(-r * t) * norm.cdf(
