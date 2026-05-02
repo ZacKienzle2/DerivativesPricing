@@ -12,6 +12,8 @@ class AmericanOption(BaseOption):
     exercise, which must be handled by an appropriate pricing model.
     """
 
+    __slots__ = ()
+
     def __init__(
         self,
         s: float,
