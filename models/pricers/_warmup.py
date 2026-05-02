@@ -145,6 +145,16 @@ def _warmup() -> None:
         100.0, np.array([90.0, 100.0, 110.0]), 1.0, 0.05, 0.0, 0.2, 4, True, False,
     )
 
+    from .mlmc import _mlmc_base_jit, _mlmc_level_jit
+    z_base = np.zeros((2, 4), dtype=np.float64)
+    _mlmc_base_jit(100.0, 100.0, 0.05, 0.0, 0.2, 1.0, 4, True, z_base)
+    z_lvl = np.zeros((2, 8), dtype=np.float64)
+    _mlmc_level_jit(100.0, 100.0, 0.05, 0.0, 0.2, 1.0, 8, 4, True, z_lvl)
+
+    from ..calibration.svi import svi_iv_jit, svi_total_variance
+    svi_total_variance(0.0, 0.04, 0.1, -0.3, 0.0, 0.1)
+    svi_iv_jit(0.0, 1.0, 0.04, 0.1, -0.3, 0.0, 0.1)
+
     chol_rb = np.eye(2, dtype=np.float64) * 0.5
     z_rb = np.zeros((2, 2, 2), dtype=np.float64)
     _rbergomi_jit(
