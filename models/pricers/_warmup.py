@@ -30,6 +30,8 @@ def _warmup() -> None:
     from .longstaff_schwartz import _backward_induction_jit
     from .monte_carlo import (
         _asian_dual_average_jit,
+        _brownian_bridge_jit,
+        _build_bb_tree,
         _calculate_barrier_payoffs_jit,
         _generate_correlated_paths_jit,
     )
@@ -70,14 +72,19 @@ def _warmup() -> None:
         vs, a, b, c, bcs, bcs, np.empty(0), False, True, 100.0
     )
     _solve_implicit_jit(
-        vs, a, b, c, bcs, bcs, np.empty(0), False, True, 100.0
+        vs, a, b, c, bcs, bcs, np.empty(0), False, True, 100.0, 0
     )
     _solve_cn_jit(
         vs,
         a, b, c,
         a, b, c,
+        a, b, c,
         bcs, bcs,
         np.empty(0), False, True, 100.0,
+        0, 0,
     )
 
     _lattice_pricer_jit(100.0, 100.0, 1.0, 0.05, 0.0, 0.2, 2, 0, 1, 0, 0, 0.0)
+
+    left, right, bridge = _build_bb_tree(2)
+    _brownian_bridge_jit(z, 0.5, left, right, bridge)
