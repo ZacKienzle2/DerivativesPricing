@@ -18,7 +18,9 @@ def _warmup() -> None:
     if os.environ.get("DERIVATIVES_PRICING_NO_WARMUP") == "1":
         return
 
+    from ..processes.bates import _bates_qe_jit
     from ..processes.heston import _heston_qe_jit
+    from ..processes.local_vol import _bilinear_lookup, _local_vol_jit
     from ..processes.sabr import _sabr_euler_jit, hagan_lognormal_vol_jit, sabr_price_jit
     from ..simulation import generate_paths_jit
     from ._analytic_kernels import (
@@ -27,6 +29,8 @@ def _warmup() -> None:
         discrete_geom_asian_price_jit,
         kemna_vorst_price_jit,
     )
+    from .cos_pricer import cos_bates_price_jit, cos_heston_price_jit
+    from .crr_batched import crr_batched_jit
     from ._fd_common import _solve_cn_jit, _solve_explicit_jit, _solve_implicit_jit
     from .binomial_tree import _asian_hull_white_jit, _european_american_jit
     from .lattice_pricer import _lattice_pricer_jit
@@ -102,3 +106,32 @@ def _warmup() -> None:
     hagan_lognormal_vol_jit(100.0, 100.0, 1.0, 0.2, 0.5, -0.3, 0.4)
     sabr_price_jit(100.0, 100.0, 1.0, 0.95, 0.2, 0.5, -0.3, 0.4, True)
     _sabr_euler_jit(100.0, 0.2, 0.5, -0.3, 0.4, 1.0, 2, z3_heston)
+
+    cos_heston_price_jit(
+        100.0, 100.0, 1.0, 0.05, 0.0,
+        2.0, 0.04, 0.3, -0.5, 0.04,
+        True, 16, 10.0,
+    )
+    cos_bates_price_jit(
+        100.0, 100.0, 1.0, 0.05, 0.0,
+        2.0, 0.04, 0.3, -0.5, 0.04,
+        0.1, -0.05, 0.1,
+        True, 16, 10.0,
+    )
+
+    z_bates = np.zeros((2, 2, 3), dtype=np.float64)
+    poisson = np.zeros((2, 2), dtype=np.int64)
+    _bates_qe_jit(
+        100.0, 0.04, 0.05, 0.0, 2.0, 0.04, 0.3, -0.5,
+        0.1, -0.05, 0.1, 1.0, 2, z_bates, poisson,
+    )
+
+    grid_s = np.array([50.0, 100.0, 150.0])
+    grid_t = np.array([0.0, 0.5, 1.0])
+    grid_v = np.full((3, 3), 0.2)
+    _bilinear_lookup(100.0, 0.5, grid_s, grid_t, grid_v)
+    _local_vol_jit(100.0, 0.05, 0.0, 1.0, 2, grid_s, grid_t, grid_v, z)
+
+    crr_batched_jit(
+        100.0, np.array([90.0, 100.0, 110.0]), 1.0, 0.05, 0.0, 0.2, 4, True, False,
+    )
