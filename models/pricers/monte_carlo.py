@@ -27,7 +27,92 @@ _BARRIER_CODES: Dict[str, int] = {
 }
 
 
-@njit(fastmath=True, parallel=True, cache=True)
+def _build_bb_tree(n: int) -> Tuple[
+    npt.NDArray[np.int64], npt.NDArray[np.int64], npt.NDArray[np.int64]
+]:
+    """Builds Brownian-Bridge bisection indices via BFS.
+
+    Args:
+        n: Number of timesteps (path increments).
+
+    Returns:
+        Tuple `(left, right, bridge)` of int64 arrays, length `n`. Slot 0 is
+        the endpoint (`bridge[0] = n`); slots `1..n-1` are interior bridge
+        points produced in BFS order so the bridge formula always reads from
+        already-filled positions.
+    """
+    left = np.zeros(n, dtype=np.int64)
+    right = np.zeros(n, dtype=np.int64)
+    bridge = np.zeros(n, dtype=np.int64)
+    bridge[0] = n
+    left[0] = 0
+    right[0] = n
+    queue: List[Tuple[int, int]] = [(0, n)]
+    head = 0
+    k = 1
+    while head < len(queue) and k < n:
+        l, r = queue[head]
+        head += 1
+        b = (l + r) // 2
+        if l < b < r:
+            left[k] = l
+            right[k] = r
+            bridge[k] = b
+            queue.append((l, b))
+            queue.append((b, r))
+            k += 1
+    return left, right, bridge
+
+
+@njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
+def _brownian_bridge_jit(
+    z: npt.NDArray[np.float64],
+    dt: float,
+    left: npt.NDArray[np.int64],
+    right: npt.NDArray[np.int64],
+    bridge: npt.NDArray[np.int64],
+) -> npt.NDArray[np.float64]:
+    """Maps i.i.d. normals to BB-ordered increments.
+
+    Recursive midpoint bisection of the Brownian path so the first Sobol
+    dimensions set the path's terminal value, the second its midpoint, and
+    so on. The resulting increment matrix has the same joint distribution
+    as the input but with variance front-loaded onto early QMC dimensions.
+
+    Args:
+        z: Standard normals, shape `(num_sims, num_steps)`.
+        dt: Per-step time increment.
+        left, right, bridge: Output of `_build_bb_tree`.
+
+    Returns:
+        Increment matrix `dW / sqrt(dt)`, same shape as `z`, ready to feed
+        into the standard cumsum-based GBM kernel.
+    """
+    num_sims = z.shape[0]
+    n = z.shape[1]
+    sqrt_t = np.sqrt(n * dt)
+    inv_sqrt_dt = 1.0 / np.sqrt(dt)
+    out = np.empty_like(z)
+
+    for s in prange(num_sims):
+        w = np.empty(n + 1)
+        w[0] = 0.0
+        w[n] = sqrt_t * z[s, 0]
+        for k in range(1, n):
+            l = left[k]
+            r = right[k]
+            b = bridge[k]
+            span = r - l
+            a_l = (r - b) / span
+            a_r = (b - l) / span
+            sigma_b = np.sqrt((b - l) * (r - b) * dt / span)
+            w[b] = a_l * w[l] + a_r * w[r] + sigma_b * z[s, k]
+        for j in range(n):
+            out[s, j] = (w[j + 1] - w[j]) * inv_sqrt_dt
+    return out
+
+
+@njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
 def _calculate_barrier_payoffs_jit(
     paths: npt.NDArray[np.float64],
     strike: float,
@@ -72,7 +157,7 @@ def _calculate_barrier_payoffs_jit(
     return payoffs
 
 
-@njit(fastmath=True, parallel=True, cache=True)
+@njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
 def _generate_correlated_paths_jit(
     initial_prices: npt.NDArray[np.float64],
     volatilities: npt.NDArray[np.float64],
@@ -125,7 +210,7 @@ def _generate_correlated_paths_jit(
     return paths
 
 
-@njit(fastmath=True, parallel=True, cache=True)
+@njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
 def _asian_dual_average_jit(
     paths: npt.NDArray[np.float64],
 ) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
@@ -240,6 +325,11 @@ class MonteCarloPricer(BasePricer):
             z = np.concatenate([z, -z], axis=0)
 
         np.nan_to_num(z, copy=False, posinf=0.0, neginf=0.0)
+
+        if "brownian_bridge" in self.variance_reduction and self.num_steps > 1:
+            dt = self.option.T / self.num_steps
+            left, right, bridge = _build_bb_tree(self.num_steps)
+            z = _brownian_bridge_jit(z, dt, left, right, bridge)
         return z
 
     def _ensure_z(self) -> npt.NDArray[np.float64]:
