@@ -17,10 +17,14 @@ import streamlit as st
 from controller import (
     ANALYTICAL_PRICERS,
     PAYOFF_REGISTRY,
+    aggregate_portfolio_greeks,
+    fit_heston_to_quotes,
     fit_svi_slice,
+    generate_synthetic_quotes,
     get_greek_data,
     get_point_pricing_context,
     get_surface_data,
+    simulate_process_paths,
 )
 from ui.components import display_metrics_card, section_header, stat_strip
 from ui.sidebar import get_sidebar_inputs
@@ -401,6 +405,312 @@ def render_iv_surface_tab() -> None:
         )
 
 
+def render_process_lab_tab() -> None:
+    """Tab 6: pick a process, simulate paths, plot path samples + density."""
+    section_header(
+        "Process Lab",
+        "Sample paths under any built-in stochastic process. Useful for "
+        "visualising vol clustering, jumps and roughness.",
+    )
+    presets = {
+        "GBM": {"s0": 100.0, "r": 0.05, "q": 0.0, "sigma": 0.2},
+        "Heston": {
+            "s0": 100.0, "v0": 0.04, "r": 0.05, "q": 0.0,
+            "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.5,
+        },
+        "Bates": {
+            "s0": 100.0, "v0": 0.04, "r": 0.05, "q": 0.0,
+            "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.5,
+            "lam": 0.4, "mu_j": -0.05, "sigma_j": 0.15,
+        },
+        "RBergomi": {
+            "s0": 100.0, "r": 0.05, "q": 0.0,
+            "xi0": 0.04, "eta": 1.5, "rho": -0.7, "hurst": 0.1,
+        },
+    }
+    col_in, col_plot = st.columns([1, 2], gap="medium")
+    with col_in:
+        with st.container(border=True):
+            st.markdown("##### Process")
+            process_name = st.selectbox(
+                "Dynamics", list(presets.keys()), key="proc_lab_name"
+            )
+            base_params = presets[process_name].copy()
+            num_paths = st.slider("Paths", 16, 512, 128, step=16)
+            num_steps = st.slider("Time steps", 32, 1024, 252, step=16)
+            t = st.number_input("Maturity (years)", 0.1, 10.0, 1.0, step=0.1)
+            with st.expander("Parameters", expanded=True):
+                for key in base_params:
+                    base_params[key] = st.number_input(
+                        key, value=float(base_params[key]),
+                        format="%.4f",
+                        key=f"proc_lab_{key}",
+                    )
+            seed = st.number_input("Seed", value=42, step=1, key="proc_lab_seed")
+            run = st.button("Simulate paths", use_container_width=True)
+
+    if run:
+        st.session_state["proc_lab_data"] = simulate_process_paths(
+            process_name, base_params, num_paths, num_steps, t, int(seed)
+        )
+
+    data = st.session_state.get("proc_lab_data")
+    with col_plot:
+        if data is None:
+            st.info("Configure a process and click *Simulate paths* to begin.")
+            return
+        with st.container(border=True):
+            paths = data["paths"]
+            times = data["times"]
+            terminal = data["terminal"]
+            display_paths = paths[: min(32, paths.shape[0])]
+            fig = go.Figure()
+            for i in range(display_paths.shape[0]):
+                fig.add_trace(
+                    go.Scatter(
+                        x=times,
+                        y=display_paths[i],
+                        mode="lines",
+                        showlegend=False,
+                        line={"width": 1, "color": "rgba(0, 212, 170, 0.35)"},
+                    )
+                )
+            fig.add_trace(
+                go.Scatter(
+                    x=times,
+                    y=display_paths.mean(axis=0),
+                    mode="lines",
+                    name="Mean path",
+                    line={"color": "#FFB74D", "width": 3},
+                )
+            )
+            fig.update_layout(
+                title="Sample paths",
+                xaxis_title="t",
+                yaxis_title="S",
+                template="plotly_dark",
+                margin={"l": 40, "r": 20, "t": 60, "b": 40},
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+            density = go.Figure()
+            density.add_trace(
+                go.Histogram(
+                    x=terminal,
+                    nbinsx=60,
+                    marker_color="rgba(30, 136, 229, 0.6)",
+                    name="Terminal density",
+                )
+            )
+            density.update_layout(
+                title=f"Terminal distribution (T = {t:.2f})",
+                template="plotly_dark",
+                xaxis_title="S_T",
+                yaxis_title="Frequency",
+                margin={"l": 40, "r": 20, "t": 60, "b": 40},
+                bargap=0.04,
+            )
+            st.plotly_chart(density, use_container_width=True)
+            stat_strip(
+                {
+                    "Mean S_T": float(terminal.mean()),
+                    "Std S_T": float(terminal.std()),
+                    "Min": float(terminal.min()),
+                    "Max": float(terminal.max()),
+                    "Skew": float(((terminal - terminal.mean()) ** 3).mean()
+                                  / max(terminal.std() ** 3, 1e-12)),
+                }
+            )
+
+
+def render_heston_calibration_tab() -> None:
+    """Tab 7: synthetic Heston quote generator + COS calibrator."""
+    section_header(
+        "Heston Calibration",
+        "Generate synthetic quotes under known Heston parameters, perturb with a "
+        "bid/ask spread, then recover via COS-driven least squares.",
+    )
+    col_in, col_plot = st.columns([1, 2], gap="medium")
+    with col_in:
+        with st.container(border=True):
+            st.markdown("##### Truth Parameters")
+            s0 = st.number_input("Spot", value=100.0, key="hcal_s0")
+            r = st.number_input("Rate", value=0.05, step=0.01, key="hcal_r")
+            kappa = st.number_input("kappa", value=2.0, key="hcal_kappa")
+            theta = st.number_input("theta", value=0.04, key="hcal_theta")
+            eta = st.number_input("eta", value=0.3, key="hcal_eta")
+            rho = st.slider("rho", -0.99, 0.99, -0.5, 0.01, key="hcal_rho")
+            v0 = st.number_input("v0", value=0.04, key="hcal_v0")
+        with st.container(border=True):
+            st.markdown("##### Quote Grid")
+            n_strikes = st.slider("Strike count", 5, 25, 9)
+            n_mats = st.slider("Maturity count", 2, 8, 4)
+            spread_bps = st.slider("Bid/ask half-spread (bps)", 0, 200, 40)
+            seed = st.number_input("Seed", value=7, step=1, key="hcal_seed")
+            run = st.button("Generate & Calibrate", use_container_width=True)
+
+    if run:
+        strikes = np.linspace(s0 * 0.7, s0 * 1.3, int(n_strikes))
+        maturities = np.linspace(0.25, 2.0, int(n_mats))
+        truth = {
+            "s0": s0, "v0": v0, "r": r, "q": 0.0,
+            "kappa": kappa, "theta": theta, "eta": eta, "rho": rho,
+        }
+        quotes = generate_synthetic_quotes(
+            "Heston", truth, strikes, maturities,
+            spread_bps=float(spread_bps), seed=int(seed),
+        )
+        fit = fit_heston_to_quotes(quotes, s0, r=r, q=0.0, weights_mode="vega_spread")
+        st.session_state["hcal_data"] = {"quotes": quotes, "fit": fit, "truth": truth}
+
+    bundle = st.session_state.get("hcal_data")
+    with col_plot:
+        if bundle is None:
+            st.info("Configure truth parameters and click *Generate & Calibrate*.")
+            return
+        quotes = bundle["quotes"]
+        fit = bundle["fit"]
+        truth = bundle["truth"]
+        with st.container(border=True):
+            heatmap_market = go.Figure(
+                data=go.Heatmap(
+                    z=quotes["prices"],
+                    x=quotes["maturities"],
+                    y=quotes["strikes"],
+                    colorscale="Viridis",
+                    colorbar={"title": "Price"},
+                )
+            )
+            heatmap_market.update_layout(
+                title="Synthetic market prices",
+                xaxis_title="Maturity",
+                yaxis_title="Strike",
+                template="plotly_dark",
+                margin={"l": 40, "r": 20, "t": 60, "b": 40},
+            )
+            st.plotly_chart(heatmap_market, use_container_width=True)
+
+            heatmap_resid = go.Figure(
+                data=go.Heatmap(
+                    z=fit["model_prices"] - quotes["prices"],
+                    x=quotes["maturities"],
+                    y=quotes["strikes"],
+                    colorscale="RdBu",
+                    zmid=0,
+                    colorbar={"title": "Model - Market"},
+                )
+            )
+            heatmap_resid.update_layout(
+                title="Calibration residuals",
+                xaxis_title="Maturity",
+                yaxis_title="Strike",
+                template="plotly_dark",
+                margin={"l": 40, "r": 20, "t": 60, "b": 40},
+            )
+            st.plotly_chart(heatmap_resid, use_container_width=True)
+
+            stat_strip(
+                {
+                    "kappa (fit / truth)": f"{fit['params']['kappa']:.4f} / {truth['kappa']:.4f}",
+                    "theta": f"{fit['params']['theta']:.4f} / {truth['theta']:.4f}",
+                    "eta": f"{fit['params']['eta']:.4f} / {truth['eta']:.4f}",
+                    "rho": f"{fit['params']['rho']:.4f} / {truth['rho']:.4f}",
+                    "v0": f"{fit['params']['v0']:.4f} / {truth['v0']:.4f}",
+                    "Residual": f"{fit['residual_norm']:.2e}",
+                    "Iterations": str(fit["n_iter"]),
+                }
+            )
+
+
+def render_risk_dashboard_tab() -> None:
+    """Tab 8: portfolio of vanilla options, aggregate Greeks."""
+    section_header(
+        "Risk Dashboard",
+        "Aggregate Greeks across a vanilla option portfolio. Edit positions "
+        "inline; cards refresh on change.",
+    )
+    import pandas as pd
+
+    default = pd.DataFrame(
+        [
+            {"Type": "call", "S": 100.0, "K": 100.0, "T": 1.0, "r": 0.05,
+             "q": 0.0, "sigma": 0.2, "Quantity": 10},
+            {"Type": "put", "S": 100.0, "K": 95.0, "T": 1.0, "r": 0.05,
+             "q": 0.0, "sigma": 0.22, "Quantity": -5},
+            {"Type": "call", "S": 100.0, "K": 110.0, "T": 0.5, "r": 0.05,
+             "q": 0.0, "sigma": 0.18, "Quantity": 3},
+        ]
+    )
+    edited = st.data_editor(
+        default,
+        num_rows="dynamic",
+        use_container_width=True,
+        key="risk_positions",
+        column_config={
+            "Type": st.column_config.SelectboxColumn(
+                "Type", options=["call", "put"], required=True
+            ),
+            "S": st.column_config.NumberColumn("Spot", format="%.2f"),
+            "K": st.column_config.NumberColumn("Strike", format="%.2f"),
+            "T": st.column_config.NumberColumn("Maturity", format="%.2f"),
+            "r": st.column_config.NumberColumn("Rate", format="%.4f"),
+            "q": st.column_config.NumberColumn("Div", format="%.4f"),
+            "sigma": st.column_config.NumberColumn("Vol", format="%.4f"),
+            "Quantity": st.column_config.NumberColumn("Qty", format="%d"),
+        },
+    )
+
+    positions = [
+        {
+            "option_type": str(row["Type"]),
+            "s": float(row["S"]),
+            "k": float(row["K"]),
+            "t": float(row["T"]),
+            "r": float(row["r"]),
+            "q": float(row.get("q", 0.0)),
+            "sigma": float(row["sigma"]),
+            "quantity": float(row["Quantity"]),
+        }
+        for _, row in edited.iterrows()
+        if pd.notna(row["S"])
+    ]
+    if not positions:
+        st.info("Add at least one position to see aggregate risk.")
+        return
+    agg = aggregate_portfolio_greeks(positions)
+    stat_strip({k.title(): v for k, v in agg.items()}, fmt="{:,.4f}")
+
+    s_centre = float(np.mean([p["s"] for p in positions]))
+    s_grid = np.linspace(s_centre * 0.5, s_centre * 1.5, 200)
+    pl = np.zeros_like(s_grid)
+    for pos in positions:
+        if pos["option_type"] == "call":
+            payoff = np.maximum(s_grid - pos["k"], 0.0)
+        else:
+            payoff = np.maximum(pos["k"] - s_grid, 0.0)
+        pl += pos["quantity"] * payoff
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=s_grid,
+            y=pl,
+            mode="lines",
+            line={"color": "#00D4AA", "width": 3},
+            name="Portfolio payoff",
+        )
+    )
+    fig.add_hline(y=0, line_color="rgba(255,255,255,0.15)")
+    fig.update_layout(
+        title="Portfolio payoff at expiry (per-leg max-T)",
+        xaxis_title="Underlying at expiry",
+        yaxis_title="P/L",
+        template="plotly_dark",
+        margin={"l": 40, "r": 20, "t": 60, "b": 40},
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+
 render_hero()
 inputs = get_sidebar_inputs()
 
@@ -411,6 +721,9 @@ tab_names = [
     "Convergence",
     "Strategy",
     "IV Surface",
+    "Process Lab",
+    "Heston Calibration",
+    "Risk Dashboard",
 ]
 tabs = st.tabs(tab_names)
 
@@ -432,3 +745,9 @@ with tabs[4]:
     render_strategy_tab()
 with tabs[5]:
     render_iv_surface_tab()
+with tabs[6]:
+    render_process_lab_tab()
+with tabs[7]:
+    render_heston_calibration_tab()
+with tabs[8]:
+    render_risk_dashboard_tab()
