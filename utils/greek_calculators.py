@@ -181,8 +181,13 @@ class BlackScholesGreekCalculator(GreekCalculator):
                 "This calculator is only for the BlackScholesPricer."
             )
         super().__init__(pricer)
-        self.d1 = pricer.d1
-        self.d2 = pricer.d2
+        opt = self.option
+        sigma_sqrt_t = max(opt.sigma * np.sqrt(opt.T), 1e-12)
+        self.d1 = (
+            np.log(opt.S / opt.K)
+            + (opt.r - opt.q + 0.5 * opt.sigma * opt.sigma) * opt.T
+        ) / sigma_sqrt_t
+        self.d2 = self.d1 - sigma_sqrt_t
 
     def calculate(self) -> Dict[str, Any]:
         opt = self.option
