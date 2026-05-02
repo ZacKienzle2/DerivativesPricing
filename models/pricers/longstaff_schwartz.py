@@ -1,13 +1,17 @@
+"""Longstaff-Schwartz American-option pricer with stabilised regression."""
+
 from typing import Any, Dict, Optional, Tuple
+
 import numpy as np
 import numpy.typing as npt
-from numba import jit
+from numba import njit
+
 from ..options import BaseOption
-from .base_pricer import BasePricer
 from ..simulation import generate_paths_jit
+from .base_pricer import BasePricer
 
 
-@jit(nopython=True, fastmath=True)
+@njit(fastmath=True, cache=True)
 def _backward_induction_jit(
     paths: npt.NDArray[np.float64],
     k: float,
@@ -16,45 +20,75 @@ def _backward_induction_jit(
     is_call: bool,
     poly_degree: int,
 ) -> npt.NDArray[np.float64]:
-    """Performs backward induction for option pricing.
+    """Performs backward induction for the Longstaff-Schwartz algorithm.
+
+    Asset prices are normalised by their per-step ITM maximum before fitting
+    the polynomial basis. This drops the regression-matrix condition number
+    by orders of magnitude and lets the linear solve stay stable for
+    `poly_degree >= 3`. Continuation values are evaluated via Horner's rule.
 
     Args:
-        paths (npt.NDArray[np.float64]): Simulated asset price paths.
-        k (float): Strike price of the option.
-        r (float): Risk-free interest rate.
-        dt (float): Time increment.
-        is_call (bool): True if the option is a call option, False if it's a put option.
-        poly_degree (int): Degree of the polynomial for regression.
+        paths: Simulated asset price paths, shape (num_sims, num_steps + 1).
+        k: Strike price.
+        r: Risk-free rate.
+        dt: Time-step size.
+        is_call: True for call, False for put.
+        poly_degree: Polynomial regression degree.
 
     Returns:
-        npt.NDArray[np.float64]: Cash flows at each time step.
+        Cash-flow vector at the first exercise step, shape (num_sims,).
     """
-    num_sims, num_steps = paths.shape[0], paths.shape[1] - 1
-    cash_flows = (
-        np.maximum(paths[:, -1] - k, 0.0)
-        if is_call
-        else np.maximum(k - paths[:, -1], 0.0)
-    )
+    num_steps = paths.shape[1] - 1
+    df = np.exp(-r * dt)
+
+    if is_call:
+        cash_flows = np.maximum(paths[:, -1] - k, 0.0)
+    else:
+        cash_flows = np.maximum(k - paths[:, -1], 0.0)
+
+    n_basis = poly_degree + 1
+
     for t in range(num_steps - 1, 0, -1):
-        cash_flows *= np.exp(-r * dt)
-        exercise_value = np.maximum(
-            paths[:, t] - k if is_call else k - paths[:, t], 0.0
-        )
-        in_money_mask = exercise_value > 0
-        if np.sum(in_money_mask) > poly_degree:
-            x, y = paths[in_money_mask, t], cash_flows[in_money_mask]
-            vandermonde = np.vander(x, N=poly_degree + 1)
-            coeffs = np.linalg.solve(vandermonde.T @ vandermonde, vandermonde.T @ y)
-            continuation = np.zeros_like(x)
-            for i in range(len(coeffs)):
-                continuation += coeffs[i] * (x ** (poly_degree - i))
-            exercise_idx = np.where(exercise_value[in_money_mask] > continuation)[0]
-            update_idx = np.where(in_money_mask)[0][exercise_idx]
-            cash_flows[update_idx] = exercise_value[update_idx]
+        cash_flows *= df
+        s_t = paths[:, t]
+        if is_call:
+            exercise = np.maximum(s_t - k, 0.0)
+        else:
+            exercise = np.maximum(k - s_t, 0.0)
+
+        itm_idx = np.where(exercise > 0.0)[0]
+        if itm_idx.size <= poly_degree:
+            continue
+
+        x = s_t[itm_idx]
+        y = cash_flows[itm_idx]
+        ex = exercise[itm_idx]
+
+        x_max = np.max(np.abs(x))
+        if x_max == 0.0:
+            x_max = 1.0
+        x_n = x / x_max
+
+        vander = np.empty((x_n.size, n_basis))
+        for c in range(n_basis):
+            vander[:, c] = x_n ** (n_basis - 1 - c)
+
+        coeffs = np.linalg.lstsq(vander, y, rcond=-1.0)[0]
+
+        continuation = np.full(x_n.size, coeffs[0])
+        for c in range(1, n_basis):
+            continuation = continuation * x_n + coeffs[c]
+
+        for j in range(itm_idx.size):
+            if ex[j] > continuation[j]:
+                cash_flows[itm_idx[j]] = ex[j]
+
     return cash_flows
 
 
 class LongstaffSchwartzPricer(BasePricer):
+    """Prices American options via least-squares Monte Carlo (LSM)."""
+
     def __init__(
         self,
         option: BaseOption,
@@ -63,19 +97,19 @@ class LongstaffSchwartzPricer(BasePricer):
         poly_degree: int = 3,
         use_crn: bool = True,
         z_matrix: Optional[npt.NDArray[np.float64]] = None,
+        seed: Optional[int] = None,
     ):
         super().__init__(option)
-        self.num_sims, self.num_steps = num_sims, num_steps
-        self.poly_degree, self.use_crn = poly_degree, use_crn
+        self.num_sims = num_sims
+        self.num_steps = num_steps
+        self.poly_degree = poly_degree
+        self.use_crn = use_crn
         self.z_matrix: Optional[npt.NDArray[np.float64]] = z_matrix
         self.convergence_data: Optional[npt.NDArray[np.float64]] = None
+        self._rng = np.random.default_rng(seed)
 
     def get_params(self) -> Dict[str, Any]:
-        """Returns the parameters used for the Longstaff-Schwartz pricer.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing the pricer parameters.
-        """
+        """Returns the configuration for this pricer instance."""
         return {
             "num_sims": self.num_sims,
             "num_steps": self.num_steps,
@@ -85,21 +119,14 @@ class LongstaffSchwartzPricer(BasePricer):
         }
 
     def _generate_z_matrix(self) -> npt.NDArray[np.float64]:
-        """Generates the Z matrix for the Longstaff-Schwartz pricer.
-
-        Returns:
-            npt.NDArray[np.float64]: The generated Z matrix.
-        """
-        return np.random.standard_normal((self.num_sims, self.num_steps))
+        """Draws standard normals for the simulation grid via PCG64."""
+        return self._rng.standard_normal((self.num_sims, self.num_steps))
 
     def price(self) -> Tuple[float, float]:
-        """Prices the option using the Longstaff-Schwartz method.
-
-        Returns:
-            Tuple[float, float]: The option price and standard error.
-        """
+        """Prices the option, returning `(price, standard_error)`."""
         if self.z_matrix is None:
             self.z_matrix = self._generate_z_matrix()
+
         opt = self.option
         dt = opt.T / self.num_steps
         paths = generate_paths_jit(
