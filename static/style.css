@@ -490,6 +490,123 @@ html, body, [class*="css"] {
     font-variant-numeric: tabular-nums;
 }
 
+/* ============================ Plotly Modebar =========================== */
+
+.modebar {
+    background: var(--bg-elevated) !important;
+    border-radius: var(--r-sm);
+    padding: 2px;
+    border: 1px solid var(--border-soft);
+}
+
+.modebar-btn path {
+    fill: var(--text-secondary) !important;
+}
+
+.modebar-btn:hover path {
+    fill: var(--accent-primary) !important;
+}
+
+/* ============================ Data editor / Tables ===================== */
+
+[data-testid="stDataEditor"] {
+    border-radius: var(--r-md);
+    overflow: hidden;
+    border: 1px solid var(--border-soft);
+}
+
+[data-testid="stDataEditor"] table {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+}
+
+[data-testid="stDataEditor"] thead th {
+    background: var(--bg-elevated) !important;
+    color: var(--text-secondary) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.7rem !important;
+}
+
+/* ============================ Loading shimmer ========================== */
+
+@keyframes shimmer {
+    0% { background-position: -468px 0; }
+    100% { background-position: 468px 0; }
+}
+
+.loading-shimmer {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.04) 100%);
+    background-size: 936px 100%;
+    animation: shimmer 1.4s infinite linear;
+}
+
+/* ============================ Tab fade-in ============================== */
+
+.stTabs [data-baseweb="tab-panel"] {
+    animation: fade-up 280ms var(--ease-out);
+}
+
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================ Plot card frame ========================== */
+
+.js-plotly-plot, .plot-container {
+    background: var(--bg-card);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+}
+
+/* ============================ Number input polish ====================== */
+
+.stNumberInput input {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================ Selectbox polish ========================= */
+
+[data-baseweb="select"] {
+    background: var(--bg-elevated) !important;
+}
+
+[data-baseweb="select"] > div {
+    border-radius: var(--r-md) !important;
+}
+
+/* ============================ Expander polish ========================== */
+
+[data-testid="stExpander"] {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft) !important;
+    border-radius: var(--r-md) !important;
+    backdrop-filter: blur(8px);
+}
+
+[data-testid="stExpander"] summary:hover {
+    color: var(--accent-primary);
+}
+
+/* ============================ Tab list scroll ========================== */
+
+.stTabs [data-baseweb="tab-list"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+}
+
+.stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {
+    height: 4px;
+}
+
 /* ============================ Footer / Misc ============================ */
 
 footer { visibility: hidden; }
