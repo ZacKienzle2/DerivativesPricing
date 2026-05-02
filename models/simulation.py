@@ -11,7 +11,7 @@ import numpy.typing as npt
 from numba import njit, prange
 
 
-@njit(fastmath=True, parallel=True, cache=True)
+@njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
 def generate_paths_jit(
     s0: float,
     t: float,
