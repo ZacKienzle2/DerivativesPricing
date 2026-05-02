@@ -42,20 +42,26 @@ html, body, [class*="css"] {
 }
 
 .hero-title {
-    text-align: left;
-    margin: 0.25rem 0 0;
-    font-size: 1.6rem;
+    margin: 0.25rem 0 1.25rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--text);
     letter-spacing: -0.01em;
 }
 
-.hero-subtitle {
-    text-align: left;
+.section-title {
+    margin: 0 0 0.85rem;
+    font-size: 1rem;
+    font-weight: 500;
     color: var(--text-muted);
-    font-weight: 400;
-    font-size: 0.9rem;
-    margin: 0 0 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.section-sub {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
 }
 
 [data-testid="stSidebar"] {
@@ -346,8 +352,3 @@ footer { visibility: hidden; }
 #MainMenu { visibility: hidden; }
 header { visibility: hidden; }
 
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        transition-duration: 0.001ms !important;
-    }
-}
