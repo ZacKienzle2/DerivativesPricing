@@ -11,7 +11,7 @@ from ..simulation import generate_paths_jit
 from .base_pricer import BasePricer
 
 
-@njit(fastmath=True, cache=True)
+@njit(fastmath=True, cache=True, boundscheck=False)
 def _backward_induction_jit(
     paths: npt.NDArray[np.float64],
     k: float,
