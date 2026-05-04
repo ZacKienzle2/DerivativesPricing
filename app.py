@@ -14,9 +14,12 @@ import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 
-from controller import (
+from services import (
     ANALYTICAL_PRICERS,
+    BATES_PRESETS,
+    HESTON_PRESETS,
     PAYOFF_REGISTRY,
+    PROCESS_LAB_PRESETS,
     aggregate_portfolio_greeks,
     fit_heston_to_quotes,
     fit_svi_slice,
@@ -73,6 +76,9 @@ def render_point_pricing_tab(inputs: Dict[str, Any]) -> None:
     """Tab 0: contract pricing + Greeks summary."""
     section_header("Contract Pricing & Greeks")
     metrics = get_point_pricing_context(inputs)
+    if "error" in metrics:
+        st.error(metrics["error"])
+        return
     if not metrics:
         st.warning("Check parameters")
         return
@@ -404,30 +410,16 @@ def render_iv_surface_tab() -> None:
 def render_process_lab_tab() -> None:
     """Tab 6: pick a process, simulate paths, plot path samples + density."""
     section_header("Process Lab")
-    presets = {
-        "GBM": {"s0": 100.0, "r": 0.05, "q": 0.0, "sigma": 0.2},
-        "Heston": {
-            "s0": 100.0, "v0": 0.04, "r": 0.05, "q": 0.0,
-            "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.5,
-        },
-        "Bates": {
-            "s0": 100.0, "v0": 0.04, "r": 0.05, "q": 0.0,
-            "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.5,
-            "lam": 0.4, "mu_j": -0.05, "sigma_j": 0.15,
-        },
-        "RBergomi": {
-            "s0": 100.0, "r": 0.05, "q": 0.0,
-            "xi0": 0.04, "eta": 1.5, "rho": -0.7, "hurst": 0.1,
-        },
-    }
     col_in, col_plot = st.columns([1, 2], gap="medium")
     with col_in:
         with st.container(border=True):
             st.markdown("##### Process")
             process_name = st.selectbox(
-                "Dynamics", list(presets.keys()), key="proc_lab_name"
+                "Dynamics",
+                list(PROCESS_LAB_PRESETS.keys()),
+                key="proc_lab_name",
             )
-            base_params = presets[process_name].copy()
+            base_params = dict(PROCESS_LAB_PRESETS[process_name])
             num_paths = st.slider("Paths", 16, 512, 128, step=16)
             num_steps = st.slider("Time steps", 32, 1024, 252, step=16)
             t = st.number_input("Maturity (years)", 0.1, 10.0, 1.0, step=0.1)
@@ -515,36 +507,6 @@ def render_process_lab_tab() -> None:
             )
 
 
-_HESTON_PRESETS = {
-    "Equity index (skew)": {
-        "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.7, "v0": 0.04,
-    },
-    "FX (mild smile)": {
-        "kappa": 1.5, "theta": 0.02, "eta": 0.4, "rho": -0.1, "v0": 0.025,
-    },
-    "Crypto (high vol-of-vol)": {
-        "kappa": 3.0, "theta": 0.40, "eta": 1.2, "rho": -0.4, "v0": 0.45,
-    },
-    "Calm market": {
-        "kappa": 1.0, "theta": 0.02, "eta": 0.15, "rho": -0.3, "v0": 0.02,
-    },
-    "Stress (high skew)": {
-        "kappa": 4.0, "theta": 0.10, "eta": 0.8, "rho": -0.85, "v0": 0.12,
-    },
-}
-
-_BATES_PRESETS = {
-    "Light jumps": {
-        "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.5, "v0": 0.04,
-        "lam": 0.3, "mu_j": -0.04, "sigma_j": 0.10,
-    },
-    "Crash-prone": {
-        "kappa": 2.5, "theta": 0.05, "eta": 0.4, "rho": -0.6, "v0": 0.05,
-        "lam": 0.8, "mu_j": -0.10, "sigma_j": 0.20,
-    },
-}
-
-
 def _parse_grid_csv(text: str) -> np.ndarray:
     """Parses a CSV-or-newline-separated number list."""
     cleaned = text.replace("\n", ",").replace(";", ",")
@@ -572,7 +534,7 @@ def render_heston_calibration_tab() -> None:
                 key="hcal_truth_model",
             )
             preset_map = (
-                _HESTON_PRESETS if truth_model == "Heston" else _BATES_PRESETS
+                HESTON_PRESETS if truth_model == "Heston" else BATES_PRESETS
             )
             preset_name = st.selectbox(
                 "Preset",
