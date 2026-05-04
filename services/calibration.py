@@ -3,14 +3,14 @@
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
-import streamlit as st
 
+from ._cache import cached
 from .logging import get_logger
 
 _log = get_logger("calibration")
 
 
-@st.cache_data(show_spinner=False)
+@cached()
 def generate_synthetic_quotes(
     process_name: str,
     params: Dict[str, Any],
@@ -40,7 +40,7 @@ def generate_synthetic_quotes(
     }
 
 
-@st.cache_data(show_spinner=False)
+@cached()
 def fit_heston_to_quotes(
     quotes: Dict[str, np.ndarray],
     s0: float,
@@ -113,7 +113,7 @@ def fit_heston_to_quotes(
     }
 
 
-@st.cache_data(show_spinner=False)
+@cached()
 def fit_svi_slice(
     strikes: np.ndarray, ivs: np.ndarray, f0: float, t: float
 ) -> Dict[str, Any]:

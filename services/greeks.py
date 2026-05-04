@@ -3,13 +3,13 @@
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
-import streamlit as st
 
+from ._cache import cached
 from .pricing import get_option_and_pricer
 from .registry import GREEK_ENGINE
 
 
-@st.cache_data
+@cached()
 def get_greek_data(
     inputs: Dict[str, Any], s_range: np.ndarray
 ) -> Tuple[Dict[str, List[float]], Dict[str, List[float]]]:
@@ -47,7 +47,7 @@ def get_greek_data(
     return call_greeks, put_greeks
 
 
-@st.cache_data(show_spinner=False)
+@cached()
 def compute_greek_surface(
     s_range: np.ndarray,
     t_range: np.ndarray,
@@ -76,7 +76,7 @@ def compute_greek_surface(
     return out
 
 
-@st.cache_data(show_spinner=False)
+@cached()
 def aggregate_portfolio_greeks(
     positions: List[Dict[str, Any]],
 ) -> Dict[str, float]:

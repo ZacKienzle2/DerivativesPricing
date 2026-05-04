@@ -4,11 +4,11 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
-import streamlit as st
 
 from models.options import BaseOption
 from models.pricers import BasePricer
 
+from ._cache import cached
 from .logging import get_logger
 from .registry import ANALYTICAL_PRICERS, GREEK_ENGINE, OPTION_MAP, PRICER_MAP
 
@@ -62,8 +62,7 @@ def get_point_pricing_context(inputs: Dict[str, Any]) -> Dict[str, Any]:
         }
     except Exception as exc:
         _log.exception("point pricing failed")
-        st.error(f"Calculation Error: {exc}")
-        return {}
+        results["error"] = str(exc)
     return results
 
 
@@ -97,7 +96,7 @@ def _price_single_point(
         return float("nan"), float("nan")
 
 
-@st.cache_data
+@cached()
 def get_surface_data(
     inputs: Dict[str, Any],
     axis_map: Dict[str, str],
