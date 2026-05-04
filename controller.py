@@ -1,8 +1,18 @@
 """Backward compatibility shim for the legacy controller module.
 
 All implementations now live under the `services` package. This module
-re-exports the public surface so existing callers keep working.
+re-exports the public surface so existing callers keep working. Importing
+this module emits a `DeprecationWarning` so consumers know to migrate
+their imports to `services`.
 """
+
+import warnings
+
+warnings.warn(
+    "controller is deprecated, import from services instead",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 from services import (
     ANALYTICAL_PRICERS,
