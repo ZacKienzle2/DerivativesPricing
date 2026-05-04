@@ -98,6 +98,49 @@ def _price_single_point(
         return float("nan"), float("nan")
 
 
+def _vectorised_bs_surface(
+    inputs: dict[str, Any],
+    axis_map: dict[str, str],
+    x_key: str,
+    y_key: str,
+    grid_x: np.ndarray,
+    grid_y: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray] | None:
+    """Vectorised Black-Scholes surface bypassing the per cell python loop.
+
+    Returns `None` when any contract parameter falls outside Black-Scholes
+    domain (e.g. non positive vol or maturity), letting the caller fall
+    back to the generic path.
+    """
+    base = inputs["contract_params"]
+    s = float(base.get("s", 100.0))
+    k = float(base.get("k", 100.0))
+    t = float(base.get("t", 1.0))
+    r = float(base.get("r", 0.0))
+    q = float(base.get("q", 0.0))
+    sigma = float(base.get("sigma", 0.2))
+    overrides = {axis_map[x_key]: grid_x, axis_map[y_key]: grid_y}
+    s_arr = overrides.get("s", np.full_like(grid_x, s, dtype=np.float64))
+    k_arr = overrides.get("k", np.full_like(grid_x, k, dtype=np.float64))
+    t_arr = overrides.get("t", np.full_like(grid_x, t, dtype=np.float64))
+    sigma_arr = overrides.get("sigma", np.full_like(grid_x, sigma, dtype=np.float64))
+    if np.any(t_arr <= 0) or np.any(sigma_arr <= 0):
+        return None
+    sigma_sqrt_t = sigma_arr * np.sqrt(t_arr)
+    d1 = (
+        np.log(s_arr / k_arr) + (r - q + 0.5 * sigma_arr * sigma_arr) * t_arr
+    ) / sigma_sqrt_t
+    d2 = d1 - sigma_sqrt_t
+    from scipy.special import ndtr
+
+    disc_q = np.exp(-q * t_arr)
+    disc_r = np.exp(-r * t_arr)
+    nd1, nd2 = ndtr(d1), ndtr(d2)
+    call = s_arr * disc_q * nd1 - k_arr * disc_r * nd2
+    put = k_arr * disc_r * (1.0 - nd2) - s_arr * disc_q * (1.0 - nd1)
+    return np.nan_to_num(call), np.nan_to_num(put)
+
+
 @cached()
 def get_surface_data(
     inputs: dict[str, Any],
@@ -108,6 +151,12 @@ def get_surface_data(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Builds call and put price surfaces over a 2D parameter grid."""
     grid_x, grid_y = np.meshgrid(ranges[x_key], ranges[y_key])
+    if inputs["pricer_type"] == "Black-Scholes":
+        fast = _vectorised_bs_surface(
+            inputs, axis_map, x_key, y_key, grid_x, grid_y
+        )
+        if fast is not None:
+            return fast
     shape = grid_x.shape
     shared_z_matrix = None
     if inputs["pricer_type"] in ["Monte Carlo", "Longstaff-Schwartz"]:
