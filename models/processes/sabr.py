@@ -8,6 +8,7 @@ import numpy.typing as npt
 from numba import njit, prange
 
 from .base import BaseProcess
+from .registry import autoregister
 
 
 @njit(cache=True, fastmath=True)
@@ -152,6 +153,7 @@ def _sabr_euler_jit(
     return paths
 
 
+@autoregister("SABR", noise_dim=2)
 class SABRProcess(BaseProcess):
     """SABR forward-rate dynamics with Hagan analytic IV available."""
 

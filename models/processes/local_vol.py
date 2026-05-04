@@ -8,6 +8,7 @@ import numpy.typing as npt
 from numba import njit, prange
 
 from .base import BaseProcess
+from .registry import autoregister
 
 
 @njit(cache=True, fastmath=True, inline="always", boundscheck=False)
@@ -100,6 +101,7 @@ def _local_vol_jit(
     return paths
 
 
+@autoregister("LocalVol", noise_dim=1)
 class LocalVolProcess(BaseProcess):
     """Dupire local-volatility dynamics.
 

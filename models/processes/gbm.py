@@ -8,8 +8,10 @@ import numpy.typing as npt
 from ..options import BaseOption
 from ..simulation import generate_paths_jit
 from .base import BaseProcess
+from .registry import autoregister
 
 
+@autoregister("GBM", noise_dim=1)
 class GBMProcess(BaseProcess):
     """Standard log-normal GBM dynamics.
 

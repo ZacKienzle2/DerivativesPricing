@@ -18,6 +18,7 @@ import numpy.typing as npt
 from numba import njit, prange
 
 from .base import BaseProcess
+from .registry import autoregister
 
 
 def _fbm_cholesky(num_steps: int, dt: float, hurst: float) -> npt.NDArray[np.float64]:
@@ -115,6 +116,7 @@ def _rbergomi_jit(
     return paths
 
 
+@autoregister("RBergomi", noise_dim=2)
 class RBergomiProcess(BaseProcess):
     """Rough Bergomi dynamics with exact Cholesky discretisation.
 

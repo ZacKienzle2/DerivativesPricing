@@ -8,6 +8,7 @@ import numpy.typing as npt
 from numba import njit, prange
 
 from .base import BaseProcess
+from .registry import autoregister
 
 _PSI_C = 1.5
 
@@ -110,6 +111,7 @@ def _heston_qe_jit(
     return paths
 
 
+@autoregister("Heston", noise_dim=2)
 class HestonProcess(BaseProcess):
     """Heston stochastic-volatility dynamics under the QE scheme.
 

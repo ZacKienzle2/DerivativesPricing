@@ -9,6 +9,7 @@ from numba import njit, prange
 
 from .base import BaseProcess
 from .heston import _PSI_C
+from .registry import autoregister
 
 
 @njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
@@ -130,6 +131,7 @@ def _bates_qe_jit(
     return paths
 
 
+@autoregister("Bates", noise_dim=3)
 class BatesProcess(BaseProcess):
     """Bates 1996 jump-diffusion: Heston variance plus log-normal Merton jumps.
 

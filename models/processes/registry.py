@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Tuple, Type
+from typing import Any, Callable
 
 from .base import BaseProcess
 
@@ -17,14 +17,16 @@ class ProcessSpec:
         noise_dim: Number of independent normals required per timestep.
     """
 
-    cls: Type[BaseProcess]
+    cls: type[BaseProcess]
     noise_dim: int
 
 
-_REGISTRY: Dict[str, ProcessSpec] = {}
+_REGISTRY: dict[str, ProcessSpec] = {}
 
 
-def register_process(name: str, cls: Type[BaseProcess], noise_dim: int) -> None:
+def register_process(
+    name: str, cls: type[BaseProcess], noise_dim: int
+) -> None:
     """Adds a process to the registry under `name`."""
     _REGISTRY[name] = ProcessSpec(cls=cls, noise_dim=noise_dim)
 
@@ -41,25 +43,18 @@ def make_process(name: str, **params: Any) -> BaseProcess:
     return get_spec(name).cls(**params)
 
 
-def list_processes() -> Tuple[str, ...]:
+def list_processes() -> tuple[str, ...]:
     """Returns the registered process names in insertion order."""
     return tuple(_REGISTRY.keys())
 
 
-def _register_defaults() -> None:
-    from .bates import BatesProcess
-    from .gbm import GBMProcess
-    from .heston import HestonProcess
-    from .local_vol import LocalVolProcess
-    from .rbergomi import RBergomiProcess
-    from .sabr import SABRProcess
+def autoregister(
+    name: str, noise_dim: int
+) -> Callable[[type[BaseProcess]], type[BaseProcess]]:
+    """Class decorator equivalent to `register_process`."""
 
-    register_process("GBM", GBMProcess, 1)
-    register_process("Heston", HestonProcess, 2)
-    register_process("Bates", BatesProcess, 3)
-    register_process("SABR", SABRProcess, 2)
-    register_process("LocalVol", LocalVolProcess, 1)
-    register_process("RBergomi", RBergomiProcess, 2)
+    def wrap(cls: type[BaseProcess]) -> type[BaseProcess]:
+        register_process(name, cls, noise_dim)
+        return cls
 
-
-_register_defaults()
+    return wrap
