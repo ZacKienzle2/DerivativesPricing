@@ -5,6 +5,7 @@ from .calibration import (
     fit_svi_slice,
     generate_synthetic_quotes,
 )
+from .presets import BATES_PRESETS, HESTON_PRESETS, PROCESS_LAB_PRESETS
 from .greeks import (
     aggregate_portfolio_greeks,
     compute_greek_surface,
@@ -27,10 +28,13 @@ from .registry import (
 
 __all__ = [
     "ANALYTICAL_PRICERS",
+    "BATES_PRESETS",
     "GREEK_ENGINE",
+    "HESTON_PRESETS",
     "OPTION_MAP",
     "PAYOFF_REGISTRY",
     "PRICER_MAP",
+    "PROCESS_LAB_PRESETS",
     "aggregate_portfolio_greeks",
     "compute_greek_surface",
     "fit_heston_to_quotes",
