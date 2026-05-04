@@ -7,8 +7,10 @@ operations are funnelled through `controller` so the UI stays a thin
 presentation layer.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import plotly.graph_objects as go
@@ -72,7 +74,7 @@ def render_hero() -> None:
     )
 
 
-def render_point_pricing_tab(inputs: Dict[str, Any]) -> None:
+def render_point_pricing_tab(inputs: dict[str, Any]) -> None:
     """Tab 0: contract pricing + Greeks summary."""
     section_header("Contract Pricing & Greeks")
     metrics = get_point_pricing_context(inputs)
@@ -108,7 +110,7 @@ def render_point_pricing_tab(inputs: Dict[str, Any]) -> None:
             )
 
 
-def render_surface_tab(inputs: Dict[str, Any]) -> None:
+def render_surface_tab(inputs: dict[str, Any]) -> None:
     """Tab 1: 3D / heatmap price surface across two contract dimensions."""
     section_header("Price Surface Analysis")
     st.sidebar.header("Surface Plot Configuration")
@@ -173,7 +175,7 @@ def render_surface_tab(inputs: Dict[str, Any]) -> None:
                 st.plotly_chart(fig, use_container_width=True)
 
 
-def render_greeks_tab(inputs: Dict[str, Any]) -> None:
+def render_greeks_tab(inputs: dict[str, Any]) -> None:
     """Tab 2: Greek sensitivity curves vs spot."""
     section_header("Greek Sensitivity Analysis")
     s_val = inputs["contract_params"]["s"]
@@ -199,7 +201,7 @@ def render_greeks_tab(inputs: Dict[str, Any]) -> None:
             )
 
 
-def render_convergence_tab(inputs: Dict[str, Any]) -> None:
+def render_convergence_tab(inputs: dict[str, Any]) -> None:
     """Tab 3: MC convergence trace."""
     section_header("Model Convergence Analysis")
     pricer_type = inputs["pricer_type"]
