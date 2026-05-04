@@ -11,16 +11,33 @@ from models.options import BaseOption
 from models.pricers import BasePricer
 
 from ._cache import cached
+from ._timing import timed
+from ._validation import ValidationError
 from .logging import get_logger
 from .registry import ANALYTICAL_PRICERS, GREEK_ENGINE, OPTION_MAP, PRICER_MAP
 
 _log = get_logger("pricing")
 
 
+def _validate_inputs(inputs: dict[str, Any]) -> None:
+    """Asserts the dashboard input bundle has the keys we depend on."""
+    if "option_type" not in inputs or inputs["option_type"] not in OPTION_MAP:
+        raise ValidationError(
+            f"Unknown option_type {inputs.get('option_type')!r}"
+        )
+    if "pricer_type" not in inputs or inputs["pricer_type"] not in PRICER_MAP:
+        raise ValidationError(
+            f"Unknown pricer_type {inputs.get('pricer_type')!r}"
+        )
+    if "contract_params" not in inputs:
+        raise ValidationError("inputs missing contract_params")
+
+
 def get_option_and_pricer(
     inputs: dict[str, Any], option_flavour: str | None = None
 ) -> tuple[BaseOption, BasePricer]:
     """Builds the configured option contract and pricer instance."""
+    _validate_inputs(inputs)
     contract_params = inputs["contract_params"].copy()
     if option_flavour:
         contract_params["option_type"] = option_flavour
@@ -34,6 +51,7 @@ def get_option_and_pricer(
     return option, pricer_cls(option, **model_params)
 
 
+@timed("services.pricing.point")
 def get_point_pricing_context(inputs: dict[str, Any]) -> dict[str, Any]:
     """Returns price + Greeks for both call and put flavours of the option."""
     results: dict[str, Any] = {}
@@ -158,6 +176,7 @@ def _vectorised_bs_surface(
 
 
 @cached()
+@timed("services.pricing.surface")
 def get_surface_data(
     inputs: dict[str, Any],
     axis_map: dict[str, str],

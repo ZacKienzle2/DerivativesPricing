@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 
 from ._cache import cached
+from ._timing import timed
 from .logging import get_logger
 
 _log = get_logger("calibration")
@@ -43,6 +44,7 @@ def generate_synthetic_quotes(
 
 
 @cached()
+@timed("services.calibration.heston")
 def fit_heston_to_quotes(
     quotes: dict[str, np.ndarray],
     s0: float,
@@ -116,6 +118,7 @@ def fit_heston_to_quotes(
 
 
 @cached()
+@timed("services.calibration.svi")
 def fit_svi_slice(
     strikes: np.ndarray, ivs: np.ndarray, f0: float, t: float
 ) -> dict[str, Any]:

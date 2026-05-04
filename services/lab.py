@@ -9,9 +9,11 @@ import numpy as np
 from models.processes import get_spec, make_process
 
 from ._cache import cached
+from ._timing import timed
 
 
 @cached()
+@timed("services.lab.simulate")
 def simulate_process_paths(
     process_name: str,
     params: dict[str, Any],
