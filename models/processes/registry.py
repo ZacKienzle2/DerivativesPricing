@@ -8,7 +8,7 @@ from typing import Any, Callable
 from .base import BaseProcess
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class ProcessSpec:
     """Carrier describing a registered process implementation.
 

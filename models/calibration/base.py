@@ -7,7 +7,7 @@ from typing import Any, Dict, Tuple
 import numpy.typing as npt
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class CalibrationResult:
     """Carrier for fitted parameters and diagnostics.
 

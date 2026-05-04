@@ -15,7 +15,7 @@ import numpy.typing as npt
 from models.processes import BaseProcess
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class SyntheticQuotes:
     """Carrier for a synthetic call quote slab.
 

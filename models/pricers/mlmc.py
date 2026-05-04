@@ -22,7 +22,7 @@ from ..options import VanillaOption
 from .base_pricer import BasePricer
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MLMCLevelStat:
     """Per-level diagnostics carried back from `mlmc_european_jit`."""
 

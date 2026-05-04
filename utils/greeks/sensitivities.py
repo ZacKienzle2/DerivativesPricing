@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, Optional
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class GreekShifts:
     """Per-Greek bump sizes used by the CRN engine."""
 
