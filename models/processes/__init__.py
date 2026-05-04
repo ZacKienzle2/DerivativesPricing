@@ -12,6 +12,13 @@ from .gbm import GBMProcess
 from .heston import HestonProcess
 from .local_vol import LocalVolProcess
 from .rbergomi import RBergomiProcess
+from .registry import (
+    ProcessSpec,
+    get_spec,
+    list_processes,
+    make_process,
+    register_process,
+)
 from .sabr import SABRProcess
 
 __all__ = [
@@ -20,6 +27,11 @@ __all__ = [
     "GBMProcess",
     "HestonProcess",
     "LocalVolProcess",
+    "ProcessSpec",
     "RBergomiProcess",
     "SABRProcess",
+    "get_spec",
+    "list_processes",
+    "make_process",
+    "register_process",
 ]
