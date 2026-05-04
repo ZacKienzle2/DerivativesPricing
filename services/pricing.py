@@ -1,6 +1,8 @@
 """Point pricing and price surface helpers."""
 
-from typing import Any, Dict, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -16,8 +18,8 @@ _log = get_logger("pricing")
 
 
 def get_option_and_pricer(
-    inputs: Dict[str, Any], option_flavour: Optional[str] = None
-) -> Tuple[BaseOption, BasePricer]:
+    inputs: dict[str, Any], option_flavour: str | None = None
+) -> tuple[BaseOption, BasePricer]:
     """Builds the configured option contract and pricer instance."""
     contract_params = inputs["contract_params"].copy()
     if option_flavour:
@@ -32,9 +34,9 @@ def get_option_and_pricer(
     return option, pricer_cls(option, **model_params)
 
 
-def get_point_pricing_context(inputs: Dict[str, Any]) -> Dict[str, Any]:
+def get_point_pricing_context(inputs: dict[str, Any]) -> dict[str, Any]:
     """Returns price + Greeks for both call and put flavours of the option."""
-    results: Dict[str, Any] = {}
+    results: dict[str, Any] = {}
     try:
         greek_method = inputs.get("model_params", {}).get("greek_method", "default")
 
@@ -67,14 +69,14 @@ def get_point_pricing_context(inputs: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _price_single_point(
-    base_inputs: Dict[str, Any],
-    axis_map: Dict[str, str],
+    base_inputs: dict[str, Any],
+    axis_map: dict[str, str],
     x_axis_key: str,
     y_axis_key: str,
     x_value: float,
     y_value: float,
-    shared_z_matrix: Optional[npt.NDArray[np.float64]],
-) -> Tuple[float, float]:
+    shared_z_matrix: npt.NDArray[np.float64] | None,
+) -> tuple[float, float]:
     """Prices a single (x, y) grid point under the configured option."""
     try:
         local_inputs = base_inputs.copy()
@@ -98,12 +100,12 @@ def _price_single_point(
 
 @cached()
 def get_surface_data(
-    inputs: Dict[str, Any],
-    axis_map: Dict[str, str],
+    inputs: dict[str, Any],
+    axis_map: dict[str, str],
     x_key: str,
     y_key: str,
-    ranges: Dict[str, np.ndarray],
-) -> Tuple[np.ndarray, np.ndarray]:
+    ranges: dict[str, np.ndarray],
+) -> tuple[np.ndarray, np.ndarray]:
     """Builds call and put price surfaces over a 2D parameter grid."""
     grid_x, grid_y = np.meshgrid(ranges[x_key], ranges[y_key])
     shape = grid_x.shape

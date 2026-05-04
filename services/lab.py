@@ -1,6 +1,8 @@
 """Process Lab simulation helper."""
 
-from typing import Any, Dict
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 
@@ -12,12 +14,12 @@ from ._cache import cached
 @cached()
 def simulate_process_paths(
     process_name: str,
-    params: Dict[str, Any],
+    params: dict[str, Any],
     num_paths: int = 64,
     num_steps: int = 252,
     t: float = 1.0,
     seed: int = 42,
-) -> Dict[str, np.ndarray]:
+) -> dict[str, np.ndarray]:
     """Simulates a batch of paths from any registered process.
 
     Resolves `process_name` against `models.processes.registry`, so any

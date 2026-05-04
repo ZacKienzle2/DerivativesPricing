@@ -1,6 +1,8 @@
 """Greek surface, sensitivity strip and portfolio aggregation helpers."""
 
-from typing import Any, Dict, List, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 
@@ -11,12 +13,12 @@ from .registry import GREEK_ENGINE
 
 @cached()
 def get_greek_data(
-    inputs: Dict[str, Any], s_range: np.ndarray
-) -> Tuple[Dict[str, List[float]], Dict[str, List[float]]]:
+    inputs: dict[str, Any], s_range: np.ndarray
+) -> tuple[dict[str, list[float]], dict[str, list[float]]]:
     """Returns per-strike Greek series for both call and put flavours."""
     greek_keys = ["delta", "gamma", "vega", "theta", "rho"]
-    call_greeks: Dict[str, List[float]] = {k: [] for k in greek_keys}
-    put_greeks: Dict[str, List[float]] = {k: [] for k in greek_keys}
+    call_greeks: dict[str, list[float]] = {k: [] for k in greek_keys}
+    put_greeks: dict[str, list[float]] = {k: [] for k in greek_keys}
     greek_method = inputs.get("model_params", {}).get("greek_method", "default")
 
     z_matrix = None
@@ -78,8 +80,8 @@ def compute_greek_surface(
 
 @cached()
 def aggregate_portfolio_greeks(
-    positions: List[Dict[str, Any]],
-) -> Dict[str, float]:
+    positions: list[dict[str, Any]],
+) -> dict[str, float]:
     """Sums Black-Scholes Greeks across a list of vanilla option positions."""
     from models.pricers._analytic_kernels import bs_full_greeks_jit
 

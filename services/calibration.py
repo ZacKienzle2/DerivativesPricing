@@ -1,6 +1,8 @@
 """Calibration helpers (synthetic quote generation, Heston, SVI)."""
 
-from typing import Any, Dict, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 
@@ -13,12 +15,12 @@ _log = get_logger("calibration")
 @cached()
 def generate_synthetic_quotes(
     process_name: str,
-    params: Dict[str, Any],
+    params: dict[str, Any],
     strikes: np.ndarray,
     maturities: np.ndarray,
     spread_bps: float = 25.0,
     seed: int = 42,
-) -> Dict[str, np.ndarray]:
+) -> dict[str, np.ndarray]:
     """Builds synthetic call quotes from a chosen process and parameter set."""
     from models.processes import BatesProcess, HestonProcess
     from utils.synthetic_quotes import synthetic_call_quotes
@@ -42,13 +44,13 @@ def generate_synthetic_quotes(
 
 @cached()
 def fit_heston_to_quotes(
-    quotes: Dict[str, np.ndarray],
+    quotes: dict[str, np.ndarray],
     s0: float,
     r: float = 0.0,
     q: float = 0.0,
     weights_mode: str = "vega",
-    x0: Optional[Tuple[float, ...]] = None,
-) -> Dict[str, Any]:
+    x0: tuple[float, ...] | None = None,
+) -> dict[str, Any]:
     """Calibrates Heston parameters to a synthetic or market quote bundle."""
     from models.calibration import HestonCalibrator
     from models.pricers.cos_pricer import cos_heston_price_jit
@@ -116,7 +118,7 @@ def fit_heston_to_quotes(
 @cached()
 def fit_svi_slice(
     strikes: np.ndarray, ivs: np.ndarray, f0: float, t: float
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Fits raw SVI to a market IV slice."""
     from models.calibration import SVICalibrator
 
