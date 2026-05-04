@@ -1,7 +1,6 @@
 """Base process interface."""
 
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -53,7 +52,7 @@ class BaseProcess(ABC):
         """Risk-free rate (used for discounting)."""
 
     @property
-    def signature(self) -> Tuple:
+    def signature(self) -> tuple:
         """Hashable identifier for caching purposes."""
         return (type(self).__name__, self.s0, self.r)
 

@@ -9,7 +9,6 @@ Memory: O(1) per call. Wall-clock: sub-millisecond at `N = 128`.
 """
 
 import math
-from typing import Tuple
 
 from numba import njit
 
@@ -19,7 +18,7 @@ from ._chf import bates_chf_re_im, heston_chf_re_im
 @njit(cache=True, fastmath=True, inline="always")
 def _cumulants_heston(
     t: float, r: float, q: float, kappa: float, theta: float, v0: float
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """Approximate first two cumulants of `log(S_T / S_0)` under Heston."""
     e_kt = math.exp(-kappa * t)
     int_var = v0 * (1.0 - e_kt) / kappa + theta * (t - (1.0 - e_kt) / kappa)
@@ -39,7 +38,7 @@ def _cumulants_bates(
     lam: float,
     mu_j: float,
     sigma_j: float,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """First two cumulants for Bates: Heston + jump contributions."""
     c1_h, c2_h = _cumulants_heston(t, r, q, kappa, theta, v0)
     m = math.exp(mu_j + 0.5 * sigma_j * sigma_j) - 1.0

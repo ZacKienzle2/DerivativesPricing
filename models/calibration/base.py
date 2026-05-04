@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import numpy.typing as npt
 
@@ -19,7 +19,7 @@ class CalibrationResult:
         cost: Optimiser final cost (typically 0.5 * residual_norm^2).
     """
 
-    params: Dict[str, float]
+    params: dict[str, float]
     residual_norm: float
     n_iter: int
     converged: bool

@@ -12,7 +12,6 @@ distribution-equivalent to one draw with the same total variance.
 """
 
 import math
-from typing import Dict, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -183,7 +182,7 @@ class VanillaMCGreeks:
         self,
         option: VanillaOption,
         num_sims: int,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ):
         if not isinstance(option, VanillaOption):
             raise TypeError("VanillaMCGreeks requires a VanillaOption.")
@@ -191,7 +190,7 @@ class VanillaMCGreeks:
         self.num_sims = num_sims
         self._rng = np.random.default_rng(seed)
 
-    def compute(self) -> Dict[str, float]:
+    def compute(self) -> dict[str, float]:
         """Returns `{price, delta, gamma, vega}`."""
         opt = self.option
         z = self._rng.standard_normal(self.num_sims)
@@ -222,7 +221,7 @@ class AsianMCGreeks:
         option: AsianOption,
         num_sims: int,
         num_steps: int,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ):
         if not isinstance(option, AsianOption):
             raise TypeError("AsianMCGreeks requires an AsianOption.")
@@ -235,7 +234,7 @@ class AsianMCGreeks:
         self.num_steps = num_steps
         self._rng = np.random.default_rng(seed)
 
-    def compute(self) -> Dict[str, float]:
+    def compute(self) -> dict[str, float]:
         """Returns `{price, delta, gamma, vega}`."""
         opt = self.option
         z = self._rng.standard_normal((self.num_sims, self.num_steps))

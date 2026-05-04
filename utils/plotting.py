@@ -1,9 +1,10 @@
 """Plotly figure helpers used by the Streamlit dashboard."""
 
+from typing import Any
+
 import numpy as np
-import plotly.graph_objects as go
 import numpy.typing as npt
-from typing import Dict, List, Any
+import plotly.graph_objects as go
 
 
 def plot_mc_convergence(prices: npt.NDArray[np.float64], title: str) -> go.Figure:
@@ -64,7 +65,7 @@ def plot_3d_surface(
 
 
 def plot_greek_sensitivity(
-    s_range: npt.NDArray[np.float64], greek_data: Dict[str, List[float]], title: str
+    s_range: npt.NDArray[np.float64], greek_data: dict[str, list[float]], title: str
 ) -> go.Figure:
     """Creates a line plot showing greek sensitivity to stock price."""
     fig = go.Figure()
@@ -87,7 +88,7 @@ def plot_greek_sensitivity(
 def plot_payoff_diagram(
     s_range: npt.NDArray[np.float64],
     total_payoff: npt.NDArray[np.float64],
-    components: List[Dict[str, Any]],
+    components: list[dict[str, Any]],
 ) -> go.Figure:
     """
     Creates an interactive payoff diagram for a financial strategy.

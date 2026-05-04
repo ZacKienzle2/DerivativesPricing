@@ -11,7 +11,8 @@ underlying pricer at all.
 """
 
 from collections import OrderedDict
-from typing import Any, Dict, Hashable, Tuple, Type
+from collections.abc import Hashable
+from typing import Any
 
 import numpy as np
 
@@ -37,22 +38,22 @@ from .monte_carlo import MonteCarloPricer
 class PricerRegistry:
     """Maps `(option_class, method_name)` to a pricer class."""
 
-    _factories: Dict[Tuple[Type[BaseOption], str], Type[BasePricer]] = {}
+    _factories: dict[tuple[type[BaseOption], str], type[BasePricer]] = {}
 
     @classmethod
     def register(
         cls,
-        option_cls: Type[BaseOption],
+        option_cls: type[BaseOption],
         method: str,
-        pricer_cls: Type[BasePricer],
+        pricer_cls: type[BasePricer],
     ) -> None:
         """Registers `pricer_cls` as the handler for `(option_cls, method)`."""
         cls._factories[(option_cls, method)] = pricer_cls
 
     @classmethod
     def get(
-        cls, option_cls: Type[BaseOption], method: str
-    ) -> Type[BasePricer]:
+        cls, option_cls: type[BaseOption], method: str
+    ) -> type[BasePricer]:
         """Looks up the pricer for `option_cls` walking the MRO.
 
         Raises:
@@ -65,7 +66,7 @@ class PricerRegistry:
         raise KeyError(f"No pricer registered for ({option_cls.__name__!r}, {method!r}).")
 
     @classmethod
-    def methods_for(cls, option_cls: Type[BaseOption]) -> Tuple[str, ...]:
+    def methods_for(cls, option_cls: type[BaseOption]) -> tuple[str, ...]:
         """Returns the method tokens registered for `option_cls`."""
         out = []
         for klass in option_cls.__mro__:
@@ -86,7 +87,7 @@ def _hashable(value: Any) -> Hashable:
     return value
 
 
-def _option_signature(opt: BaseOption) -> Tuple[Hashable, ...]:
+def _option_signature(opt: BaseOption) -> tuple[Hashable, ...]:
     """Builds a hashable tuple of every slot value across the MRO."""
     seen: set = set()
     parts: list = []
@@ -113,12 +114,12 @@ class PricingService:
     """
 
     def __init__(self, cache_size: int = 256):
-        self._cache: "OrderedDict[Tuple, Tuple[float, float]]" = OrderedDict()
+        self._cache: OrderedDict[tuple, tuple[float, float]] = OrderedDict()
         self._max = cache_size
 
     def _key(
-        self, option: BaseOption, method: str, kwargs: Dict[str, Any]
-    ) -> Tuple:
+        self, option: BaseOption, method: str, kwargs: dict[str, Any]
+    ) -> tuple:
         opt_sig = _option_signature(option)
         kw_sig = tuple(sorted((k, _hashable(v)) for k, v in kwargs.items()))
         return (type(option).__name__, method, opt_sig, kw_sig)
@@ -128,7 +129,7 @@ class PricingService:
         option: BaseOption,
         method: str = "default",
         **kwargs: Any,
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """Prices `option` via the `method`-registered pricer.
 
         Hits the LRU cache on repeat calls with identical option state and

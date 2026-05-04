@@ -9,7 +9,6 @@ Working memory is `O(N)`: a rolling vector of node values plus a few
 N-length factor caches.
 """
 
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -30,7 +29,7 @@ def _thomas_factor(
     sub: npt.NDArray[np.float64],
     diag: npt.NDArray[np.float64],
     sup: npt.NDArray[np.float64],
-) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """LU decomposes a tridiagonal matrix.
 
     Args:
@@ -358,7 +357,7 @@ def _grid(
     n_steps: int,
     n_points: int,
     cluster_density: float = 0.0,
-) -> Tuple[float, npt.NDArray[np.float64], float]:
+) -> tuple[float, npt.NDArray[np.float64], float]:
     """Builds the asset-price grid and timestep.
 
     With `cluster_density > 0` the grid is sinh-stretched (Tavella-Randall)
@@ -389,7 +388,7 @@ def _continuous_operator(
     sigma: float,
     r: float,
     q: float,
-) -> Tuple[
+) -> tuple[
     npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]
 ]:
     """Builds non-uniform Black-Scholes operator coefficients.
@@ -431,7 +430,7 @@ def _boundary_values(
     dt: float,
     n_steps: int,
     is_call: bool,
-) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """Pre-computes boundary value vectors indexed by timestep."""
     tau = dt * (n_steps - np.arange(n_steps + 1, dtype=np.float64))
     if is_call:

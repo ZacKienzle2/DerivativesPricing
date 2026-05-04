@@ -1,6 +1,7 @@
 """Monte Carlo pricer with QMC, antithetic, control variate and PCG64 RNG."""
 
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -20,7 +21,7 @@ from ..simulation import generate_final_prices_jit
 from ._analytic_kernels import discrete_geom_asian_price_jit
 from .base_pricer import BasePricer
 
-_BARRIER_CODES: Dict[str, int] = {
+_BARRIER_CODES: dict[str, int] = {
     "up-and-in": 0,
     "up-and-out": 1,
     "down-and-in": 2,
@@ -28,7 +29,7 @@ _BARRIER_CODES: Dict[str, int] = {
 }
 
 
-def _build_bb_tree(n: int) -> Tuple[
+def _build_bb_tree(n: int) -> tuple[
     npt.NDArray[np.int64], npt.NDArray[np.int64], npt.NDArray[np.int64]
 ]:
     """Builds Brownian-Bridge bisection indices via BFS.
@@ -48,7 +49,7 @@ def _build_bb_tree(n: int) -> Tuple[
     bridge[0] = n
     left[0] = 0
     right[0] = n
-    queue: List[Tuple[int, int]] = [(0, n)]
+    queue: list[tuple[int, int]] = [(0, n)]
     head = 0
     k = 1
     while head < len(queue) and k < n:
@@ -214,7 +215,7 @@ def _generate_correlated_paths_jit(
 @njit(fastmath=True, parallel=True, cache=True, boundscheck=False)
 def _asian_dual_average_jit(
     paths: npt.NDArray[np.float64],
-) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """Computes per-path arithmetic and geometric sample-mean prices.
 
     Single pass over `paths[:, 1:]`. Geometric mean accumulates in log-space.
@@ -268,10 +269,10 @@ class MonteCarloPricer(BasePricer):
         option: BaseOption,
         num_sims: int,
         num_steps: int,
-        variance_reduction: Optional[List[str]] = None,
+        variance_reduction: list[str] | None = None,
         use_crn: bool = True,
-        seed: Optional[int] = None,
-        process: Optional[BaseProcess] = None,
+        seed: int | None = None,
+        process: BaseProcess | None = None,
         **kwargs: Any,
     ):
         super().__init__(option)
@@ -282,21 +283,21 @@ class MonteCarloPricer(BasePricer):
         self.num_steps = num_steps
         self.variance_reduction = vr
         self.use_crn = use_crn
-        self.z_matrix: Optional[npt.NDArray[np.float64]] = None
-        self.convergence_data: Optional[npt.NDArray[np.float64]] = None
-        self.discounted_payoffs: Optional[npt.NDArray[np.float64]] = None
+        self.z_matrix: npt.NDArray[np.float64] | None = None
+        self.convergence_data: npt.NDArray[np.float64] | None = None
+        self.discounted_payoffs: npt.NDArray[np.float64] | None = None
         self._rng = np.random.default_rng(seed)
         self._process = process
         self._uses_default_process = process is None
 
-        self._payoff_handlers: Dict[type, Callable[[], npt.NDArray[np.float64]]] = {
+        self._payoff_handlers: dict[type, Callable[[], npt.NDArray[np.float64]]] = {
             VanillaOption: self._payoff_vanilla,
             BasketOption: self._payoff_basket,
             BarrierOption: self._payoff_barrier,
             AsianOption: self._payoff_asian,
         }
 
-    def get_params(self) -> Dict[str, Any]:
+    def get_params(self) -> dict[str, Any]:
         """Returns the simulation configuration."""
         return {
             "num_sims": self.num_sims,
@@ -500,7 +501,7 @@ class MonteCarloPricer(BasePricer):
         beta = _ols_beta(arith_payoff, geom_payoff)
         return arith_payoff - beta * (geom_payoff - analytic_geom / df)
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Returns `(price, standard_error)`."""
         opt = self.option
         handler = self._payoff_handlers.get(type(opt))

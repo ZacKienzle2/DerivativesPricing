@@ -1,7 +1,6 @@
 """Abstract base class for option pricers."""
 
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 from models.options import BaseOption
 
@@ -16,7 +15,7 @@ class BasePricer(ABC):
         self.option = option
 
     @abstractmethod
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """
         Calculates the theoretical price of the option.
 

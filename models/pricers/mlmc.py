@@ -12,7 +12,6 @@ coarse-fine path pair.
 
 import math
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -138,8 +137,8 @@ class MLMCVanillaPricer(BasePricer):
         option: VanillaOption,
         levels: int = 4,
         base_steps: int = 8,
-        samples_per_level: Optional[Tuple[int, ...]] = None,
-        seed: Optional[int] = None,
+        samples_per_level: tuple[int, ...] | None = None,
+        seed: int | None = None,
     ):
         if not isinstance(option, VanillaOption):
             raise TypeError("MLMCVanillaPricer is for VanillaOption only.")
@@ -154,7 +153,7 @@ class MLMCVanillaPricer(BasePricer):
             raise ValueError("samples_per_level must have length levels + 1.")
         self.samples_per_level = tuple(int(n) for n in samples_per_level)
         self._rng = np.random.default_rng(seed)
-        self.level_stats: Tuple[MLMCLevelStat, ...] = ()
+        self.level_stats: tuple[MLMCLevelStat, ...] = ()
 
     def get_params(self) -> dict:
         """Returns the configuration of this pricer."""
@@ -164,7 +163,7 @@ class MLMCVanillaPricer(BasePricer):
             "samples_per_level": self.samples_per_level,
         }
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Returns `(price, standard_error)` from the MLMC telescoping sum."""
         opt = self.option
         is_call = opt.option_type == "call"

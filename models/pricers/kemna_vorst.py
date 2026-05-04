@@ -1,6 +1,5 @@
 """Kemna-Vorst closed-form geometric Asian pricer."""
 
-from typing import Tuple
 
 from models.options import AsianOption
 
@@ -21,7 +20,7 @@ class KemnaVorstPricer(BasePricer):
             raise TypeError("KemnaVorstPricer is only for GEOMETRIC Asian options.")
         super().__init__(option)
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Returns `(price, 0.0)` from the Kemna-Vorst formula."""
         opt = self.option
         return (

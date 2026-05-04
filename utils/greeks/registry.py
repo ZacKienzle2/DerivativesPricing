@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Callable, Dict, Tuple, Type
+from collections.abc import Callable
 
 from models.pricers import BasePricer
 
@@ -20,12 +20,12 @@ class GreekCalculatorRegistry:
     for.
     """
 
-    _factories: Dict[Tuple[Type[BasePricer], str], _CalculatorFactory] = {}
+    _factories: dict[tuple[type[BasePricer], str], _CalculatorFactory] = {}
 
     @classmethod
     def register(
         cls,
-        pricer_cls: Type[BasePricer],
+        pricer_cls: type[BasePricer],
         method: str,
         factory: _CalculatorFactory,
     ) -> None:

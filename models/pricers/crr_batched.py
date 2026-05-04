@@ -7,7 +7,6 @@ shared transition kernel cut redundant arithmetic.
 """
 
 import math
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -83,7 +82,7 @@ def crr_strike_grid(
     n: int,
     is_call: bool = True,
     is_american: bool = False,
-) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """Returns `(strikes, prices)` from a single batched CRR sweep.
 
     Args:

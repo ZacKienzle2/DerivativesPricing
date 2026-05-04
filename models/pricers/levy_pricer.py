@@ -1,11 +1,11 @@
 """Levy 1992 closed-form continuous-arithmetic Asian pricer."""
 
-from typing import Tuple
 
 import numpy as np
 from scipy.special import ndtr as norm_cdf  # type: ignore
 
 from models.options import AsianOption
+
 from .base_pricer import BasePricer
 
 
@@ -20,7 +20,7 @@ class LevyPricer(BasePricer):
             raise TypeError("This pricer is for arithmetic Asian options.")
         super().__init__(option)
 
-    def _calculate_moments(self) -> Tuple[float, float]:
+    def _calculate_moments(self) -> tuple[float, float]:
         """Calculates the first two moments of the
         asset price's arithmetic average."""
         s, t, r, q, sigma = (
@@ -55,7 +55,7 @@ class LevyPricer(BasePricer):
         m2 = term1 + term2
         return m1, m2
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Calculates the approximate option price."""
         k, t, r = self.option.K, self.option.T, self.option.r
         m1, m2 = self._calculate_moments()

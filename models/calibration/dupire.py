@@ -9,7 +9,6 @@ in `(K, T)`. Output is clamped to a positive interval and returned as a
 ready-to-use `LocalVolProcess`.
 """
 
-from typing import Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -127,7 +126,7 @@ def build_local_vol_process(
     q: float = 0.0,
     floor: float = 1e-3,
     ceil: float = 5.0,
-    smoothing: Optional[float] = None,
+    smoothing: float | None = None,
 ) -> LocalVolProcess:
     """Builds a `LocalVolProcess` from a market IV surface.
 

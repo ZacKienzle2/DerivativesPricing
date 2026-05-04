@@ -1,6 +1,5 @@
 """SABR calibrator fitting Hagan implied vols to a single-maturity slice."""
 
-from typing import Optional, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -47,12 +46,12 @@ class SABRCalibrator(BaseCalibrator):
         self,
         strikes: npt.NDArray,
         market: npt.NDArray,
-        f0: Optional[float] = None,
-        t: Optional[float] = None,
-        weights: Optional[Union[npt.NDArray, str]] = None,
-        bids: Optional[npt.NDArray] = None,
-        asks: Optional[npt.NDArray] = None,
-        x0: Optional[npt.NDArray] = None,
+        f0: float | None = None,
+        t: float | None = None,
+        weights: npt.NDArray | str | None = None,
+        bids: npt.NDArray | None = None,
+        asks: npt.NDArray | None = None,
+        x0: npt.NDArray | None = None,
         **kwargs,
     ) -> CalibrationResult:
         """Calibrates `(alpha, rho, nu)` to market IVs.

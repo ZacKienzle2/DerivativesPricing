@@ -1,7 +1,6 @@
 """Bates jump-diffusion process: Heston QE plus compound Poisson jumps."""
 
 import math
-from typing import Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -154,7 +153,7 @@ class BatesProcess(BaseProcess):
         lam: float,
         mu_j: float,
         sigma_j: float,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ):
         if not (-1.0 <= rho <= 1.0):
             raise ValueError("rho must be in [-1, 1].")
@@ -186,7 +185,7 @@ class BatesProcess(BaseProcess):
         return self._r
 
     @property
-    def jump_params(self) -> Tuple[float, float, float]:
+    def jump_params(self) -> tuple[float, float, float]:
         """Returns `(lam, mu_j, sigma_j)`."""
         return self._lam, self._mu_j, self._sigma_j
 
@@ -213,7 +212,7 @@ class BatesProcess(BaseProcess):
         )
 
     @property
-    def signature(self) -> Tuple:
+    def signature(self) -> tuple:
         return (
             type(self).__name__,
             self._s0, self._v0, self._r, self._q,

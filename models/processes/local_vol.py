@@ -1,7 +1,6 @@
 """Local-volatility (Dupire) process with bilinear interpolation."""
 
 import math
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -174,7 +173,7 @@ class LocalVolProcess(BaseProcess):
         )
 
     @property
-    def signature(self) -> Tuple:
+    def signature(self) -> tuple:
         return (
             type(self).__name__, self._s0, self._r, self._q,
             self._grid_s.tobytes(), self._grid_t.tobytes(), self._grid_v.tobytes(),

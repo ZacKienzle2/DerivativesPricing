@@ -1,7 +1,6 @@
 """Heston stochastic-volatility process via Andersen's QE scheme."""
 
 import math
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -181,7 +180,7 @@ class HestonProcess(BaseProcess):
         )
 
     @property
-    def signature(self) -> Tuple:
+    def signature(self) -> tuple:
         return (
             type(self).__name__,
             self._s0, self._v0, self._r, self._q,

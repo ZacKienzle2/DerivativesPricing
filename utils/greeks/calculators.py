@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Tuple
 import concurrent.futures
+from abc import ABC, abstractmethod
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -12,17 +12,17 @@ from numba import jit
 from scipy.stats import norm
 
 from models.options import (
-    VanillaOption,
+    AmericanOption,
+    AsianOption,
     BarrierOption,
     BasketOption,
-    AsianOption,
-    AmericanOption,
+    VanillaOption,
 )
-from models.pricers.black_scholes import BlackScholesPricer
 from models.pricers.base_pricer import BasePricer
-from models.pricers.monte_carlo import MonteCarloPricer, _calculate_barrier_payoffs_jit
-from models.pricers.lattice_pricer import LatticePricer
+from models.pricers.black_scholes import BlackScholesPricer
 from models.pricers.kemna_vorst import KemnaVorstPricer
+from models.pricers.lattice_pricer import LatticePricer
+from models.pricers.monte_carlo import MonteCarloPricer, _calculate_barrier_payoffs_jit
 
 
 @jit(nopython=True, fastmath=True)
@@ -35,7 +35,7 @@ def _calculate_pathwise_estimators_jit(
     sigma: float,
     q: float,
     is_call: bool,
-) -> Tuple[npt.NDArray[np.float64], float, float, float, float, float]:
+) -> tuple[npt.NDArray[np.float64], float, float, float, float, float]:
     num_sims, num_steps = z_matrix.shape
     dt = t / num_steps
     st_base = np.empty(num_sims, dtype=np.float64)
@@ -79,7 +79,7 @@ def _calculate_lrm_greeks_jit(
     r: float,
     t: float,
     sigma: float,
-) -> Tuple[float, float, float, float]:
+) -> tuple[float, float, float, float]:
     sqrt_t = np.sqrt(t)
     sigma_sqrt_t = sigma * sqrt_t
     w_s0 = z_terminal / (sigma_sqrt_t * s0)
@@ -106,7 +106,7 @@ def _lattice_greeks_jit(
     num_steps: int,
     option_type_code: int,
     exercise_type_code: int,
-) -> Tuple[float, float, float, float]:
+) -> tuple[float, float, float, float]:
     if num_steps < 2:
         return np.nan, np.nan, np.nan, np.nan
 
@@ -174,7 +174,7 @@ class GreekCalculator(ABC):
         self.option = pricer.option
 
     @abstractmethod
-    def calculate(self) -> Dict[str, Any]:
+    def calculate(self) -> dict[str, Any]:
         pass
 
 
@@ -193,7 +193,7 @@ class BlackScholesGreekCalculator(GreekCalculator):
         ) / sigma_sqrt_t
         self.d2 = self.d1 - sigma_sqrt_t
 
-    def calculate(self) -> Dict[str, Any]:
+    def calculate(self) -> dict[str, Any]:
         opt = self.option
         s, k, t, r, q, sigma = opt.S, opt.K, opt.T, opt.r, opt.q, opt.sigma
         if opt.option_type == "call":
@@ -225,7 +225,7 @@ class FiniteDifferenceCalculator(GreekCalculator):
     def _get_bumped_price(
         self, bump_attr: str, bump_val: float, z_matrix=None
     ) -> float:
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "s": self.option.S,
             "k": self.option.K,
             "t": self.option.T,
@@ -244,7 +244,7 @@ class FiniteDifferenceCalculator(GreekCalculator):
             params[bump_attr] += bump_val
 
         option_copy = self.option.__class__(**params)
-        pricer_params: Dict[str, Any] = {}
+        pricer_params: dict[str, Any] = {}
         if hasattr(self.pricer, "get_params"):
             pricer_params = self.pricer.get_params()
 
@@ -255,7 +255,7 @@ class FiniteDifferenceCalculator(GreekCalculator):
         price = price_result[0] if isinstance(price_result, tuple) else price_result
         return float(price)
 
-    def _calculate_fallback(self) -> Dict[str, Any]:
+    def _calculate_fallback(self) -> dict[str, Any]:
         z_matrix = None
         if isinstance(self.pricer, MonteCarloPricer) and self.pricer.use_crn:
             if self.pricer.z_matrix is None:
@@ -297,7 +297,7 @@ class FiniteDifferenceCalculator(GreekCalculator):
             "rho": rho * 0.01,
         }
 
-    def _calculate_mc_optimized(self) -> Dict[str, Any]:
+    def _calculate_mc_optimized(self) -> dict[str, Any]:
         opt = self.option
         pricer = self.pricer
         if pricer.z_matrix is None:
@@ -396,7 +396,7 @@ class FiniteDifferenceCalculator(GreekCalculator):
             "rho": rho * 0.01,
         }
 
-    def calculate(self) -> Dict[str, Any]:
+    def calculate(self) -> dict[str, Any]:
         if isinstance(self.pricer, MonteCarloPricer) and isinstance(
             self.option, (VanillaOption, BarrierOption)
         ):
@@ -407,7 +407,7 @@ class FiniteDifferenceCalculator(GreekCalculator):
 
 
 class PathwiseCalculator(GreekCalculator):
-    def calculate(self) -> Dict[str, Any]:
+    def calculate(self) -> dict[str, Any]:
         if not isinstance(self.pricer, MonteCarloPricer):
             raise IncompatibleCalculatorError(
                 "Pathwise method requires MonteCarloPricer."
@@ -441,7 +441,7 @@ class PathwiseCalculator(GreekCalculator):
 
 
 class LikelihoodRatioCalculator(GreekCalculator):
-    def calculate(self) -> Dict[str, Any]:
+    def calculate(self) -> dict[str, Any]:
         if not isinstance(self.pricer, MonteCarloPricer):
             raise IncompatibleCalculatorError("LRM requires MonteCarloPricer.")
         if isinstance(
@@ -478,7 +478,7 @@ class LikelihoodRatioCalculator(GreekCalculator):
 
 
 class LatticeGreekCalculator(GreekCalculator):
-    def calculate(self) -> Dict[str, Any]:
+    def calculate(self) -> dict[str, Any]:
         if not isinstance(self.pricer, LatticePricer):
             raise IncompatibleCalculatorError(
                 "This calculator is only for the LatticePricer."
@@ -575,7 +575,7 @@ class KemnaVorstGreekCalculator(GreekCalculator):
         self.N_prime_d1 = norm.pdf(self.d1)
         self.N_d2 = norm.cdf(self.d2)
 
-    def calculate(self) -> Dict[str, Any]:
+    def calculate(self) -> dict[str, Any]:
         opt = self.option
         s, k, t, r = opt.S, opt.K, opt.T, opt.r
         delta_call = np.exp((self.b_a - r) * t) * self.N_d1

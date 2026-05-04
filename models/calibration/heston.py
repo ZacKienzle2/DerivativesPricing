@@ -1,6 +1,5 @@
 """Heston calibrator fitting COS-priced calls to market quotes."""
 
-from typing import Optional, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -63,13 +62,13 @@ class HestonCalibrator(BaseCalibrator):
         self,
         strikes: npt.NDArray,
         market: npt.NDArray,
-        maturities: Optional[npt.NDArray] = None,
-        is_call: Optional[npt.NDArray] = None,
-        weights: Optional[Union[npt.NDArray, str]] = None,
-        bids: Optional[npt.NDArray] = None,
-        asks: Optional[npt.NDArray] = None,
-        market_iv: Optional[npt.NDArray] = None,
-        x0: Optional[npt.NDArray] = None,
+        maturities: npt.NDArray | None = None,
+        is_call: npt.NDArray | None = None,
+        weights: npt.NDArray | str | None = None,
+        bids: npt.NDArray | None = None,
+        asks: npt.NDArray | None = None,
+        market_iv: npt.NDArray | None = None,
+        x0: npt.NDArray | None = None,
         **kwargs,
     ) -> CalibrationResult:
         """Calibrates Heston parameters to a multi-maturity market slice.

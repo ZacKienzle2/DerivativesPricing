@@ -43,7 +43,26 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "SIM"]
-ignore = ["E501", "N803", "N806"]
+ignore = [
+    "E501",   # line too long (formatter handles)
+    "E701",   # multiple statements on one line (math kernels)
+    "E702",   # multiple statements on one line via semicolon
+    "E741",   # ambiguous variable name (math notation)
+    "N802",   # invalid function name (lower-case math fns)
+    "N803",   # invalid argument name (math notation)
+    "N806",   # uppercase variable in function (S, K, T notation)
+    "N813",   # camelcase imported as lowercase
+    "N816",   # mixed-case-variable-in-global-scope
+    "SIM103", # needless-bool
+    "SIM108", # use ternary operator (cosmetic)
+    "B008",   # function call in default argument (frozen dataclass default)
+    "B024",   # abstract base class without abstract method (Protocol-like)
+    "B904",   # raise without from inside except (logging path)
+    "B905",   # zip without explicit strict
+    "F821",   # undefined name (numba prange resolved at jit time)
+    "F841",   # unused local variable (intermediate math results)
+    "UP031",  # use f-string instead of percent formatting
+]
 
 [tool.ruff.lint.per-file-ignores]
 "models/pricers/_warmup.py" = ["F401"]
@@ -51,6 +70,9 @@ ignore = ["E501", "N803", "N806"]
 "models/processes/__init__.py" = ["F401"]
 "models/calibration/__init__.py" = ["F401"]
 "utils/greeks/__init__.py" = ["F401"]
+"models/processes/registry.py" = ["F401"]
+"models/processes/*.py" = ["E402"]
+"controller.py" = ["E402"]
 
 [tool.black]
 line-length = 100

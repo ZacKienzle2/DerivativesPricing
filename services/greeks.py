@@ -10,7 +10,6 @@ from ._cache import cached
 from .pricing import get_option_and_pricer
 from .registry import GREEK_ENGINE
 
-
 _GREEK_KEYS: tuple[str, ...] = ("delta", "gamma", "vega", "theta", "rho")
 
 

@@ -1,6 +1,5 @@
 """Reiner-Rubinstein 1991 closed-form barrier option pricer."""
 
-from typing import Tuple
 
 import numpy as np
 from scipy.special import ndtr as norm_cdf
@@ -58,7 +57,7 @@ class ReinerRubinsteinPricer(BasePricer):
             t
         )
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """
         Calculates the barrier option price by dispatching to the correct formula.
         """

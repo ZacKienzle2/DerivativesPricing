@@ -38,10 +38,10 @@ def _warmup() -> None:
         discrete_geom_asian_price_jit,
         kemna_vorst_price_jit,
     )
-    from .cos_pricer import cos_bates_price_jit, cos_heston_price_jit
-    from .crr_batched import crr_batched_jit
     from ._fd_common import _solve_cn_jit, _solve_explicit_jit, _solve_implicit_jit
     from .binomial_tree import _asian_hull_white_jit, _european_american_jit
+    from .cos_pricer import cos_bates_price_jit, cos_heston_price_jit
+    from .crr_batched import crr_batched_jit
     from .lattice_pricer import _lattice_pricer_jit
     from .longstaff_schwartz import _backward_induction_jit
     from .monte_carlo import (

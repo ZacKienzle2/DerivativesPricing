@@ -6,7 +6,6 @@ variate routines) without object-mode fallback.
 """
 
 import math
-from typing import Tuple
 
 from numba import njit
 
@@ -99,7 +98,7 @@ def bs_full_greeks_jit(
     q: float,
     sigma: float,
     is_call: bool,
-) -> Tuple[float, float, float, float, float, float]:
+) -> tuple[float, float, float, float, float, float]:
     """Computes BS price plus the standard 5-Greek vector in one pass.
 
     Returns:

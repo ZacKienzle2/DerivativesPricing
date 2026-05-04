@@ -1,6 +1,5 @@
 """Black-Scholes-Merton analytic pricer."""
 
-from typing import Dict, Tuple
 
 from models.options import VanillaOption
 
@@ -21,7 +20,7 @@ class BlackScholesPricer(BasePricer):
             raise TypeError("BlackScholesPricer is for VanillaOption only.")
         super().__init__(option)
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Returns `(price, 0.0)` from the analytic formula."""
         opt = self.option
         return (
@@ -37,7 +36,7 @@ class BlackScholesPricer(BasePricer):
             0.0,
         )
 
-    def greeks(self) -> Dict[str, float]:
+    def greeks(self) -> dict[str, float]:
         """Returns `{price, delta, gamma, vega, theta, rho}` in one JIT call.
 
         All Greeks share `d1`, `d2`, `phi(d1)`, `N(d1)`, `N(d2)` and the two

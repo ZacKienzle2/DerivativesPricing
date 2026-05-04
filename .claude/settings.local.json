@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__lean-ctx__ctx_read",
+      "mcp__lean-ctx__ctx_tree",
+      "mcp__lean-ctx__ctx_shell",
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git mv *)",
+      "Bash(DERIVATIVES_PRICING_NO_WARMUP=1 /opt/anaconda3/envs/OptionPricer/bin/python -m pytest tests/ -q)",
+      "Bash(/opt/anaconda3/envs/OptionPricer/bin/pip install *)",
+      "Bash(/opt/anaconda3/envs/OptionPricer/bin/ruff check *)"
+    ]
+  }
+}

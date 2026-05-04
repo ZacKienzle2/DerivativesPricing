@@ -1,9 +1,8 @@
 """CRR binomial-tree pricer (path-independent and Hull-White Asian)."""
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import numpy as np
-import numpy.typing as npt
 from numba import njit, prange
 
 from models.options import AmericanOption, AsianOption, BaseOption
@@ -190,7 +189,7 @@ class BinomialTreePricer(BasePricer):
         self.num_avgs = num_avgs
         self.richardson = richardson
 
-    def get_params(self) -> Dict[str, Any]:
+    def get_params(self) -> dict[str, Any]:
         """Returns the configuration of this pricer."""
         return {
             "num_steps": self.num_steps,
@@ -215,7 +214,7 @@ class BinomialTreePricer(BasePricer):
             )
         )
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Returns `(price, 0.0)`.
 
         With `richardson=True`, prices `(n)` and `(n+1)` step trees and

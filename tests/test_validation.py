@@ -8,9 +8,9 @@ import pytest
 from services._validation import (
     ValidationError,
     in_range,
+    ndarray_1d,
     nonempty,
     nonneg_float,
-    ndarray_1d,
     positive_float,
     positive_int,
 )

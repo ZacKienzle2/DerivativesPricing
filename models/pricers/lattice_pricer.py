@@ -1,11 +1,12 @@
 """Generic CRR or Boyle trinomial lattice pricer."""
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import numpy as np
 from numba import jit
 
 from models.options import AmericanOption, BarrierOption, BaseOption, VanillaOption
+
 from .base_pricer import BasePricer
 
 
@@ -147,10 +148,10 @@ class LatticePricer(BasePricer):
         self.num_steps = num_steps
         self.model = model
 
-    def get_params(self) -> Dict[str, Any]:
+    def get_params(self) -> dict[str, Any]:
         return {"num_steps": self.num_steps, "model": self.model}
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         opt = self.option
         option_type_code = 1 if opt.option_type == "call" else 0
         exercise_type_code = 1 if isinstance(opt, AmericanOption) else 0
@@ -165,12 +166,12 @@ class LatticePricer(BasePricer):
             barrier_type_code = self._BARRIER_MAP.get(opt.barrier_type, 0)
             is_in_option = "in" in opt.barrier_type
 
-            if (opt.barrier_type == "down-and-out" and opt.S <= barrier_level) or (
-                opt.barrier_type == "up-and-out" and opt.S >= barrier_level
+            if (opt.barrier_type == "down-and-out" and barrier_level >= opt.S) or (
+                opt.barrier_type == "up-and-out" and barrier_level <= opt.S
             ):
                 return 0.0, 0.0
-            if (opt.barrier_type == "down-and-in" and opt.S <= barrier_level) or (
-                opt.barrier_type == "up-and-in" and opt.S >= barrier_level
+            if (opt.barrier_type == "down-and-in" and barrier_level >= opt.S) or (
+                opt.barrier_type == "up-and-in" and barrier_level <= opt.S
             ):
                 vanilla_opt_class = (
                     AmericanOption if isinstance(opt, AmericanOption) else VanillaOption
@@ -209,7 +210,7 @@ class LatticePricer(BasePricer):
                 )  # Heuristic cap like QuantLib
                 divisor = 0.0
                 if abs(opt.S - barrier_level) > 1e-9:  # Avoid log(1)
-                    if opt.S > barrier_level:
+                    if barrier_level < opt.S:
                         divisor = np.log(opt.S / barrier_level) ** 2
                     else:
                         divisor = np.log(barrier_level / opt.S) ** 2

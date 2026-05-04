@@ -11,7 +11,6 @@ to a few hundred steps. Fall back to the hybrid scheme for larger N.
 """
 
 import math
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -147,7 +146,7 @@ class RBergomiProcess(BaseProcess):
         self._eta = float(eta)
         self._rho = float(rho)
         self._hurst = float(hurst)
-        self._chol_cache: Tuple[int, float, npt.NDArray[np.float64]] = (0, 0.0, np.empty((0, 0)))
+        self._chol_cache: tuple[int, float, npt.NDArray[np.float64]] = (0, 0.0, np.empty((0, 0)))
 
     @property
     def noise_dim(self) -> int:
@@ -188,7 +187,7 @@ class RBergomiProcess(BaseProcess):
         )
 
     @property
-    def signature(self) -> Tuple:
+    def signature(self) -> tuple:
         return (
             type(self).__name__,
             self._s0, self._r, self._q,

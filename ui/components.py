@@ -5,7 +5,8 @@ emit pure HTML so the theme `style.css` can drive presentation centrally
 without per-call inline styling.
 """
 
-from typing import Any, Dict, Iterable, Optional, Set
+from collections.abc import Iterable
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -21,7 +22,7 @@ def _format(value: Any, fmt: str = "{:,.4f}") -> str:
         return str(value)
 
 
-def section_header(title: str, subtitle: Optional[str] = None) -> None:
+def section_header(title: str, subtitle: str | None = None) -> None:
     """Renders a left aligned section heading with optional subtitle."""
     sub = (
         f'<div class="section-sub">{subtitle}</div>' if subtitle else ""
@@ -32,7 +33,7 @@ def section_header(title: str, subtitle: Optional[str] = None) -> None:
     )
 
 
-def stat_strip(stats: Dict[str, Any], fmt: str = "{:,.4f}") -> None:
+def stat_strip(stats: dict[str, Any], fmt: str = "{:,.4f}") -> None:
     """Renders a horizontal strip of `(label, value)` stat cells."""
     cells = "".join(
         f'<div class="stat-cell">'
@@ -44,7 +45,7 @@ def stat_strip(stats: Dict[str, Any], fmt: str = "{:,.4f}") -> None:
     st.markdown(f'<div class="stat-strip">{cells}</div>', unsafe_allow_html=True)
 
 
-def greek_pills(greeks: Dict[str, Any]) -> str:
+def greek_pills(greeks: dict[str, Any]) -> str:
     """Returns HTML for the compact Greek pill grid embedded inside a card."""
     if not greeks or "info" in greeks:
         return ""
@@ -61,9 +62,9 @@ def greek_pills(greeks: Dict[str, Any]) -> str:
 
 def display_metrics_card(
     name: str,
-    metrics: Dict[str, Any],
+    metrics: dict[str, Any],
     option_type: str,
-    analytical_pricers: Set,
+    analytical_pricers: set,
 ) -> None:
     """Renders a price + Greeks card for a single option flavour.
 

@@ -39,7 +39,6 @@ from utils.plotting import (
     plot_payoff_diagram,
 )
 
-
 st.set_page_config(
     page_title="Derivatives Pricer",
     page_icon=":chart_with_upwards_trend:",
@@ -282,36 +281,35 @@ def render_strategy_tab() -> None:
                 ):
                     st.session_state.strategy.pop(i)
                     st.rerun()
-    with col2:
-        with st.container(border=True):
-            if not st.session_state.strategy:
-                st.info("Add an instrument")
-                return
-            try:
-                prices = [
-                    p
-                    for pos in st.session_state.strategy
-                    for k_param, p in pos["params"].items()
-                    if "k" in k_param or "price" in k_param
-                ]
-                center = np.mean(prices) if prices else 100.0
-                s_range = np.linspace(center * 0.5, center * 1.5, 200)
-                total_payoff = np.zeros_like(s_range)
-                components = []
-                for i, pos in enumerate(st.session_state.strategy):
-                    info = PAYOFF_REGISTRY[pos["type"]]
-                    payoff = info["func"](s_range, **pos["params"])
-                    total_payoff += payoff
-                    components.append(
-                        {"name": f"Position {i + 1}: {pos['type']}", "payoff": payoff}
-                    )
-                st.plotly_chart(
-                    plot_payoff_diagram(s_range, total_payoff, components),
-                    use_container_width=True,
+    with col2, st.container(border=True):
+        if not st.session_state.strategy:
+            st.info("Add an instrument")
+            return
+        try:
+            prices = [
+                p
+                for pos in st.session_state.strategy
+                for k_param, p in pos["params"].items()
+                if "k" in k_param or "price" in k_param
+            ]
+            center = np.mean(prices) if prices else 100.0
+            s_range = np.linspace(center * 0.5, center * 1.5, 200)
+            total_payoff = np.zeros_like(s_range)
+            components = []
+            for i, pos in enumerate(st.session_state.strategy):
+                info = PAYOFF_REGISTRY[pos["type"]]
+                payoff = info["func"](s_range, **pos["params"])
+                total_payoff += payoff
+                components.append(
+                    {"name": f"Position {i + 1}: {pos['type']}", "payoff": payoff}
                 )
-            except Exception as e:
-                st.error(f"Error calculating payoffs: {e}")
-                st.info("Check position parameters")
+            st.plotly_chart(
+                plot_payoff_diagram(s_range, total_payoff, components),
+                use_container_width=True,
+            )
+        except Exception as e:
+            st.error(f"Error calculating payoffs: {e}")
+            st.info("Check position parameters")
 
 
 def render_iv_surface_tab() -> None:
@@ -319,23 +317,22 @@ def render_iv_surface_tab() -> None:
     section_header("Implied Volatility")
     col_in, col_plot = st.columns([1, 2], gap="medium")
 
-    with col_in:
-        with st.container(border=True):
-            st.markdown("##### Market Slice")
-            f0 = st.number_input("Forward (F)", value=100.0, min_value=0.01)
-            t = st.number_input(
-                "Maturity (years)", value=1.0, min_value=0.01, step=0.05
-            )
-            default = (
-                "60, 0.30\n70, 0.26\n80, 0.23\n90, 0.21\n"
-                "100, 0.20\n110, 0.21\n120, 0.23\n130, 0.27\n140, 0.32"
-            )
-            csv = st.text_area(
-                "Strikes, IVs (one pair per line)",
-                value=default,
-                height=240,
-            )
-            fit_clicked = st.button("Fit SVI", use_container_width=True)
+    with col_in, st.container(border=True):
+        st.markdown("##### Market Slice")
+        f0 = st.number_input("Forward (F)", value=100.0, min_value=0.01)
+        t = st.number_input(
+            "Maturity (years)", value=1.0, min_value=0.01, step=0.05
+        )
+        default = (
+            "60, 0.30\n70, 0.26\n80, 0.23\n90, 0.21\n"
+            "100, 0.20\n110, 0.21\n120, 0.23\n130, 0.27\n140, 0.32"
+        )
+        csv = st.text_area(
+            "Strikes, IVs (one pair per line)",
+            value=default,
+            height=240,
+        )
+        fit_clicked = st.button("Fit SVI", use_container_width=True)
 
     if fit_clicked:
         try:
@@ -413,27 +410,26 @@ def render_process_lab_tab() -> None:
     """Tab 6: pick a process, simulate paths, plot path samples + density."""
     section_header("Process Lab")
     col_in, col_plot = st.columns([1, 2], gap="medium")
-    with col_in:
-        with st.container(border=True):
-            st.markdown("##### Process")
-            process_name = st.selectbox(
-                "Dynamics",
-                list(PROCESS_LAB_PRESETS.keys()),
-                key="proc_lab_name",
-            )
-            base_params = dict(PROCESS_LAB_PRESETS[process_name])
-            num_paths = st.slider("Paths", 16, 512, 128, step=16)
-            num_steps = st.slider("Time steps", 32, 1024, 252, step=16)
-            t = st.number_input("Maturity (years)", 0.1, 10.0, 1.0, step=0.1)
-            with st.expander("Parameters", expanded=True):
-                for key in base_params:
-                    base_params[key] = st.number_input(
-                        key, value=float(base_params[key]),
-                        format="%.4f",
-                        key=f"proc_lab_{key}",
-                    )
-            seed = st.number_input("Seed", value=42, step=1, key="proc_lab_seed")
-            run = st.button("Simulate paths", use_container_width=True)
+    with col_in, st.container(border=True):
+        st.markdown("##### Process")
+        process_name = st.selectbox(
+            "Dynamics",
+            list(PROCESS_LAB_PRESETS.keys()),
+            key="proc_lab_name",
+        )
+        base_params = dict(PROCESS_LAB_PRESETS[process_name])
+        num_paths = st.slider("Paths", 16, 512, 128, step=16)
+        num_steps = st.slider("Time steps", 32, 1024, 252, step=16)
+        t = st.number_input("Maturity (years)", 0.1, 10.0, 1.0, step=0.1)
+        with st.expander("Parameters", expanded=True):
+            for key in base_params:
+                base_params[key] = st.number_input(
+                    key, value=float(base_params[key]),
+                    format="%.4f",
+                    key=f"proc_lab_{key}",
+                )
+        seed = st.number_input("Seed", value=42, step=1, key="proc_lab_seed")
+        run = st.button("Simulate paths", use_container_width=True)
 
     if run:
         st.session_state["proc_lab_data"] = simulate_process_paths(

@@ -1,6 +1,6 @@
 """Merton jump-diffusion Fourier pricer via FFT inversion."""
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import numpy as np
 from scipy.interpolate import interp1d
@@ -30,7 +30,7 @@ class MertonFourierPricer(BasePricer):
         self.xwidth = xwidth
         self.alpha = alpha if option.option_type == "call" else -alpha
 
-    def get_params(self) -> Dict[str, Any]:
+    def get_params(self) -> dict[str, Any]:
         return {
             "lam": self.lam,
             "mu_j": self.mu_j,
@@ -76,7 +76,7 @@ class MertonFourierPricer(BasePricer):
 
         return np.exp(psi * t)
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         opt = self.option
         s, k, t, r, q, sigma = opt.S, opt.K, opt.T, opt.r, opt.q, opt.sigma
 

@@ -1,12 +1,13 @@
 """Black-Scholes implied vol fitter and Yahoo option chain loader."""
 
+from typing import Any
+
 import numpy as np
 import pandas as pd
 import yfinance as yf  # type: ignore
-from scipy.stats import norm  # type: ignore
-from typing import Tuple, Dict, Any
+from numpy import bool_, float64, floating
 from numpy.typing import NDArray
-from numpy import float64, bool_, floating
+from scipy.stats import norm  # type: ignore
 
 
 def _n_cdf(x: NDArray[floating[Any]]) -> NDArray[floating[Any]]:
@@ -29,7 +30,7 @@ def calculate_implied_volatility(
     dividend_yield: NDArray[float64],
     max_iterations: int = 20,
     tolerance: float = 1e-9,
-) -> Tuple[NDArray[float64], NDArray[bool_]]:
+) -> tuple[NDArray[float64], NDArray[bool_]]:
     """Calculates Black-Scholes implied volatility using Newton-Raphson.
 
     This function calculate the implied volatility for an entire array of
@@ -149,7 +150,7 @@ def fetch_and_prepare_data(
     dividend_yield: float,
     num_expiries: int = 12,
     strike_range_pct: float = 0.20,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Fetches, filters, and prepares option data from Yahoo Finance.
 
     This function retrieves all available option chains for a given number

@@ -7,7 +7,6 @@ recover via the calibrator, compare.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -84,9 +83,9 @@ def synthetic_call_quotes(
     strikes: npt.NDArray,
     maturities: npt.NDArray,
     spread_bps: float = 25.0,
-    r: Optional[float] = None,
+    r: float | None = None,
     q: float = 0.0,
-    seed: Optional[int] = None,
+    seed: int | None = None,
 ) -> SyntheticQuotes:
     """Generates a synthetic call quote slab from a given process.
 
@@ -146,7 +145,7 @@ def synthetic_call_quotes(
 
 def quotes_to_long_form(
     quotes: SyntheticQuotes,
-) -> Tuple[
+) -> tuple[
     npt.NDArray, npt.NDArray, npt.NDArray, npt.NDArray, npt.NDArray, npt.NDArray
 ]:
     """Flattens a `(N_K, N_T)` quote slab into long-form 1D arrays.

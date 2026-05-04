@@ -8,8 +8,9 @@ process tuple per call.
 """
 
 import copy
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Iterable, Optional
+from typing import Any
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,7 +46,7 @@ class CRNSensitivities:
         self,
         pricer_factory: Callable[[Any], Any],
         shifts: GreekShifts = GreekShifts(),
-        greeks: Optional[Iterable[str]] = None,
+        greeks: Iterable[str] | None = None,
     ):
         self.pricer_factory = pricer_factory
         self.shifts = shifts
@@ -54,9 +55,9 @@ class CRNSensitivities:
     def _price(self, option: Any) -> float:
         return float(self.pricer_factory(option).price()[0])
 
-    def compute(self, option: Any) -> Dict[str, float]:
+    def compute(self, option: Any) -> dict[str, float]:
         """Returns `{price, delta, gamma, vega, theta, rho}` for the option."""
-        out: Dict[str, float] = {}
+        out: dict[str, float] = {}
         base_price = self._price(option)
         out["price"] = base_price
 

@@ -1,11 +1,11 @@
 """Haug-Haug-Margrabe approximation for arithmetic Asian options."""
 
-from typing import Tuple
 
 import numpy as np
 from scipy.special import ndtr as norm_cdf
 
 from models.options import AsianOption
+
 from .base_pricer import BasePricer
 
 
@@ -20,7 +20,7 @@ class HaugHaugMargrabePricer(BasePricer):
             raise TypeError("This pricer is for arithmetic Asian options.")
         super().__init__(option)
 
-    def _calculate_moments(self) -> Tuple[float, float]:
+    def _calculate_moments(self) -> tuple[float, float]:
         """Calculates the moments of the discrete average asset price."""
         s, t, r, q, sigma = (
             self.option.S,
@@ -44,7 +44,7 @@ class HaugHaugMargrabePricer(BasePricer):
 
         return m1, m2
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Calculates the approximate option price."""
         k, t, r = (self.option.K, self.option.T, self.option.r)
         m1, m2 = self._calculate_moments()

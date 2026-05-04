@@ -1,6 +1,5 @@
 """Basket option contract on a portfolio of assets."""
 
-from typing import List, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -24,13 +23,13 @@ class BasketOption(BaseOption):
 
     def __init__(
         self,
-        initial_prices: Union[List[float], npt.NDArray[np.float64]],
+        initial_prices: list[float] | npt.NDArray[np.float64],
         k: float,
         t: float,
         r: float,
-        volatilities: Union[List[float], npt.NDArray[np.float64]],
+        volatilities: list[float] | npt.NDArray[np.float64],
         option_type: str,
-        weights: Union[List[float], npt.NDArray[np.float64]],
+        weights: list[float] | npt.NDArray[np.float64],
         corr_matrix: npt.NDArray[np.float64],
     ):
         prices_arr = np.asarray(initial_prices, dtype=float)

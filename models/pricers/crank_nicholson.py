@@ -1,6 +1,6 @@
 """Crank-Nicolson finite-difference Black-Scholes pricer."""
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from ..options import BaseOption
 from ._fd_common import solve_fd
@@ -34,7 +34,7 @@ class CrankNicolsonPricer(BasePricer):
         self.rannacher_steps = rannacher_steps
         self.cluster_density = cluster_density
 
-    def get_params(self) -> Dict[str, Any]:
+    def get_params(self) -> dict[str, Any]:
         """Returns the pricer configuration."""
         return {
             "num_steps": self.n_steps,
@@ -44,7 +44,7 @@ class CrankNicolsonPricer(BasePricer):
             "cluster_density": self.cluster_density,
         }
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Returns `(price, 0.0)` — deterministic scheme has no MC error."""
         return (
             solve_fd(

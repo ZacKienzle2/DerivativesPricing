@@ -9,7 +9,6 @@ through scipy least-squares with the standard no-butterfly constraints
 """
 
 import math
-from typing import Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -82,10 +81,10 @@ class SVICalibrator(BaseCalibrator):
         self,
         strikes: npt.NDArray,
         market: npt.NDArray,
-        f0: Optional[float] = None,
-        t: Optional[float] = None,
-        weights: Optional[npt.NDArray] = None,
-        x0: Optional[npt.NDArray] = None,
+        f0: float | None = None,
+        t: float | None = None,
+        weights: npt.NDArray | None = None,
+        x0: npt.NDArray | None = None,
         **kwargs,
     ) -> CalibrationResult:
         """Calibrates raw SVI to a market IV slice.
@@ -161,7 +160,7 @@ class SVICalibrator(BaseCalibrator):
         strikes: npt.NDArray,
         f0: float,
         t: float,
-    ) -> Tuple[npt.NDArray, npt.NDArray]:
+    ) -> tuple[npt.NDArray, npt.NDArray]:
         """Returns `(strikes, ivs)` evaluated from a fitted SVI slice."""
         ks = np.log(np.asarray(strikes, dtype=np.float64) / f0)
         ivs = np.empty_like(ks)

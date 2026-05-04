@@ -9,7 +9,6 @@ branch-cut issues for long maturities.
 
 import cmath
 import math
-from typing import Tuple
 
 from numba import njit
 
@@ -25,7 +24,7 @@ def heston_chf_re_im(
     eta: float,
     rho: float,
     v0: float,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """Heston risk-neutral chf of `log(S_T / S_0)` (Albrecher / Schoutens form).
 
     Args:
@@ -68,7 +67,7 @@ def bates_chf_re_im(
     lam: float,
     mu_j: float,
     sigma_j: float,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """Bates jump-diffusion chf (Heston + Merton jumps).
 
     Adds a compound Poisson factor `exp(lam*T*(exp(i*u*mu_J - 0.5*sigma_J^2*u^2) - 1))`

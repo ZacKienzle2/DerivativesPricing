@@ -1,6 +1,6 @@
 """Longstaff-Schwartz American-option pricer with stabilised regression."""
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -96,19 +96,19 @@ class LongstaffSchwartzPricer(BasePricer):
         num_steps: int,
         poly_degree: int = 3,
         use_crn: bool = True,
-        z_matrix: Optional[npt.NDArray[np.float64]] = None,
-        seed: Optional[int] = None,
+        z_matrix: npt.NDArray[np.float64] | None = None,
+        seed: int | None = None,
     ):
         super().__init__(option)
         self.num_sims = num_sims
         self.num_steps = num_steps
         self.poly_degree = poly_degree
         self.use_crn = use_crn
-        self.z_matrix: Optional[npt.NDArray[np.float64]] = z_matrix
-        self.convergence_data: Optional[npt.NDArray[np.float64]] = None
+        self.z_matrix: npt.NDArray[np.float64] | None = z_matrix
+        self.convergence_data: npt.NDArray[np.float64] | None = None
         self._rng = np.random.default_rng(seed)
 
-    def get_params(self) -> Dict[str, Any]:
+    def get_params(self) -> dict[str, Any]:
         """Returns the configuration for this pricer instance."""
         return {
             "num_sims": self.num_sims,
@@ -122,7 +122,7 @@ class LongstaffSchwartzPricer(BasePricer):
         """Draws standard normals for the simulation grid via PCG64."""
         return self._rng.standard_normal((self.num_sims, self.num_steps))
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         """Prices the option, returning `(price, standard_error)`."""
         if self.z_matrix is None:
             self.z_matrix = self._generate_z_matrix()

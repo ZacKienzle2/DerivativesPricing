@@ -1,7 +1,7 @@
 """Merton 1976 analytical jump-diffusion pricer."""
 
 import math
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import numpy as np
 from scipy.special import ndtr as norm_cdf
@@ -29,7 +29,7 @@ class MertonAnalyticalPricer(BasePricer):
         self.max_iter = max_iter
         self.stop_cond = stop_cond
 
-    def get_params(self) -> Dict[str, Any]:
+    def get_params(self) -> dict[str, Any]:
         return {
             "lam": self.lam,
             "mu_j": self.mu_j,
@@ -51,7 +51,7 @@ class MertonAnalyticalPricer(BasePricer):
                 -d1
             )
 
-    def price(self) -> Tuple[float, float]:
+    def price(self) -> tuple[float, float]:
         opt = self.option
         s, k, t, r, q, sigma = opt.S, opt.K, opt.T, opt.r, opt.q, opt.sigma
         is_call = opt.option_type == "call"

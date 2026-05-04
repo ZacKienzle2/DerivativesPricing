@@ -1,8 +1,9 @@
 """Default parameter presets surfaced through the dashboard."""
 
-from typing import Any, Dict, Mapping
+from collections.abc import Mapping
+from typing import Any
 
-PROCESS_LAB_PRESETS: Mapping[str, Dict[str, Any]] = {
+PROCESS_LAB_PRESETS: Mapping[str, dict[str, Any]] = {
     "GBM": {"s0": 100.0, "r": 0.05, "q": 0.0, "sigma": 0.2},
     "Heston": {
         "s0": 100.0, "v0": 0.04, "r": 0.05, "q": 0.0,
@@ -19,7 +20,7 @@ PROCESS_LAB_PRESETS: Mapping[str, Dict[str, Any]] = {
     },
 }
 
-HESTON_PRESETS: Mapping[str, Dict[str, float]] = {
+HESTON_PRESETS: Mapping[str, dict[str, float]] = {
     "Equity index (skew)": {
         "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.7, "v0": 0.04,
     },
@@ -37,7 +38,7 @@ HESTON_PRESETS: Mapping[str, Dict[str, float]] = {
     },
 }
 
-BATES_PRESETS: Mapping[str, Dict[str, float]] = {
+BATES_PRESETS: Mapping[str, dict[str, float]] = {
     "Light jumps": {
         "kappa": 2.0, "theta": 0.04, "eta": 0.3, "rho": -0.5, "v0": 0.04,
         "lam": 0.3, "mu_j": -0.04, "sigma_j": 0.10,

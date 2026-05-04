@@ -1,7 +1,6 @@
 """SABR stochastic-volatility process: Hagan analytic IV + path simulator."""
 
 import math
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -226,7 +225,7 @@ class SABRProcess(BaseProcess):
         )
 
     @property
-    def signature(self) -> Tuple:
+    def signature(self) -> tuple:
         return (
             type(self).__name__,
             self._f0, self._alpha, self._beta, self._rho, self._nu, self._r,
