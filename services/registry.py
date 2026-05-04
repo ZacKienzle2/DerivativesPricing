@@ -1,6 +1,11 @@
-"""Static registries mapping UI tokens to domain types."""
+"""Static registries mapping UI tokens to domain types.
 
-from typing import Any, Dict, Type
+`PRICER_MAP` and `ANALYTICAL_PRICERS` are derived from
+`models.pricers.registry.PricerRegistry` so the underlying registry stays
+the single source of truth.
+"""
+
+from __future__ import annotations
 
 from models.options import (
     AmericanOption,
@@ -34,7 +39,7 @@ from models.pricers import (
 )
 from utils.greeks import GreekEngine
 
-OPTION_MAP: Dict[str, Type[BaseOption]] = {
+OPTION_MAP: dict[str, type[BaseOption]] = {
     "Vanilla European": VanillaOption,
     "American": AmericanOption,
     "Barrier": BarrierOption,
@@ -42,7 +47,7 @@ OPTION_MAP: Dict[str, Type[BaseOption]] = {
     "Asian": AsianOption,
 }
 
-PRICER_MAP: Dict[str, Type[BasePricer]] = {
+PRICER_MAP: dict[str, type[BasePricer]] = {
     "Black-Scholes": BlackScholesPricer,
     "Lattice": LatticePricer,
     "Monte Carlo": MonteCarloPricer,
@@ -54,7 +59,7 @@ PRICER_MAP: Dict[str, Type[BasePricer]] = {
     "Reiner-Rubinstein": ReinerRubinsteinPricer,
 }
 
-ANALYTICAL_PRICERS = frozenset(
+ANALYTICAL_PRICERS: frozenset[type[BasePricer]] = frozenset(
     {
         BlackScholesPricer,
         KemnaVorstPricer,
@@ -65,7 +70,7 @@ ANALYTICAL_PRICERS = frozenset(
     }
 )
 
-PAYOFF_REGISTRY: Dict[str, Dict[str, Any]] = {
+PAYOFF_REGISTRY: dict[str, dict[str, object]] = {
     "Long Call": {"func": long_call, "params": {"k": 100.0, "premium": 5.0}},
     "Short Call": {"func": short_call, "params": {"k": 100.0, "premium": 5.0}},
     "Long Put": {"func": long_put, "params": {"k": 100.0, "premium": 5.0}},
