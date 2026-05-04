@@ -120,25 +120,41 @@ def _vectorised_bs_surface(
     q = float(base.get("q", 0.0))
     sigma = float(base.get("sigma", 0.2))
     overrides = {axis_map[x_key]: grid_x, axis_map[y_key]: grid_y}
-    s_arr = overrides.get("s", np.full_like(grid_x, s, dtype=np.float64))
-    k_arr = overrides.get("k", np.full_like(grid_x, k, dtype=np.float64))
-    t_arr = overrides.get("t", np.full_like(grid_x, t, dtype=np.float64))
-    sigma_arr = overrides.get("sigma", np.full_like(grid_x, sigma, dtype=np.float64))
+    s_arr = np.asarray(
+        overrides.get("s", np.broadcast_to(s, grid_x.shape)), dtype=np.float64
+    )
+    k_arr = np.asarray(
+        overrides.get("k", np.broadcast_to(k, grid_x.shape)), dtype=np.float64
+    )
+    t_arr = np.asarray(
+        overrides.get("t", np.broadcast_to(t, grid_x.shape)), dtype=np.float64
+    )
+    sigma_arr = np.asarray(
+        overrides.get("sigma", np.broadcast_to(sigma, grid_x.shape)),
+        dtype=np.float64,
+    )
     if np.any(t_arr <= 0) or np.any(sigma_arr <= 0):
         return None
-    sigma_sqrt_t = sigma_arr * np.sqrt(t_arr)
-    d1 = (
-        np.log(s_arr / k_arr) + (r - q + 0.5 * sigma_arr * sigma_arr) * t_arr
-    ) / sigma_sqrt_t
-    d2 = d1 - sigma_sqrt_t
+
     from scipy.special import ndtr
+
+    sqrt_t = np.sqrt(t_arr)
+    sigma_sqrt_t = sigma_arr * sqrt_t
+    sig2_half = 0.5 * sigma_arr * sigma_arr
+    d1 = np.log(s_arr / k_arr)
+    d1 += (r - q + sig2_half) * t_arr
+    d1 /= sigma_sqrt_t
+    d2 = d1 - sigma_sqrt_t
 
     disc_q = np.exp(-q * t_arr)
     disc_r = np.exp(-r * t_arr)
-    nd1, nd2 = ndtr(d1), ndtr(d2)
-    call = s_arr * disc_q * nd1 - k_arr * disc_r * nd2
-    put = k_arr * disc_r * (1.0 - nd2) - s_arr * disc_q * (1.0 - nd1)
-    return np.nan_to_num(call), np.nan_to_num(put)
+    nd1 = ndtr(d1)
+    nd2 = ndtr(d2)
+    sd_q = s_arr * disc_q
+    kd_r = k_arr * disc_r
+    call = sd_q * nd1 - kd_r * nd2
+    put = kd_r - kd_r * nd2 - sd_q + sd_q * nd1
+    return np.nan_to_num(call, copy=False), np.nan_to_num(put, copy=False)
 
 
 @cached()
