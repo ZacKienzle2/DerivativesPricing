@@ -121,14 +121,22 @@ def _mlmc_base_jit(
 class MLMCVanillaPricer(BasePricer):
     """Multilevel Monte Carlo pricer for European vanillas under GBM.
 
+    The default driver is Giles' adaptive allocation: a short pilot run
+    estimates per-level variances `V_l`, then the remaining sample budget
+    is split as `N_l ~ sqrt(V_l / C_l)` to minimise estimator variance for
+    fixed compute. Cost `C_l` is proxied by `base_steps * 2^l`. A static
+    `samples_per_level` tuple disables the pilot and runs the legacy
+    fixed-budget loop verbatim.
+
     Args:
         option: A `VanillaOption`.
         levels: Number of refinement levels above the coarsest grid. Total
             grids: `levels + 1`. Refinement factor is fixed at 2.
         base_steps: Steps on the coarsest grid (level 0).
-        samples_per_level: Iterable of length `levels + 1` giving the
-            sample budget for each level. If omitted, a geometric decay
-            heuristic is used.
+        samples_per_level: Iterable of length `levels + 1` overriding the
+            adaptive allocator with a fixed budget.
+        total_budget: Total sample budget for the adaptive allocator.
+        pilot_per_level: Pilot samples drawn per level when adaptive.
         seed: Optional PCG64 seed.
     """
 
@@ -138,6 +146,8 @@ class MLMCVanillaPricer(BasePricer):
         levels: int = 4,
         base_steps: int = 8,
         samples_per_level: tuple[int, ...] | None = None,
+        total_budget: int | None = None,
+        pilot_per_level: int = 128,
         seed: int | None = None,
     ):
         if not isinstance(option, VanillaOption):
@@ -145,13 +155,20 @@ class MLMCVanillaPricer(BasePricer):
         super().__init__(option)
         self.levels = levels
         self.base_steps = base_steps
-        if samples_per_level is None:
-            samples_per_level = tuple(
-                max(64, int(8192 / (4 ** lvl))) for lvl in range(levels + 1)
+        if samples_per_level is not None:
+            if len(samples_per_level) != levels + 1:
+                raise ValueError("samples_per_level must have length levels + 1.")
+            self.samples_per_level: tuple[int, ...] | None = tuple(
+                int(n) for n in samples_per_level
             )
-        if len(samples_per_level) != levels + 1:
-            raise ValueError("samples_per_level must have length levels + 1.")
-        self.samples_per_level = tuple(int(n) for n in samples_per_level)
+        else:
+            self.samples_per_level = None
+        self.total_budget = (
+            int(total_budget)
+            if total_budget is not None
+            else 8192 * (levels + 1)
+        )
+        self.pilot_per_level = max(2, int(pilot_per_level))
         self._rng = np.random.default_rng(seed)
         self.level_stats: tuple[MLMCLevelStat, ...] = ()
 
@@ -161,7 +178,59 @@ class MLMCVanillaPricer(BasePricer):
             "levels": self.levels,
             "base_steps": self.base_steps,
             "samples_per_level": self.samples_per_level,
+            "total_budget": self.total_budget,
+            "pilot_per_level": self.pilot_per_level,
         }
+
+    def _level_steps(self, lvl: int) -> tuple[int, int]:
+        """Returns `(fine, coarse)` step counts for level `lvl`."""
+        if lvl == 0:
+            return self.base_steps, 0
+        fine = self.base_steps * (2 ** lvl)
+        return fine, fine // 2
+
+    def _level_cost(self, lvl: int) -> float:
+        """Proxy compute cost: timesteps walked per sample at level `lvl`."""
+        fine, coarse = self._level_steps(lvl)
+        return float(fine + coarse)
+
+    def _draw_level(
+        self, lvl: int, n: int, is_call: bool
+    ) -> npt.NDArray[np.float64]:
+        """Returns level-`lvl` per-sample cash flows for `n` paths."""
+        opt = self.option
+        if lvl == 0:
+            z = self._rng.standard_normal((n, self.base_steps))
+            return _mlmc_base_jit(
+                opt.S, opt.K, opt.r, opt.q, opt.sigma, opt.T,
+                self.base_steps, is_call, z,
+            )
+        fine, coarse = self._level_steps(lvl)
+        z = self._rng.standard_normal((n, fine))
+        return _mlmc_level_jit(
+            opt.S, opt.K, opt.r, opt.q, opt.sigma, opt.T,
+            fine, coarse, is_call, z,
+        )
+
+    def _allocate(
+        self, variances: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.int64]:
+        """Splits `total_budget` across levels via `sqrt(V_l / C_l)` rule."""
+        costs = np.array(
+            [self._level_cost(lvl) for lvl in range(self.levels + 1)],
+            dtype=np.float64,
+        )
+        weights = np.sqrt(np.maximum(variances, 0.0) / costs)
+        s = weights.sum()
+        if s <= 0.0:
+            n_each = max(self.pilot_per_level, self.total_budget // (self.levels + 1))
+            return np.full(self.levels + 1, n_each, dtype=np.int64)
+        share = weights / s
+        budget = np.maximum(
+            np.ceil(self.total_budget * share).astype(np.int64),
+            self.pilot_per_level,
+        )
+        return budget
 
     def price(self) -> tuple[float, float]:
         """Returns `(price, standard_error)` from the MLMC telescoping sum."""
@@ -169,39 +238,55 @@ class MLMCVanillaPricer(BasePricer):
         is_call = opt.option_type == "call"
         df = math.exp(-opt.r * opt.T)
 
+        if self.samples_per_level is not None:
+            return self._price_fixed(is_call, df)
+        return self._price_adaptive(is_call, df)
+
+    def _price_fixed(self, is_call: bool, df: float) -> tuple[float, float]:
+        """Runs the legacy fixed-budget MLMC loop."""
+        assert self.samples_per_level is not None
         total = 0.0
         var_total = 0.0
-        stats = []
-
-        # Level 0
-        n_l = self.samples_per_level[0]
-        steps_l = self.base_steps
-        z = self._rng.standard_normal((n_l, steps_l))
-        payoffs = _mlmc_base_jit(
-            opt.S, opt.K, opt.r, opt.q, opt.sigma, opt.T,
-            steps_l, is_call, z,
-        )
-        mean_l = float(payoffs.mean())
-        var_l = float(payoffs.var(ddof=1)) if n_l > 1 else 0.0
-        total += mean_l
-        var_total += var_l / n_l
-        stats.append(MLMCLevelStat(n_l, mean_l, var_l))
-
-        # Levels 1..L
-        for lvl in range(1, self.levels + 1):
+        stats: list[MLMCLevelStat] = []
+        for lvl in range(self.levels + 1):
             n_l = self.samples_per_level[lvl]
-            fine = self.base_steps * (2 ** lvl)
-            coarse = fine // 2
-            z = self._rng.standard_normal((n_l, fine))
-            corrections = _mlmc_level_jit(
-                opt.S, opt.K, opt.r, opt.q, opt.sigma, opt.T,
-                fine, coarse, is_call, z,
-            )
-            mean_l = float(corrections.mean())
-            var_l = float(corrections.var(ddof=1)) if n_l > 1 else 0.0
+            samples = self._draw_level(lvl, n_l, is_call)
+            mean_l = float(samples.mean())
+            var_l = float(samples.var(ddof=1)) if n_l > 1 else 0.0
             total += mean_l
-            var_total += var_l / n_l
+            var_total += var_l / max(n_l, 1)
             stats.append(MLMCLevelStat(n_l, mean_l, var_l))
+        self.level_stats = tuple(stats)
+        return df * total, df * math.sqrt(var_total)
 
+    def _price_adaptive(self, is_call: bool, df: float) -> tuple[float, float]:
+        """Runs a pilot + variance-optimal allocation across levels."""
+        n_levels = self.levels + 1
+        pilot_payoffs: list[npt.NDArray[np.float64]] = []
+        pilot_var = np.zeros(n_levels, dtype=np.float64)
+        for lvl in range(n_levels):
+            samples = self._draw_level(lvl, self.pilot_per_level, is_call)
+            pilot_payoffs.append(samples)
+            pilot_var[lvl] = float(samples.var(ddof=1))
+
+        budget = self._allocate(pilot_var)
+
+        total = 0.0
+        var_total = 0.0
+        stats: list[MLMCLevelStat] = []
+        for lvl in range(n_levels):
+            n_target = int(budget[lvl])
+            n_extra = max(0, n_target - self.pilot_per_level)
+            if n_extra > 0:
+                extra = self._draw_level(lvl, n_extra, is_call)
+                samples = np.concatenate([pilot_payoffs[lvl], extra])
+            else:
+                samples = pilot_payoffs[lvl]
+            n_total = samples.shape[0]
+            mean_l = float(samples.mean())
+            var_l = float(samples.var(ddof=1)) if n_total > 1 else 0.0
+            total += mean_l
+            var_total += var_l / max(n_total, 1)
+            stats.append(MLMCLevelStat(n_total, mean_l, var_l))
         self.level_stats = tuple(stats)
         return df * total, df * math.sqrt(var_total)

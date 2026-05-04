@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import numpy as np
@@ -17,6 +19,26 @@ from .logging import get_logger
 from .registry import ANALYTICAL_PRICERS, GREEK_ENGINE, OPTION_MAP, PRICER_MAP
 
 _log = get_logger("pricing")
+
+_SURFACE_THREAD_CAP = 8
+
+
+def _surface_workers() -> int:
+    """Returns thread count for surface fan-out.
+
+    Capped to avoid over-subscribing cores already saturated by `prange`
+    inside JIT kernels. Honours the `DERIVATIVES_PRICING_SURFACE_WORKERS`
+    env override for benchmarking.
+    """
+    override = os.environ.get("DERIVATIVES_PRICING_SURFACE_WORKERS")
+    if override:
+        try:
+            n = int(override)
+            if n > 0:
+                return n
+        except ValueError:
+            pass
+    return min(_SURFACE_THREAD_CAP, max(1, (os.cpu_count() or 1)))
 
 
 def _validate_inputs(inputs: dict[str, Any]) -> None:
@@ -51,6 +73,7 @@ def get_option_and_pricer(
     return option, pricer_cls(option, **model_params)
 
 
+@cached()
 @timed("services.pricing.point")
 def get_point_pricing_context(inputs: dict[str, Any]) -> dict[str, Any]:
     """Returns price + Greeks for both call and put flavours of the option."""
@@ -201,11 +224,28 @@ def get_surface_data(
         shared_z_matrix = np.random.standard_normal((num_sims, num_steps))
     surface_c = np.empty(shape)
     surface_p = np.empty(shape)
-    for i, j in np.ndindex(shape):
+    indices = list(np.ndindex(shape))
+    grid_x_flat = grid_x.ravel()
+    grid_y_flat = grid_y.ravel()
+
+    def _price_idx(flat_idx: int) -> tuple[int, float, float]:
         c, p = _price_single_point(
             inputs, axis_map, x_key, y_key,
-            grid_x[i, j], grid_y[i, j], shared_z_matrix,
+            float(grid_x_flat[flat_idx]),
+            float(grid_y_flat[flat_idx]),
+            shared_z_matrix,
         )
+        return flat_idx, c, p
+
+    workers = _surface_workers()
+    if workers <= 1 or len(indices) <= 1:
+        results = (_price_idx(k) for k in range(len(indices)))
+    else:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            results = list(pool.map(_price_idx, range(len(indices))))
+
+    for flat_idx, c, p in results:
+        i, j = indices[flat_idx]
         surface_c[i, j] = c
         surface_p[i, j] = p
     return np.nan_to_num(surface_c), np.nan_to_num(surface_p)

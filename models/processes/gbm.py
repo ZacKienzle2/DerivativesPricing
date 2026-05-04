@@ -5,7 +5,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ..options import BaseOption
-from ..simulation import generate_paths_jit
+from ..simulation import generate_final_prices_jit, generate_paths_jit
 from .base import BaseProcess
 from .registry import autoregister
 
@@ -58,6 +58,18 @@ class GBMProcess(BaseProcess):
     ) -> npt.NDArray[np.float64]:
         """Simulates `num_sims` GBM paths over `[0, t]`."""
         return generate_paths_jit(
+            self._s0, t, self._r, self._q, self._sigma, num_steps, z
+        )
+
+    def simulate_terminal(
+        self,
+        num_sims: int,
+        num_steps: int,
+        t: float,
+        z: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Returns terminal prices via the closed-form log increment sum."""
+        return generate_final_prices_jit(
             self._s0, t, self._r, self._q, self._sigma, num_steps, z
         )
 

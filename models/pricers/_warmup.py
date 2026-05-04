@@ -21,7 +21,7 @@ def _warmup() -> None:
     from ..processes.bates import _bates_qe_jit
     from ..processes.heston import _heston_qe_jit
     from ..processes.local_vol import _bilinear_lookup, _local_vol_jit
-    from ..processes.rbergomi import _rbergomi_jit
+    from ..processes.rbergomi import _rbergomi_hybrid_jit
     from ..processes.sabr import _sabr_euler_jit, hagan_lognormal_vol_jit, sabr_price_jit
     from ..simulation import generate_paths_jit
     try:
@@ -155,10 +155,12 @@ def _warmup() -> None:
     svi_total_variance(0.0, 0.04, 0.1, -0.3, 0.0, 0.1)
     svi_iv_jit(0.0, 1.0, 0.04, 0.1, -0.3, 0.0, 0.1)
 
-    chol_rb = np.eye(2, dtype=np.float64) * 0.5
-    z_rb = np.zeros((2, 2, 2), dtype=np.float64)
-    _rbergomi_jit(
-        100.0, 0.05, 0.0, 0.04, 1.0, -0.5, 0.1, 1.0, 2, chol_rb, z_rb,
+    z_v_rb = np.zeros((2, 2), dtype=np.float64)
+    z_spot_rb = np.zeros((2, 2), dtype=np.float64)
+    w_h_rb = np.zeros((2, 2), dtype=np.float64)
+    _rbergomi_hybrid_jit(
+        100.0, 0.05, 0.0, 0.04, 1.0, -0.5, 0.3, 1.0, 2,
+        z_v_rb, z_spot_rb, w_h_rb,
     )
 
     if _vanilla_pathwise_greeks_jit is not None:

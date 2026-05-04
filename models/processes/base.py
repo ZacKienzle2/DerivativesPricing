@@ -56,6 +56,22 @@ class BaseProcess(ABC):
         """Hashable identifier for caching purposes."""
         return (type(self).__name__, self.s0, self.r)
 
+    def simulate_terminal(
+        self,
+        num_sims: int,
+        num_steps: int,
+        t: float,
+        z: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Returns terminal asset prices `S_T` only.
+
+        Default implementation slices the last column of `simulate_paths`,
+        so any process gains a working hook for free. Subclasses with a
+        cheaper terminal sampler (e.g. GBM via the closed-form sum of log
+        increments) should override to skip building the full path tensor.
+        """
+        return self.simulate_paths(num_sims, num_steps, t, z)[..., -1]
+
     @property
     def supports_analytic_european(self) -> bool:
         """Whether `analytic_european_price` is implemented."""

@@ -27,7 +27,7 @@ def test_all_processes_simulate_clean_paths():
             xi0=0.04, eta=0.5, rho=-0.5, hurst=0.3,
         ),
     }
-    noise_dims = {"GBM": 1, "Heston": 2, "Bates": 3, "SABR": 2, "RBergomi": 2}
+    noise_dims = {"GBM": 1, "Heston": 2, "Bates": 3, "SABR": 2, "RBergomi": 3}
     for name in presets:
         if name not in list_processes():
             continue

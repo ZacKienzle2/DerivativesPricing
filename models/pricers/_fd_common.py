@@ -121,7 +121,7 @@ def _solve_explicit_jit(
     is_call: bool,
     k: float,
 ) -> npt.NDArray[np.float64]:
-    """Explicit FTCS backward sweep with rolling buffer."""
+    """Explicit FTCS backward sweep with ping-pong rolling buffer."""
     n = vs.size
     n_steps = lower_bc.size - 1
 
@@ -142,8 +142,7 @@ def _solve_explicit_jit(
             for i in range(1, n - 1):
                 if exercise[i - 1] > vals_curr[i]:
                     vals_curr[i] = exercise[i - 1]
-        for i in range(n):
-            vals_next[i] = vals_curr[i]
+        vals_next, vals_curr = vals_curr, vals_next
     return vals_next
 
 
@@ -188,7 +187,6 @@ def _solve_implicit_jit(
         vals_next = np.maximum(vs - k, 0.0)
     else:
         vals_next = np.maximum(k - vs, 0.0)
-    vals_curr = np.empty(n)
     rhs = np.empty(n_int)
     interior = np.empty(n_int)
 
@@ -210,16 +208,14 @@ def _solve_implicit_jit(
         else:
             _thomas_solve(sub, c_prime, inv_diag, rhs, interior)
 
-        vals_curr[0] = lower_bc[j]
-        vals_curr[n - 1] = upper_bc[j]
+        vals_next[0] = lower_bc[j]
+        vals_next[n - 1] = upper_bc[j]
         for i in range(n_int):
-            vals_curr[i + 1] = interior[i]
+            vals_next[i + 1] = interior[i]
         if is_american and not use_psor:
             for i in range(1, n - 1):
-                if exercise[i - 1] > vals_curr[i]:
-                    vals_curr[i] = exercise[i - 1]
-        for i in range(n):
-            vals_next[i] = vals_curr[i]
+                if exercise[i - 1] > vals_next[i]:
+                    vals_next[i] = exercise[i - 1]
     return vals_next
 
 
@@ -295,7 +291,6 @@ def _solve_cn_jit(
         vals_next = np.maximum(vs - k, 0.0)
     else:
         vals_next = np.maximum(k - vs, 0.0)
-    vals_curr = np.empty(n)
     rhs = np.empty(n_int)
     interior = np.empty(n_int)
 
@@ -339,16 +334,14 @@ def _solve_cn_jit(
             else:
                 _thomas_solve(sub_l, cp_l, id_l, rhs, interior)
 
-        vals_curr[0] = lower_bc[j]
-        vals_curr[n - 1] = upper_bc[j]
+        vals_next[0] = lower_bc[j]
+        vals_next[n - 1] = upper_bc[j]
         for i in range(n_int):
-            vals_curr[i + 1] = interior[i]
+            vals_next[i + 1] = interior[i]
         if is_american and not use_psor:
             for i in range(1, n - 1):
-                if exercise[i - 1] > vals_curr[i]:
-                    vals_curr[i] = exercise[i - 1]
-        for i in range(n):
-            vals_next[i] = vals_curr[i]
+                if exercise[i - 1] > vals_next[i]:
+                    vals_next[i] = exercise[i - 1]
     return vals_next
 
 
@@ -397,29 +390,33 @@ def _continuous_operator(
     `L V[i] = L_a[i] V[i-1] + L_b[i] V[i] + L_c[i] V[i+1]`
     discretises `0.5 sigma^2 S^2 V_SS + (r-q) S V_S - r V` on the
     (possibly non-uniform) grid `vs`. Boundary slots `L[0]` and `L[N]` are
-    left at zero; the solver applies Dirichlet BCs separately.
+    left at zero; the solver applies Dirichlet BCs separately. Coefficients
+    are evaluated as a single vectorised numpy expression on the interior
+    slice; the Python loop has been hoisted out for cache locality and
+    BLAS-friendly memory access.
     """
     n = vs.size
     la = np.zeros(n)
     lb = np.zeros(n)
     lc = np.zeros(n)
-    sig2 = sigma * sigma
-    for i in range(1, n - 1):
-        s_i = vs[i]
-        d_m = vs[i] - vs[i - 1]
-        d_p = vs[i + 1] - vs[i]
-        sum_d = d_m + d_p
-        a_diff = 2.0 / (d_m * sum_d)
-        b_diff = -2.0 / (d_m * d_p)
-        c_diff = 2.0 / (d_p * sum_d)
-        a_drift = -d_p / (d_m * sum_d)
-        b_drift = (d_p - d_m) / (d_m * d_p)
-        c_drift = d_m / (d_p * sum_d)
-        sig2_s2 = 0.5 * sig2 * s_i * s_i
-        rqS = (r - q) * s_i
-        la[i] = sig2_s2 * a_diff + rqS * a_drift
-        lb[i] = sig2_s2 * b_diff + rqS * b_drift - r
-        lc[i] = sig2_s2 * c_diff + rqS * c_drift
+    if n < 3:
+        return la, lb, lc
+    s_i = vs[1:-1]
+    d_m = s_i - vs[:-2]
+    d_p = vs[2:] - s_i
+    sum_d = d_m + d_p
+    inv_dm_sum = 1.0 / (d_m * sum_d)
+    inv_dp_sum = 1.0 / (d_p * sum_d)
+    inv_dm_dp = 1.0 / (d_m * d_p)
+    sig2_s2 = 0.5 * sigma * sigma * s_i * s_i
+    rq_s = (r - q) * s_i
+    la[1:-1] = sig2_s2 * (2.0 * inv_dm_sum) + rq_s * (-d_p * inv_dm_sum)
+    lb[1:-1] = (
+        sig2_s2 * (-2.0 * inv_dm_dp)
+        + rq_s * ((d_p - d_m) * inv_dm_dp)
+        - r
+    )
+    lc[1:-1] = sig2_s2 * (2.0 * inv_dp_sum) + rq_s * (d_m * inv_dp_sum)
     return la, lb, lc
 
 

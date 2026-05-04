@@ -403,8 +403,14 @@ class MonteCarloPricer(BasePricer):
                 opt.S, opt.T, opt.r, opt.q, opt.sigma, self.num_steps, z
             )
         else:
-            paths = self._generate_paths()
-            final = paths[:, -1]
+            process = self._process_for()
+            if process.noise_dim == 1:
+                z = self._ensure_z()
+            else:
+                z = self._multi_dim_z(process.noise_dim)
+            final = process.simulate_terminal(
+                self.num_sims, self.num_steps, opt.T, z
+            )
         return (
             np.maximum(final - opt.K, 0.0)
             if is_call
@@ -455,16 +461,13 @@ class MonteCarloPricer(BasePricer):
         is_call = opt.option_type == "call"
         paths = self._generate_paths()
 
+        arith, geom = _asian_dual_average_jit(paths)
         if opt.avg_type == "geometric":
-            sample = paths[:, 1:]
-            geom = np.exp(np.log(sample).mean(axis=1))
             return (
                 np.maximum(geom - opt.K, 0.0)
                 if is_call
                 else np.maximum(opt.K - geom, 0.0)
             )
-
-        arith, geom = _asian_dual_average_jit(paths)
         arith_payoff = (
             np.maximum(arith - opt.K, 0.0)
             if is_call

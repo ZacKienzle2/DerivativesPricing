@@ -1,5 +1,6 @@
 """Longstaff-Schwartz American-option pricer with stabilised regression."""
 
+import math
 from typing import Any
 
 import numpy as np
@@ -22,10 +23,15 @@ def _backward_induction_jit(
 ) -> npt.NDArray[np.float64]:
     """Performs backward induction for the Longstaff-Schwartz algorithm.
 
-    Asset prices are normalised by their per-step ITM maximum before fitting
-    the polynomial basis. This drops the regression-matrix condition number
-    by orders of magnitude and lets the linear solve stay stable for
-    `poly_degree >= 3`. Continuation values are evaluated via Horner's rule.
+    Spot prices at each step are mapped to the Chebyshev domain `[-1, 1]`
+    via an affine rescaling fitted to the per-step ITM range. The
+    Chebyshev basis is near-orthogonal under uniform spot densities, so
+    the per-step Gram matrix is well-conditioned and a normal-equations
+    solve via `np.linalg.solve` replaces the SVD-backed `np.linalg.lstsq`
+    used previously. Basis polynomials and Gram contributions are
+    accumulated in one pass per sample to avoid materialising a Vandermonde
+    matrix, dropping per-step work from `O(n_itm * n_basis^2 + n_basis^3)`
+    SVD to `O(n_itm * n_basis^2)` with a tight inner loop.
 
     Args:
         paths: Simulated asset price paths, shape (num_sims, num_steps + 1).
@@ -39,14 +45,17 @@ def _backward_induction_jit(
         Cash-flow vector at the first exercise step, shape (num_sims,).
     """
     num_steps = paths.shape[1] - 1
-    df = np.exp(-r * dt)
+    df = math.exp(-r * dt)
+    n_basis = poly_degree + 1
 
     if is_call:
         cash_flows = np.maximum(paths[:, -1] - k, 0.0)
     else:
         cash_flows = np.maximum(k - paths[:, -1], 0.0)
 
-    n_basis = poly_degree + 1
+    basis = np.empty(n_basis)
+    gram = np.empty((n_basis, n_basis))
+    rhs = np.empty(n_basis)
 
     for t in range(num_steps - 1, 0, -1):
         cash_flows *= df
@@ -57,31 +66,66 @@ def _backward_induction_jit(
             exercise = np.maximum(k - s_t, 0.0)
 
         itm_idx = np.where(exercise > 0.0)[0]
-        if itm_idx.size <= poly_degree:
+        n_itm = itm_idx.size
+        if n_itm <= poly_degree:
             continue
 
-        x = s_t[itm_idx]
-        y = cash_flows[itm_idx]
-        ex = exercise[itm_idx]
+        x_min = s_t[itm_idx[0]]
+        x_max = x_min
+        for j in range(1, n_itm):
+            xv = s_t[itm_idx[j]]
+            if xv < x_min:
+                x_min = xv
+            elif xv > x_max:
+                x_max = xv
+        span = x_max - x_min
+        if span <= 0.0:
+            continue
+        scale = 2.0 / span
+        offset = -1.0 - scale * x_min
 
-        x_max = np.max(np.abs(x))
-        if x_max == 0.0:
-            x_max = 1.0
-        x_n = x / x_max
+        for a in range(n_basis):
+            rhs[a] = 0.0
+            for b in range(n_basis):
+                gram[a, b] = 0.0
 
-        vander = np.empty((x_n.size, n_basis))
-        for c in range(n_basis):
-            vander[:, c] = x_n ** (n_basis - 1 - c)
+        for j in range(n_itm):
+            idx = itm_idx[j]
+            ui = scale * s_t[idx] + offset
+            basis[0] = 1.0
+            if n_basis > 1:
+                basis[1] = ui
+            for c in range(2, n_basis):
+                basis[c] = 2.0 * ui * basis[c - 1] - basis[c - 2]
+            yi = cash_flows[idx]
+            for a in range(n_basis):
+                rhs[a] += basis[a] * yi
+                ba = basis[a]
+                for b in range(a, n_basis):
+                    gram[a, b] += ba * basis[b]
 
-        coeffs = np.linalg.lstsq(vander, y, rcond=-1.0)[0]
+        for a in range(n_basis):
+            for b in range(a + 1, n_basis):
+                gram[b, a] = gram[a, b]
 
-        continuation = np.full(x_n.size, coeffs[0])
-        for c in range(1, n_basis):
-            continuation = continuation * x_n + coeffs[c]
+        coeffs = np.linalg.solve(gram, rhs)
 
-        for j in range(itm_idx.size):
-            if ex[j] > continuation[j]:
-                cash_flows[itm_idx[j]] = ex[j]
+        for j in range(n_itm):
+            idx = itm_idx[j]
+            ui = scale * s_t[idx] + offset
+            t0 = 1.0
+            cv = coeffs[0]
+            if n_basis > 1:
+                t1 = ui
+                cv += coeffs[1] * t1
+                for c in range(2, n_basis):
+                    tk = 2.0 * ui * t1 - t0
+                    cv += coeffs[c] * tk
+                    t0 = t1
+                    t1 = tk
+            ex_j = exercise[idx]
+            if ex_j > cv:
+                cash_flows[idx] = ex_j
 
     return cash_flows
 
