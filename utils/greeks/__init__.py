@@ -12,6 +12,7 @@ from .calculators import (
 )
 from .engine import GreekEngine
 from .pathwise import AsianMCGreeks, VanillaMCGreeks
+from .registry import GreekCalculatorRegistry
 from .sensitivities import CRNSensitivities, GreekShifts
 
 __all__ = [
@@ -20,6 +21,7 @@ __all__ = [
     "CRNSensitivities",
     "FiniteDifferenceCalculator",
     "GreekCalculator",
+    "GreekCalculatorRegistry",
     "GreekEngine",
     "GreekShifts",
     "IncompatibleCalculatorError",
