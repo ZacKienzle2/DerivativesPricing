@@ -38,7 +38,10 @@ class ExplicitFDPricer(BasePricer):
         """Returns `(price, 0.0)` — deterministic scheme has no MC error."""
         return (
             solve_fd(
-                self.option, self.n_steps, self.n_points, "explicit",
+                self.option,
+                self.n_steps,
+                self.n_points,
+                "explicit",
                 cluster_density=self.cluster_density,
             ),
             0.0,
