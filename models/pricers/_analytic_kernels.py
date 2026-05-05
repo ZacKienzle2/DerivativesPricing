@@ -7,7 +7,9 @@ variate routines) without object-mode fallback.
 
 import math
 
-from numba import njit
+import numpy as np
+import numpy.typing as npt
+from numba import njit, prange
 
 _INV_SQRT_2 = 0.7071067811865476
 
@@ -182,3 +184,88 @@ def kemna_vorst_price_jit(
     if is_call:
         return forward * norm_cdf(d1) - k * disc * norm_cdf(d2)
     return k * disc * norm_cdf(-d2) - forward * norm_cdf(-d1)
+
+
+@njit(parallel=True, fastmath=True, cache=True, boundscheck=False)
+def bs_greek_surface_jit(
+    s_arr: npt.NDArray[np.float64],
+    t_arr: npt.NDArray[np.float64],
+    k: float,
+    r: float,
+    q: float,
+    sigma: float,
+    is_call: bool,
+    out: npt.NDArray[np.float64],
+) -> None:
+    """Fills `out[6, ns, nt]` with BS price + 5 Greeks across an `(S, T)` grid.
+
+    Single parallel sweep over the spot axis. Inner time loop is sequential
+    so adjacent `(s_i, t_j)` evaluations stay warm in cache. `out` must be
+    pre-allocated as `(6, s_arr.size, t_arr.size)` so callers can swap layouts
+    without touching this kernel.
+
+    Output channel order matches `bs_full_greeks_jit`:
+    `(price, delta, gamma, vega, theta, rho)`.
+
+    Args:
+        s_arr: Spot grid.
+        t_arr: Maturity grid.
+        k, r, q, sigma: Fixed contract / market parameters.
+        is_call: True for call.
+        out: Pre-allocated output tensor.
+    """
+    ns = s_arr.shape[0]
+    nt = t_arr.shape[0]
+    for i in prange(ns):
+        s = s_arr[i]
+        for j in range(nt):
+            price, delta, gamma, vega, theta, rho = bs_full_greeks_jit(
+                s, k, t_arr[j], r, q, sigma, is_call,
+            )
+            out[0, i, j] = price
+            out[1, i, j] = delta
+            out[2, i, j] = gamma
+            out[3, i, j] = vega
+            out[4, i, j] = theta
+            out[5, i, j] = rho
+
+
+@njit(parallel=True, fastmath=True, cache=True, boundscheck=False)
+def bs_portfolio_aggregate_jit(
+    s_arr: npt.NDArray[np.float64],
+    k_arr: npt.NDArray[np.float64],
+    t_arr: npt.NDArray[np.float64],
+    r_arr: npt.NDArray[np.float64],
+    q_arr: npt.NDArray[np.float64],
+    sigma_arr: npt.NDArray[np.float64],
+    is_call_arr: npt.NDArray[np.bool_],
+    qty_arr: npt.NDArray[np.float64],
+) -> tuple[float, float, float, float, float, float]:
+    """Quantity-weighted Greek aggregation over a vanilla portfolio.
+
+    Parallel reduction across positions. Each thread accumulates locally and
+    the runtime fuses the partials at the `prange` join.
+
+    Returns:
+        Tuple `(price, delta, gamma, vega, theta, rho)`.
+    """
+    n = s_arr.shape[0]
+    p_acc = 0.0
+    d_acc = 0.0
+    g_acc = 0.0
+    v_acc = 0.0
+    th_acc = 0.0
+    rh_acc = 0.0
+    for i in prange(n):
+        price, delta, gamma, vega, theta, rho = bs_full_greeks_jit(
+            s_arr[i], k_arr[i], t_arr[i], r_arr[i], q_arr[i], sigma_arr[i],
+            is_call_arr[i],
+        )
+        q = qty_arr[i]
+        p_acc += q * price
+        d_acc += q * delta
+        g_acc += q * gamma
+        v_acc += q * vega
+        th_acc += q * theta
+        rh_acc += q * rho
+    return p_acc, d_acc, g_acc, v_acc, th_acc, rh_acc

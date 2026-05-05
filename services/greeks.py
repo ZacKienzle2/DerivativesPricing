@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import numpy as np
 
 from ._cache import cached
-from .pricing import get_option_and_pricer
+from .pricing import _surface_workers, get_option_and_pricer
 from .registry import GREEK_ENGINE
 
 _GREEK_KEYS: tuple[str, ...] = ("delta", "gamma", "vega", "theta", "rho")
@@ -17,9 +18,12 @@ _GREEK_KEYS: tuple[str, ...] = ("delta", "gamma", "vega", "theta", "rho")
 def get_greek_data(
     inputs: dict[str, Any], s_range: np.ndarray
 ) -> tuple[dict[str, list[float]], dict[str, list[float]]]:
-    """Returns per-strike Greek series for both call and put flavours."""
-    call_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
-    put_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
+    """Returns per-strike Greek series for both call and put flavours.
+
+    Fan-out across spot points uses a thread pool capped to
+    `_surface_workers()` to mirror the surface code path and avoid
+    over-subscribing JIT-internal `prange` threads.
+    """
     greek_method = inputs.get("model_params", {}).get("greek_method", "default")
 
     z_matrix = None
@@ -29,11 +33,10 @@ def get_greek_data(
         num_steps = model_params.get("num_steps", 100)
         z_matrix = np.random.standard_normal((num_sims, num_steps))
 
-    for s_val in s_range:
+    def _greeks_at(s_val: float) -> tuple[dict[str, Any], dict[str, Any]]:
         local = inputs.copy()
         local["contract_params"] = inputs["contract_params"].copy()
-        local["contract_params"]["s"] = s_val
-
+        local["contract_params"]["s"] = float(s_val)
         _, pricer_c = get_option_and_pricer(local, "call")
         _, pricer_p = get_option_and_pricer(local, "put")
         if z_matrix is not None:
@@ -41,13 +44,31 @@ def get_greek_data(
                 pricer_c.z_matrix = z_matrix
             if hasattr(pricer_p, "z_matrix"):
                 pricer_p.z_matrix = z_matrix
+        g_c = GREEK_ENGINE.get_calculator(pricer_c, greek_method).calculate()
+        g_p = GREEK_ENGINE.get_calculator(pricer_p, greek_method).calculate()
+        return g_c, g_p
 
-        greeks_c = GREEK_ENGINE.get_calculator(pricer_c, greek_method).calculate()
-        greeks_p = GREEK_ENGINE.get_calculator(pricer_p, greek_method).calculate()
+    n_pts = len(s_range)
+    workers = _surface_workers()
+    if workers <= 1 or n_pts <= 1:
+        pairs = [_greeks_at(s) for s in s_range]
+    else:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            pairs = list(pool.map(_greeks_at, s_range))
+
+    call_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
+    put_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
+    for greeks_c, greeks_p in pairs:
         for key in _GREEK_KEYS:
             call_greeks[key].append(greeks_c.get(key, np.nan))
             put_greeks[key].append(greeks_p.get(key, np.nan))
     return call_greeks, put_greeks
+
+
+_PORTFOLIO_KEYS: tuple[str, ...] = (
+    "price", "delta", "gamma", "vega", "theta", "rho",
+)
+_GREEK_CHANNEL: dict[str, int] = {key: idx for idx, key in enumerate(_PORTFOLIO_KEYS)}
 
 
 @cached()
@@ -61,49 +82,56 @@ def compute_greek_surface(
     is_call: bool,
     greek: str,
 ) -> np.ndarray:
-    """Computes a 2D `(S, T)` surface for a single Black-Scholes Greek."""
-    from models.pricers._analytic_kernels import bs_full_greeks_jit
+    """Computes a 2D `(S, T)` surface for a single Black-Scholes Greek.
 
-    idx = {"price": 0, "delta": 1, "gamma": 2, "vega": 3, "theta": 4, "rho": 5}
-    if greek not in idx:
+    Dispatches a single vectorised parallel JIT call instead of a Python
+    double loop over scalar `bs_full_greeks_jit` evaluations.
+    """
+    from models.pricers._analytic_kernels import bs_greek_surface_jit
+
+    if greek not in _GREEK_CHANNEL:
         raise ValueError(f"Unknown greek: {greek!r}")
-    pos = idx[greek]
-    out = np.empty((s_range.size, t_range.size))
-    for i in range(s_range.size):
-        for j in range(t_range.size):
-            tup = bs_full_greeks_jit(
-                float(s_range[i]), k, float(t_range[j]),
-                r, q, sigma, is_call,
-            )
-            out[i, j] = tup[pos]
-    return out
-
-
-_PORTFOLIO_KEYS: tuple[str, ...] = (
-    "price", "delta", "gamma", "vega", "theta", "rho",
-)
+    s_arr = np.ascontiguousarray(s_range, dtype=np.float64)
+    t_arr = np.ascontiguousarray(t_range, dtype=np.float64)
+    out = np.empty((6, s_arr.size, t_arr.size), dtype=np.float64)
+    bs_greek_surface_jit(s_arr, t_arr, k, r, q, sigma, is_call, out)
+    return out[_GREEK_CHANNEL[greek]]
 
 
 @cached()
 def aggregate_portfolio_greeks(
     positions: list[dict[str, Any]],
 ) -> dict[str, float]:
-    """Sums Black-Scholes Greeks across a list of vanilla option positions."""
-    from models.pricers._analytic_kernels import bs_full_greeks_jit
+    """Sums Black-Scholes Greeks across a list of vanilla option positions.
 
-    agg = {k: 0.0 for k in _PORTFOLIO_KEYS}
-    for pos in positions:
-        is_call = pos.get("option_type", "call") == "call"
-        qty = float(pos.get("quantity", 1))
-        tup = bs_full_greeks_jit(
-            float(pos["s"]),
-            float(pos["k"]),
-            float(pos["t"]),
-            float(pos["r"]),
-            float(pos.get("q", 0.0)),
-            float(pos["sigma"]),
-            is_call,
-        )
-        for key, val in zip(_PORTFOLIO_KEYS, tup):
-            agg[key] += qty * val
-    return agg
+    Marshals positions into contiguous float arrays and dispatches a single
+    parallel reduction kernel.
+    """
+    from models.pricers._analytic_kernels import bs_portfolio_aggregate_jit
+
+    n = len(positions)
+    if n == 0:
+        return {key: 0.0 for key in _PORTFOLIO_KEYS}
+
+    s_arr = np.empty(n, dtype=np.float64)
+    k_arr = np.empty(n, dtype=np.float64)
+    t_arr = np.empty(n, dtype=np.float64)
+    r_arr = np.empty(n, dtype=np.float64)
+    q_arr = np.empty(n, dtype=np.float64)
+    sigma_arr = np.empty(n, dtype=np.float64)
+    is_call_arr = np.empty(n, dtype=np.bool_)
+    qty_arr = np.empty(n, dtype=np.float64)
+    for i, pos in enumerate(positions):
+        s_arr[i] = float(pos["s"])
+        k_arr[i] = float(pos["k"])
+        t_arr[i] = float(pos["t"])
+        r_arr[i] = float(pos["r"])
+        q_arr[i] = float(pos.get("q", 0.0))
+        sigma_arr[i] = float(pos["sigma"])
+        is_call_arr[i] = pos.get("option_type", "call") == "call"
+        qty_arr[i] = float(pos.get("quantity", 1))
+
+    totals = bs_portfolio_aggregate_jit(
+        s_arr, k_arr, t_arr, r_arr, q_arr, sigma_arr, is_call_arr, qty_arr,
+    )
+    return {key: float(val) for key, val in zip(_PORTFOLIO_KEYS, totals)}

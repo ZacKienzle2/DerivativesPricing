@@ -10,6 +10,41 @@ from models.options import AmericanOption, AsianOption, BaseOption
 from .base_pricer import BasePricer
 
 
+@njit(cache=True, fastmath=True, inline="always", boundscheck=False)
+def _uniform_lerp(
+    a: float,
+    av: np.ndarray,
+    va: np.ndarray,
+    n_avgs: int,
+) -> float:
+    """O(1) linear interp on a uniformly-spaced grid with endpoint clamping.
+
+    The averages grid `av` is built as `av[m] = av[0] + (av[-1]-av[0])*m/(n-1)`,
+    so the bin index for query `a` is recoverable arithmetically without a search.
+
+    Args:
+        a: Query point.
+        av: Uniform grid of length `n_avgs`; only endpoints define the bracket.
+        va: Function values at the same grid points.
+        n_avgs: Length of `av` and `va`.
+
+    Returns:
+        Linear interpolant clamped to `va[0]` / `va[n_avgs-1]` outside the grid.
+    """
+    mn = av[0]
+    mx = av[n_avgs - 1]
+    if mx <= mn or a <= mn:
+        return va[0]
+    if a >= mx:
+        return va[n_avgs - 1]
+    frac = (a - mn) * (n_avgs - 1) / (mx - mn)
+    idx = int(frac)
+    if idx >= n_avgs - 1:
+        idx = n_avgs - 2
+    w = frac - idx
+    return va[idx] * (1.0 - w) + va[idx + 1] * w
+
+
 @njit(fastmath=True, cache=True, boundscheck=False)
 def _european_american_jit(
     s: float,
@@ -159,8 +194,8 @@ def _asian_hull_white_jit(
                 a = averages[i, j, m]
                 a_up = (a * steps_done + sup) * inv_next
                 a_dn = (a * steps_done + sdn) * inv_next
-                v_up = np.interp(a_up, up_av, up_va)
-                v_dn = np.interp(a_dn, dn_av, dn_va)
+                v_up = _uniform_lerp(a_up, up_av, up_va, n_avgs)
+                v_dn = _uniform_lerp(a_dn, dn_av, dn_va, n_avgs)
                 values[i, j, m] = (p * v_up + (1.0 - p) * v_dn) * df
 
     return values[0, 0, 0]
