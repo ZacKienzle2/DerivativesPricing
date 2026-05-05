@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import os
-from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import numpy as np
@@ -13,64 +11,40 @@ from models.options import BaseOption
 from models.pricers import BasePricer
 
 from ._cache import cached
+from ._request import PricingRequest
 from ._timing import timed
 from ._validation import ValidationError
 from .logging import get_logger
-from .registry import ANALYTICAL_PRICERS, GREEK_ENGINE, OPTION_MAP, PRICER_MAP
+from .registry import GREEK_ENGINE
 
 _log = get_logger("pricing")
 
-_SURFACE_THREAD_CAP = 8
-
-
-def _surface_workers() -> int:
-    """Returns thread count for surface fan-out.
-
-    Capped to avoid over-subscribing cores already saturated by `prange`
-    inside JIT kernels. Honours the `DERIVATIVES_PRICING_SURFACE_WORKERS`
-    env override for benchmarking.
-    """
-    override = os.environ.get("DERIVATIVES_PRICING_SURFACE_WORKERS")
-    if override:
-        try:
-            n = int(override)
-            if n > 0:
-                return n
-        except ValueError:
-            pass
-    return min(_SURFACE_THREAD_CAP, max(1, (os.cpu_count() or 1)))
-
-
-def _validate_inputs(inputs: dict[str, Any]) -> None:
-    """Asserts the dashboard input bundle has the keys we depend on."""
-    if "option_type" not in inputs or inputs["option_type"] not in OPTION_MAP:
-        raise ValidationError(
-            f"Unknown option_type {inputs.get('option_type')!r}"
-        )
-    if "pricer_type" not in inputs or inputs["pricer_type"] not in PRICER_MAP:
-        raise ValidationError(
-            f"Unknown pricer_type {inputs.get('pricer_type')!r}"
-        )
-    if "contract_params" not in inputs:
-        raise ValidationError("inputs missing contract_params")
+_SHARED_Z_PRICERS: frozenset[str] = frozenset({"Monte Carlo", "Longstaff-Schwartz"})
+_SURFACE_FAILURE_EXCEPTIONS: tuple[type[BaseException], ...] = (
+    ValidationError,
+    ValueError,
+    ArithmeticError,
+)
 
 
 def get_option_and_pricer(
-    inputs: dict[str, Any], option_flavour: str | None = None
+    inputs: PricingRequest | dict[str, Any],
+    option_flavour: str | None = None,
 ) -> tuple[BaseOption, BasePricer]:
-    """Builds the configured option contract and pricer instance."""
-    _validate_inputs(inputs)
-    contract_params = inputs["contract_params"].copy()
-    if option_flavour:
-        contract_params["option_type"] = option_flavour
-    option_cls = OPTION_MAP[inputs["option_type"]]
-    pricer_cls = PRICER_MAP[inputs["pricer_type"]]
-    option = option_cls(**contract_params)
-    model_params = inputs.get("model_params", {}).copy()
-    model_params.pop("greek_method", None)
-    if pricer_cls in ANALYTICAL_PRICERS:
-        return option, pricer_cls(option)
-    return option, pricer_cls(option, **model_params)
+    """Builds the configured option contract and pricer instance.
+
+    Accepts either a `PricingRequest` (preferred) or a UI-shaped dict
+    (legacy). Dicts are validated and converted on entry.
+    """
+    if isinstance(inputs, PricingRequest):
+        request = (
+            inputs
+            if option_flavour is None
+            else inputs.with_overrides(option_flavour=option_flavour)
+        )
+    else:
+        request = PricingRequest.from_dict(inputs, option_flavour=option_flavour)
+    return request.build()
 
 
 @cached()
@@ -79,17 +53,18 @@ def get_point_pricing_context(inputs: dict[str, Any]) -> dict[str, Any]:
     """Returns price + Greeks for both call and put flavours of the option."""
     results: dict[str, Any] = {}
     try:
-        greek_method = inputs.get("model_params", {}).get("greek_method", "default")
+        request = PricingRequest.from_dict(inputs)
+        method = request.greek_method
 
-        _, pricer_c = get_option_and_pricer(inputs, "call")
+        _, pricer_c = request.with_overrides(option_flavour="call").build()
         price_res_c = pricer_c.price()
-        greeks_c = GREEK_ENGINE.get_calculator(pricer_c, greek_method).calculate()
+        greeks_c = GREEK_ENGINE.get_calculator(pricer_c, method).calculate()
 
-        _, pricer_p = get_option_and_pricer(inputs, "put")
+        _, pricer_p = request.with_overrides(option_flavour="put").build()
         if hasattr(pricer_c, "z_matrix") and pricer_c.z_matrix is not None:
             pricer_p.z_matrix = pricer_c.z_matrix
         price_res_p = pricer_p.price()
-        greeks_p = GREEK_ENGINE.get_calculator(pricer_p, greek_method).calculate()
+        greeks_p = GREEK_ENGINE.get_calculator(pricer_p, method).calculate()
 
         results["call"] = {
             "price": price_res_c[0],
@@ -110,22 +85,19 @@ def get_point_pricing_context(inputs: dict[str, Any]) -> dict[str, Any]:
 
 
 def _price_single_point(
-    base_inputs: dict[str, Any],
-    axis_map: dict[str, str],
-    x_axis_key: str,
-    y_axis_key: str,
+    call_request: PricingRequest,
+    put_request: PricingRequest,
+    x_attr: str,
+    y_attr: str,
     x_value: float,
     y_value: float,
     shared_z_matrix: npt.NDArray[np.float64] | None,
 ) -> tuple[float, float]:
-    """Prices a single (x, y) grid point under the configured option."""
+    """Prices a single (x, y) grid point under pre-resolved request specs."""
+    overrides = {x_attr: x_value, y_attr: y_value}
     try:
-        local_inputs = base_inputs.copy()
-        local_inputs["contract_params"] = base_inputs["contract_params"].copy()
-        local_inputs["contract_params"][axis_map[x_axis_key]] = x_value
-        local_inputs["contract_params"][axis_map[y_axis_key]] = y_value
-        _, pricer_call = get_option_and_pricer(local_inputs, "call")
-        _, pricer_put = get_option_and_pricer(local_inputs, "put")
+        _, pricer_call = call_request.with_overrides(**overrides).build()
+        _, pricer_put = put_request.with_overrides(**overrides).build()
         if shared_z_matrix is not None:
             if hasattr(pricer_call, "z_matrix"):
                 pricer_call.z_matrix = shared_z_matrix
@@ -134,16 +106,15 @@ def _price_single_point(
         price_call, _ = pricer_call.price()
         price_put, _ = pricer_put.price()
         return float(price_call), float(price_put)
-    except Exception:
+    except _SURFACE_FAILURE_EXCEPTIONS:
         _log.debug("surface point failed", exc_info=True)
         return float("nan"), float("nan")
 
 
 def _vectorised_bs_surface(
-    inputs: dict[str, Any],
-    axis_map: dict[str, str],
-    x_key: str,
-    y_key: str,
+    request: PricingRequest,
+    x_attr: str,
+    y_attr: str,
     grid_x: np.ndarray,
     grid_y: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray] | None:
@@ -153,14 +124,14 @@ def _vectorised_bs_surface(
     domain (e.g. non positive vol or maturity), letting the caller fall
     back to the generic path.
     """
-    base = inputs["contract_params"]
-    s = float(base.get("s", 100.0))
-    k = float(base.get("k", 100.0))
-    t = float(base.get("t", 1.0))
-    r = float(base.get("r", 0.0))
+    base = request.contract_params
+    s = float(base["s"])
+    k = float(base["k"])
+    t = float(base["t"])
+    r = float(base["r"])
     q = float(base.get("q", 0.0))
-    sigma = float(base.get("sigma", 0.2))
-    overrides = {axis_map[x_key]: grid_x, axis_map[y_key]: grid_y}
+    sigma = float(base["sigma"])
+    overrides = {x_attr: grid_x, y_attr: grid_y}
     s_arr = np.asarray(
         overrides.get("s", np.broadcast_to(s, grid_x.shape)), dtype=np.float64
     )
@@ -208,44 +179,41 @@ def get_surface_data(
     ranges: dict[str, np.ndarray],
 ) -> tuple[np.ndarray, np.ndarray]:
     """Builds call and put price surfaces over a 2D parameter grid."""
+    request = PricingRequest.from_dict(inputs)
+    x_attr = axis_map[x_key]
+    y_attr = axis_map[y_key]
     grid_x, grid_y = np.meshgrid(ranges[x_key], ranges[y_key])
-    if inputs["pricer_type"] == "Black-Scholes":
-        fast = _vectorised_bs_surface(
-            inputs, axis_map, x_key, y_key, grid_x, grid_y
-        )
+    if request.pricer_type == "Black-Scholes":
+        fast = _vectorised_bs_surface(request, x_attr, y_attr, grid_x, grid_y)
         if fast is not None:
             return fast
+
     shape = grid_x.shape
-    shared_z_matrix = None
-    if inputs["pricer_type"] in ["Monte Carlo", "Longstaff-Schwartz"]:
-        model_params = inputs.get("model_params", {})
-        num_sims = model_params.get("num_sims", 10000)
-        num_steps = model_params.get("num_steps", 100)
+    shared_z_matrix: npt.NDArray[np.float64] | None = None
+    if request.pricer_type in _SHARED_Z_PRICERS:
+        num_sims = request.model_params.get("num_sims", 10000)
+        num_steps = request.model_params.get("num_steps", 100)
         shared_z_matrix = np.random.standard_normal((num_sims, num_steps))
+
+    call_request = request.with_overrides(option_flavour="call")
+    put_request = request.with_overrides(option_flavour="put")
+
     surface_c = np.empty(shape)
     surface_p = np.empty(shape)
-    indices = list(np.ndindex(shape))
     grid_x_flat = grid_x.ravel()
     grid_y_flat = grid_y.ravel()
-
-    def _price_idx(flat_idx: int) -> tuple[int, float, float]:
+    cols = shape[1]
+    for flat_idx in range(grid_x_flat.size):
         c, p = _price_single_point(
-            inputs, axis_map, x_key, y_key,
+            call_request,
+            put_request,
+            x_attr,
+            y_attr,
             float(grid_x_flat[flat_idx]),
             float(grid_y_flat[flat_idx]),
             shared_z_matrix,
         )
-        return flat_idx, c, p
-
-    workers = _surface_workers()
-    if workers <= 1 or len(indices) <= 1:
-        results = (_price_idx(k) for k in range(len(indices)))
-    else:
-        with ThreadPoolExecutor(max_workers=workers) as pool:
-            results = list(pool.map(_price_idx, range(len(indices))))
-
-    for flat_idx, c, p in results:
-        i, j = indices[flat_idx]
+        i, j = divmod(flat_idx, cols)
         surface_c[i, j] = c
         surface_p[i, j] = p
     return np.nan_to_num(surface_c), np.nan_to_num(surface_p)

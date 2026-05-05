@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import numpy as np
 
 from ._cache import cached
-from .pricing import _surface_workers, get_option_and_pricer
+from ._request import PricingRequest
 from .registry import GREEK_ENGINE
 
 _GREEK_KEYS: tuple[str, ...] = ("delta", "gamma", "vega", "theta", "rho")
+_SHARED_Z_PRICERS: frozenset[str] = frozenset({"Monte Carlo", "Longstaff-Schwartz"})
 
 
 @cached()
@@ -20,45 +20,36 @@ def get_greek_data(
 ) -> tuple[dict[str, list[float]], dict[str, list[float]]]:
     """Returns per-strike Greek series for both call and put flavours.
 
-    Fan-out across spot points uses a thread pool capped to
-    `_surface_workers()` to mirror the surface code path and avoid
-    over-subscribing JIT-internal `prange` threads.
+    Sequential outer loop. JIT-internal `prange` already saturates cores
+    inside the parallel pricer kernels, so an additional Python-level
+    `ThreadPoolExecutor` would be both redundant and unsafe under numba's
+    default workqueue threading layer.
     """
-    greek_method = inputs.get("model_params", {}).get("greek_method", "default")
+    request = PricingRequest.from_dict(inputs)
+    method = request.greek_method
 
     z_matrix = None
-    if inputs["pricer_type"] in ["Monte Carlo", "Longstaff-Schwartz"]:
-        model_params = inputs.get("model_params", {})
-        num_sims = model_params.get("num_sims", 10000)
-        num_steps = model_params.get("num_steps", 100)
+    if request.pricer_type in _SHARED_Z_PRICERS:
+        num_sims = request.model_params.get("num_sims", 10000)
+        num_steps = request.model_params.get("num_steps", 100)
         z_matrix = np.random.standard_normal((num_sims, num_steps))
 
-    def _greeks_at(s_val: float) -> tuple[dict[str, Any], dict[str, Any]]:
-        local = inputs.copy()
-        local["contract_params"] = inputs["contract_params"].copy()
-        local["contract_params"]["s"] = float(s_val)
-        _, pricer_c = get_option_and_pricer(local, "call")
-        _, pricer_p = get_option_and_pricer(local, "put")
+    call_request = request.with_overrides(option_flavour="call")
+    put_request = request.with_overrides(option_flavour="put")
+
+    call_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
+    put_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
+    for s_val in s_range:
+        s_float = float(s_val)
+        _, pricer_c = call_request.with_overrides(s=s_float).build()
+        _, pricer_p = put_request.with_overrides(s=s_float).build()
         if z_matrix is not None:
             if hasattr(pricer_c, "z_matrix"):
                 pricer_c.z_matrix = z_matrix
             if hasattr(pricer_p, "z_matrix"):
                 pricer_p.z_matrix = z_matrix
-        g_c = GREEK_ENGINE.get_calculator(pricer_c, greek_method).calculate()
-        g_p = GREEK_ENGINE.get_calculator(pricer_p, greek_method).calculate()
-        return g_c, g_p
-
-    n_pts = len(s_range)
-    workers = _surface_workers()
-    if workers <= 1 or n_pts <= 1:
-        pairs = [_greeks_at(s) for s in s_range]
-    else:
-        with ThreadPoolExecutor(max_workers=workers) as pool:
-            pairs = list(pool.map(_greeks_at, s_range))
-
-    call_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
-    put_greeks: dict[str, list[float]] = {k: [] for k in _GREEK_KEYS}
-    for greeks_c, greeks_p in pairs:
+        greeks_c = GREEK_ENGINE.get_calculator(pricer_c, method).calculate()
+        greeks_p = GREEK_ENGINE.get_calculator(pricer_p, method).calculate()
         for key in _GREEK_KEYS:
             call_greeks[key].append(greeks_c.get(key, np.nan))
             put_greeks[key].append(greeks_p.get(key, np.nan))
